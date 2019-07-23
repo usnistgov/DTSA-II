@@ -1,0 +1,94 @@
+<izpack:shortcuts version="5.0"
+    xmlns:izpack="http://izpack.org/schema/shortcuts"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://izpack.org/schema/shortcuts http://izpack.org/schema/5.0/izpack-shortcuts-5.0.xsd">
+        <programGroup defaultName="NIST Applications" location="applications"/>
+        <shortcut name="$APP_NAME $APP_VER" 
+                  target="$INSTALL_PATH/DTSA-II.exe"
+                  workingDirectory="$INSTALL_PATH"
+                  programGroup="true"
+                  startMenu="true"
+                  description="Power tools for x-ray microanalysis">
+            <createForPack name="NIST DTSA-II Application"/>
+        </shortcut>
+        <shortcut name="Basic scripting in DTSA-II" 
+                  target="$INSTALL_PATH/doc/Basic scripting in DTSA-II.pdf"
+                  programGroup="true"
+                  description="Documentation for basic scripting within DTSA-II">
+            <createForPack name="NIST DTSA-II Application"/>
+        </shortcut>
+        <shortcut name="Introduction to DTSA-II" 
+                  target="$INSTALL_PATH/doc/Introduction to DTSA-II.pdf"
+                  programGroup="true"
+                  description="A presentation with basic instructions for using NIST DTSA-II">
+            <createForPack name="NIST DTSA-II Application"/>
+        </shortcut>
+        <shortcut name="Microscopy Today - Getting Started with NIST DTSA-II" 
+                  target="$INSTALL_PATH/doc/MT1_GettingStartedWithNIST_DTSA_II.pdf"
+                  programGroup="true"
+                  description="Getting Started with NIST DTSA-II from Microscopy Today">
+            <createForPack name="NIST DTSA-II Application"/>
+        </shortcut>
+        <shortcut name="Microscopy Today - Manipulating Spectra Using NIST DTSA-II" 
+                  target="$INSTALL_PATH/doc/MT2_ManipulatingSpectraUsingDTSA_II.pdf"
+                  programGroup="true"
+                  description="Instructions for using NIST DTSA-II to manipulate spectra">
+            <createForPack name="NIST DTSA-II Application"/>
+        </shortcut>
+        <shortcut name="Microscopy Today - Standards-based Quantication in DTSA-II - Part 1" 
+                  target="$INSTALL_PATH/doc/MT3_Standards_based_Quantication_Part1.pdf"
+                  programGroup="true"
+                  description="Instructions for performing standards-based quantification in NIST DTSA-II - Part 1">
+            <createForPack name="NIST DTSA-II Application"/>
+        </shortcut>
+        <shortcut name="Microscopy Today - Standards-based Quantication in DTSA-II - Part 2" 
+                  target="$INSTALL_PATH/doc/MT4_Standards_based_Quantication_Part2.pdf"
+                  programGroup="true"
+                  description="Instructions for performing standards-based quantification in NIST DTSA-II - Part 2">
+            <createForPack name="NIST DTSA-II Application"/>
+        </shortcut>
+        <shortcut name="Introduction to Standard Bundles" 
+                  target="$INSTALL_PATH/doc/Standard Bundles.pdf"
+                  programGroup="true"
+                  description="Introduces 'standard bundles' - a tool for facilitating quantitative analysis.">
+            <createForPack name="NIST DTSA-II Application"/>
+        </shortcut>
+        <shortcut name="Newbury and Ritchie (2014) - High precision and accuracy quantitative EDS" 
+                  target="$INSTALL_PATH/doc/Newbury2014_Limits_of_Quantitative_EDS.pdf"
+                  programGroup="true"
+                  description="How well can NIST DTSA-II quantify the composition from EDS spectra?">
+            <createForPack name="NIST DTSA-II Application"/>
+        </shortcut>
+        <shortcut name="NIST Graf $APP_VER" 
+                  target="$INSTALL_PATH/graf.exe"
+                  workingDirectory="$INSTALL_PATH"
+                  programGroup="true"
+                  startMenu="true"
+                  description="Data analysis tools for automated particle analysis data">
+            <createForPack name="NIST Graf Application"/>
+        </shortcut>
+        <shortcut name="NIST Graf $APP_VER" 
+                  target="$INSTALL_PATH/graf.exe"
+                  workingDirectory="$INSTALL_PATH"
+                  programGroup="true"
+                  startMenu="true"
+                  description="Data analysis tools for automated particle analysis data">
+            <createForPack name="SEMantics"/>
+        </shortcut>
+        <shortcut name="NIST Relocate $APP_VER" 
+                  target="$INSTALL_PATH/Relocate.exe"
+                  workingDirectory="$INSTALL_PATH"
+                  startMenu="true"
+                  programGroup="true"
+                  description="Coordinate translation tool">
+            <createForPack name="NIST Relocation Application"/>
+        </shortcut>
+        <shortcut name="NIST Glass Database 1.3" 
+                  target="$INSTALL_PATH/GlassDatabase.exe"
+                  workingDirectory="$INSTALL_PATH"
+                  startMenu="true"
+                  programGroup="true"
+                  description="Search the NIST Glass database">
+            <createForPack name="NIST Glass Database"/>
+        </shortcut>
+</izpack:shortcuts>

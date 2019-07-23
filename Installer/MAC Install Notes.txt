@@ -1,0 +1,16 @@
+Building the Mac app and package
+
+1.  Copy all the files from the generic install JAR file into an accessible directory
+2.  Use the JAR bundler to build an App bundle from the JAR files.  See the images 
+"Jar Bundler - Build.tiff", "Jar Bundler - Classpath.tiff" and "Jar Bundler - Properties.tiff" to 
+properly configure the bundle.
+3.  Build and save the bundle to "DTSA-II XXX.app" where XXX is the version designator
+4.  From the app bundle properties menu select  "Show Package Contents"
+5.  Navigate to 'Contents/Resources/Java'
+6.  Copy the 'Lib' directory from the files in step 1 into this directory.
+7.  Use the 'Disk Utility.app' to build a disk image containing "DTSA-II XXX.app" 
+and the PDF documentation.
+8.  Use the 'Disk Utility.app' to transform the disk image into a compressed disk image.
+9.  Name this image 'dtsa2_XXX.dmg'
+10. Download it to the web site
+11. Update the links on the installation.html page to link to this file. 

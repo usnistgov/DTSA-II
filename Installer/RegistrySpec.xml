@@ -1,0 +1,14 @@
+<izpack:registry version="5.0"
+    xmlns:izpack="http://izpack.org/schema/registry"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://izpack.org/schema/registry http://izpack.org/schema/5.0/izpack-registry-5.0.xsd">
+    <pack name="NIST DTSA-II Application">
+        <key root="HKCU" keypath="Software/NIST/DTSA-II"/>
+    </pack>
+    <pack name="NIST Graf Application">
+        <key root="HKCU" keypath="Software/NIST/Graf"/>
+    </pack>    
+    <pack name="NIST Relocate Application">
+        <key root="HKCU" keypath="Software/NIST/Relocate"/>
+    </pack>    
+</izpack:registry>

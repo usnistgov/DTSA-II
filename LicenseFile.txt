@@ -1,0 +1,18 @@
+DTSA-II and the EPQ library license
+------------------------------------
+
+Public domain: This software was developed at the National Institute of Standards and Technology by employees of the Federal Government in the course of their official duties. Pursuant to title 17 Section 105 of the United States Code this software is not subject to copyright protection and is in the public domain. 
+
+Responsibility: DTSA-II and the EPQ library is an experimental system. NIST assumes no responsibility whatsoever for its use by other parties, and makes no guarantees, expressed or implied, about its quality, reliability, or any other characteristic. 
+
+Acknowledgement: We would appreciate acknowledgement if the software is used to generated published results.
+
+Distribution: This software can be redistributed and/or modified freely.  The author requests that any derivative works bear some notice that they are derived from DTSA-II or EPQ, and any modified versions bear some notice that they have been modified.
+
+
+Disclaimer: Certain software products, both public-domain and commercial, are identified in DTSA-II and the EPQ library in order to adequately document the software. Identification of such products does not imply recommendation or endorsement by NIST, nor does it imply that the identified software is the best available. Conversely, the omission of any such software does not imply its unsuitability for use.
+
+Privacy Policy:  This software maintains your privacy.  The software does not harvest user information nor does it transmit user data to any external site.
+
+License version: 1.2 
+Updated: 28-Jan-2015

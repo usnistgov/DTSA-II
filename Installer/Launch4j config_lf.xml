@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch4jConfig>
+  <dontWrapJar>true</dontWrapJar>
+  <headerType>gui</headerType>
+  <jar>dtsa2.jar</jar>
+  <outfile>C:\Users\nritchie.NIST\workspace\DTSA2\Installer\DTSA-II Build\DTSA-II (large font).exe</outfile>
+  <errTitle>NIST DTSA-II</errTitle>
+  <cmdLine></cmdLine>
+  <chdir></chdir>
+  <priority>normal</priority>
+  <downloadUrl>http://java.com/download</downloadUrl>
+  <supportUrl>http://www.cstl.nist.gov/div837/837.02/epq/dtsa2/index.html</supportUrl>
+  <stayAlive>false</stayAlive>
+  <restartOnCrash>false</restartOnCrash>
+  <manifest></manifest>
+  <icon>C:\Users\nritchie.NIST\workspace\DTSA2\trixy.ico</icon>
+  <jre>
+    <path></path>
+    <bundledJre64Bit>false</bundledJre64Bit>
+    <bundledJreAsFallback>false</bundledJreAsFallback>
+    <minVersion>1.8.0</minVersion>
+    <maxVersion></maxVersion>
+    <jdkPreference>preferJre</jdkPreference>
+    <runtimeBits>64/32</runtimeBits>
+    <initialHeapPercent>10</initialHeapPercent>
+    <maxHeapPercent>70</maxHeapPercent>
+    <opt>-DWindows.controlFont=Tahoma-plain-11 </opt>
+    <opt>-DWindows.menuFont=Tahoma-plain-12 </opt>
+    <opt>-DPlastic.controlFont=Tahoma-plain-11 </opt>
+    <opt>-DPlastic.menuFont=Tahoma-bold-11</opt>
+  </jre>
+  <versionInfo>
+    <fileVersion>2018.8.29.1</fileVersion>
+    <txtFileVersion>Kelvin  2018-08-29</txtFileVersion>
+    <fileDescription>NIST DTSA-II Kelvin</fileDescription>
+    <copyright>Not subject to copyright (US government work)</copyright>
+    <productVersion>2018.8.29.1</productVersion>
+    <txtProductVersion>Kelvin  2018-08-29</txtProductVersion>
+    <productName>NIST DTSA-II Kelvin</productName>
+    <companyName>National Insitute of Standards and Technology</companyName>
+    <internalName>DTSA-II</internalName>
+    <originalFilename>DTSA-II.exe</originalFilename>
+    <trademarks></trademarks>
+    <language>ENGLISH_US</language>
+  </versionInfo>
+</launch4jConfig>

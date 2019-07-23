@@ -1,0 +1,14 @@
+Tue Jul 16 07:47:45 EDT 2019 : Apache Derby Network Server - 10.14.1.0 - (1808820) started and ready to accept connections on port 1527
+----------------------------------------------------------------
+Tue Jul 16 07:47:45 EDT 2019:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.14.1.0 - (1808820): instance a816c00e-016b-fa9c-254e-00003ec44bd8 
+on database directory C:\Users\nritchie\NIST DTSA-II Reports\Database v2 with class loader jdk.internal.loader.ClassLoaders$AppClassLoader@2aae9190 
+Loaded from file:/C:/Users/nritchie/.m2/repository/org/apache/derby/derby/10.14.1.0/derby-10.14.1.0.jar
+java.vendor=Amazon.com Inc.
+java.runtime.version=11.0.3+7-LTS
+user.dir=C:\Users\nritchie\workspace\DTSA2
+os.name=Windows 10
+os.arch=amd64
+os.version=10.0
+derby.system.home=null
+Database Class Loader started - derby.database.classpath=''

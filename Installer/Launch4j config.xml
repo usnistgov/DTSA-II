@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch4jConfig>
+  <dontWrapJar>true</dontWrapJar>
+  <headerType>gui</headerType>
+  <jar>dtsa2.jar</jar>
+  <outfile>C:\Users\nritchie\workspace\DTSA2\Installer\DTSA-II Build\DTSA-II.exe</outfile>
+  <errTitle>NIST DTSA-II</errTitle>
+  <cmdLine></cmdLine>
+  <chdir></chdir>
+  <priority>normal</priority>
+  <downloadUrl>http://java.com/download</downloadUrl>
+  <supportUrl>http://www.cstl.nist.gov/div837/837.02/epq/dtsa2/index.html</supportUrl>
+  <stayAlive>false</stayAlive>
+  <restartOnCrash>false</restartOnCrash>
+  <manifest></manifest>
+  <icon>C:\Users\nritchie\workspace\DTSA2\trixy.ico</icon>
+  <jre>
+    <path>java-runtime</path>
+    <bundledJre64Bit>true</bundledJre64Bit>
+    <bundledJreAsFallback>false</bundledJreAsFallback>
+    <minVersion>1.8.0</minVersion>
+    <maxVersion></maxVersion>
+    <jdkPreference>preferJre</jdkPreference>
+    <runtimeBits>64/32</runtimeBits>
+    <initialHeapPercent>10</initialHeapPercent>
+    <maxHeapPercent>70</maxHeapPercent>
+  </jre>
+  <versionInfo>
+    <fileVersion>2019.05.17.1</fileVersion>
+    <txtFileVersion>Lorentz 2019-05-17</txtFileVersion>
+    <fileDescription>NIST DTSA-II Lorentz</fileDescription>
+    <copyright>Not subject to copyright (US government work)</copyright>
+    <productVersion>2019.05.17.1</productVersion>
+    <txtProductVersion>Lorentz 2019-05-17</txtProductVersion>
+    <productName>NIST DTSA-II Lorentz</productName>
+    <companyName>National Insitute of Standards and Technology</companyName>
+    <internalName>DTSA-II</internalName>
+    <originalFilename>DTSA-II.exe</originalFilename>
+    <trademarks></trademarks>
+    <language>ENGLISH_US</language>
+  </versionInfo>
+</launch4jConfig>

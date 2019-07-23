@@ -1,0 +1,131 @@
+body { 
+	background-color: #FFFFFF;
+	font-family: Tahoma, Geneva, sans-serif;
+	font-size: small;
+	color:#000000
+}
+
+p.error {
+	color: red;
+}
+
+a:link { color:#000000 }
+a:visited { color:#000000 }
+a:hover { color:#FF00FF }
+
+p {
+	background-color: #FFFFFF;
+	margin-top: 0pt;
+	margin-bottom: 0pt;
+}
+
+h1 {
+	font-size: x-large;
+	font-weight: lighter;
+	font-variant:small-caps;
+	background-color: #FFFFFF;
+	color:#000000
+	margin-top: 0pt;
+	margin-bottom: 6pt;
+}
+
+h2 {
+	font-size: large;
+    font-weight: lighter;
+	background-color: #FFFFFF;
+	color:#000000
+	margin-top: 6pt;
+	margin-bottom: 6pt;
+}
+
+h3 {
+	font-size: medium;
+    font-weight: lighter;
+    background-color: #FFFFFF;
+    color:#000000
+	margin-top:6pt;
+	margin-bottom: 6pt;
+	position: relative;
+	left: 1em;
+}
+
+table {
+    background-color: #FFFFFF;
+	border-style: none;
+	border-width: 0px;
+	border-collapse: collapse;
+    font-size: small;
+    position: relative;
+    left: 2em;
+}
+
+th {
+    background-color: #F0F0F0;
+    border-color: #D0D0D0;
+    border-style: solid;
+    border-width: thin;
+    border-padding: 3pt;
+    text-align: left;
+    font-weight: normal;
+}
+
+td {
+    background-color: #FFFFFF;
+    border-color: #D0D0D0;
+    border-style: solid;
+    border-width: thin;
+    padding: 3px 3px 3px 3px;
+    text-align: left;
+}
+
+tr {
+    border-color: #D0D0D0;
+    border-style: solid;
+    border-width: thin;
+    border-padding: 0pt;
+}
+
+table.leftalign {
+    background-color: #FFFFFF;
+    border-style: none;
+    border-width: 0px;
+    border-collapse: collapse;
+    font-size: small;
+    position: relative;
+    left: 0em;
+}
+
+table.noborder {
+    width: 100%;
+    border-style: none;
+    background-color: white;
+    position: relative;
+    left: 0em;
+}
+
+table.noborder tr {
+    border-style: none;
+    border-padding: 3px;
+}
+
+
+table.noborder th {
+    border-width: 0px;
+    padding: 1px;
+    border-style: inset;
+    border-color: gray;
+    background-color: white;
+    -moz-border-radius: ;
+}
+
+table.noborder td {
+    border-width: 0px;
+    padding: 1px;
+    border-style: inset;
+    border-color: gray;
+    background-color: white;
+}
+
+div { 
+	page-break-before: always;
+}
