@@ -18,7 +18,6 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.StringTokenizer;
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.LinkedBlockingDeque;
 
@@ -748,20 +747,6 @@ public class JCommandLine
          mConsole.setOut(mStdOut);
          mCommands.add("import sys");
          final String path = System.getProperty("user.dir").replace('\\', '/');
-         if(false) {
-            final String jcp = System.getProperty("java.class.path");
-            if(jcp != null) {
-               final StringTokenizer st = new StringTokenizer(jcp, ";");
-               while(st.hasMoreTokens()) {
-                  final String nextToken = st.nextToken().replace('\\', '/');
-                  if(nextToken.endsWith(".jar")) {
-                     mCommands.add("print \"" + nextToken + "\"");
-                     mCommands.add("sys.add_package(\"" + nextToken + "\")");
-                  }
-               }
-            }
-            mCommands.add("print \"" + path + "\"");
-         }
          mCommands.add("sys.path.append(\"" + path + "/Lib\")");
          // mCommands.add("sys.add_extdir(\"" + path + "\")");
       }

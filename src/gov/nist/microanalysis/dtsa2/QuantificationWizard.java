@@ -1777,8 +1777,6 @@ public class QuantificationWizard
                   jTableModel_Standards.setValueAt(newMat, r, COMPOSITION_COL);
                   if(errs == null)
                      getWizard().setMessageText("The composition has been set to " + newMat.toString());
-                  else
-                     getWizard().setExtendedError("This material may be a poor choice of standard material.", errs.toString());
                } else {
                   final DefaultComboBoxModel<Composition> dcbm = (DefaultComboBoxModel<Composition>) src.getModel();
                   jTableModel_Standards.setValueAt(dcbm.getElementAt(0), r, COMPOSITION_COL);

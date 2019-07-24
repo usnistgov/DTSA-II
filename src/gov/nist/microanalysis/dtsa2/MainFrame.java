@@ -2017,8 +2017,7 @@ public class MainFrame
          userPref.putInt(POSITION_LEFT, (int) bounds.getY());
          userPref.putInt(SPLITTER_POSITION, jSplitPane_MainVert.getDividerLocation());
       }
-      final int z = 1;
-      userPref.putInt("KLMDialog\\Atomic Number", z != Element.elmNone ? z : Element.elmC);
+      userPref.putInt("KLMDialog\\Atomic Number", Element.elmH);
       if(mSessionStarted == null)
          appendHTML("<p><b>Session Terminated:</b> " + DateFormat.getTimeInstance().format(new Date()) + "</p>");
       performShutdownScript();
