@@ -3,7 +3,7 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://izpack.org/schema/installation http://izpack.org/schema/5.0/izpack-installation-5.0.xsd">
     <!-- The script doesn't work within Eclipse but can be build from the command line 
-    C:\Users\nritchie\workspace\DTSA2\Installer>"C:\Program Files (x86)\IzPack\bin\compile.bat" -h ${IZPACK_HOME} izPack_install.xml -b . -o dtsa2_lorentz.jar -k standard -->
+    C:\Users\nritchie\git\nist-dtsa-ii\Installer>"C:\Program Files (x86)\IzPack\bin\compile.bat" -h ${IZPACK_HOME} izPack_install.xml -b . -o dtsa2_lorentz.jar -k standard -->
     <variables>
         <variable name="TargetPanel.dir.windows" value="$USER_HOME\AppData\Local\NIST\$APP_NAME $APP_VER"/>
         <variable name="TargetPanel.dir.unix" value="/usr/local/NIST/$APP_NAME $APP_VER"/>
@@ -18,7 +18,7 @@
         <property name="info.url" value="http://www.cstl.nist.gov/div837/837.02/epq/dtsa2/index.html"/>
         <property name="info.company.name" value="NIST"/>
         <property name="info.version" value="Lorentz"/>
-        <property name="info.release-date" value="2019-07-22"/>
+        <property name="info.release-date" value="2019-07-29"/>
     </properties>
     <info>
         <appname>@{info.company.name} @{info.appName}</appname>
@@ -87,7 +87,7 @@
             <fileset dir="$BUILDPATH/../../Lib/dtsa2" targetdir="${INSTALL_PATH}/Lib/dtsa2" excludes="*/.class"/>
         </pack>
         <pack name="Java Runtime for Windows" preselected="yes" required="no">
-            <description>A recent Java runtime environment for Windows.</description>
+            <description>An integrated Java 11.0 JRE (run-time environment) for MS Windows only!!.</description>
             <fileset dir="$BUILDPATH/java-runtime" targetdir="${INSTALL_PATH}/java-runtime"/>
         </pack>
         <pack name="NIST DTSA-II Application" preselected="yes" required="no">
