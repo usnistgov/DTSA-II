@@ -1263,6 +1263,7 @@ Example:
           sp.setDetector(det)
           comp = sp.getCompositionProperty(epq.SpectrumProperties.StandardComposition)
           qus.addStandard(elm, comp, ju.Collections.EMPTY_SET, spec)
+          coating = sp.getObjectWithDefault(epq.SpectrumProperties.ConductiveCoating, null)
           if coating:
               qus.assignCoatingToStandard(spec, coating)
    for xrt, spec in refs.iteritems():
@@ -1491,13 +1492,22 @@ def tabulateAsOxides(specs, withErrs=False, prop=epq.SpectrumProperties.Microana
               tmp = "%s\t" % (tmp,)
        print tmp  
 
- 
+
 def tabulate(specs, withErrs=False, normalize=False, prop=epq.SpectrumProperties.MicroanalyticalComposition, precision=4, massFrac=True, asOxides=False, total=True, stageCoords=tuple()):
    """tabulate(specs,[withErrs=False],[normalize=False],[prop=epq.SpectrumProperties.MicroanalyticalComposition],[precision=4],[massFrac=True],[asOxides=False],[total=True],[stageCoords=()])
 Tabulate the compositions associated with the specified collection of spectra.  Rows represent spectra and columns represent elements. \
 You can use 'k', 'c' or 's' for prop for k-ratios, measured composition or standard composition respectively. precision>4 will output \
 additional decimal digits of precision. [massFrac->False for atomic fraction.] [total -> True|False] \
 [stageCoords->( ['x',] ['y',] ['z',] ['r',] ['t',] ['b'] )"""
+   print tabulateHelper(specs, withErrs, normalize, prop, precision, massFrac, asOxides, total, stageCoords)
+
+
+def printTab(file, specs, withErrs=False, normalize=False, prop=epq.SpectrumProperties.MicroanalyticalComposition, precision=4, massFrac=True, asOxides=False, total=True, stageCoords=tuple()):
+   with open(file,"a") as pw:
+       pw.write(tabulateHelper(specs, withErrs, normalize, prop, precision, massFrac, asOxides, total, stageCoords))
+
+
+def tabulateHelper(specs, withErrs, normalize, prop, precision, massFrac, asOxides, total, stageCoords):
    def prStgCoord(spec, coords):
       def pcoord(ax, coord):
          return ("%2.3f" % coord.get(ax) if coord.isPresent(ax) else "-")

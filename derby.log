@@ -1,11 +1,11 @@
-Wed Jul 24 15:44:54 EDT 2019 : Apache Derby Network Server - 10.14.1.0 - (1808820) started and ready to accept connections on port 1527
+Wed Sep 11 11:36:59 EDT 2019 : Apache Derby Network Server - 10.14.1.0 - (1808820) started and ready to accept connections on port 1527
 ----------------------------------------------------------------
-Wed Jul 24 15:44:54 EDT 2019:
-Booting Derby version The Apache Software Foundation - Apache Derby - 10.14.1.0 - (1808820): instance a816c00e-016c-2583-da57-00003ec3a8f0 
-on database directory C:\Users\nritchie\NIST DTSA-II Reports\Database v2 with class loader jdk.internal.loader.ClassLoaders$AppClassLoader@2aae9190 
+Wed Sep 11 11:36:59 EDT 2019:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.14.1.0 - (1808820): instance a816c00e-016d-20f8-7ef8-00003ec4b090 
+on database directory C:\Users\nritchie\NIST DTSA-II Reports\Database v2 with class loader jdk.internal.loader.ClassLoaders$AppClassLoader@2f333739 
 Loaded from file:/C:/Users/nritchie/.m2/repository/org/apache/derby/derby/10.14.1.0/derby-10.14.1.0.jar
 java.vendor=Amazon.com Inc.
-java.runtime.version=11.0.3+7-LTS
+java.runtime.version=11.0.4+11-LTS
 user.dir=C:\Users\nritchie\git\nist-dtsa-ii
 os.name=Windows 10
 os.arch=amd64

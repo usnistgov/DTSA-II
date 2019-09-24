@@ -26,12 +26,12 @@
     <maxHeapPercent>70</maxHeapPercent>
   </jre>
   <versionInfo>
-    <fileVersion>2019.05.29.1</fileVersion>
-    <txtFileVersion>Lorentz 2019-05-29</txtFileVersion>
+    <fileVersion>2019.8.30.1</fileVersion>
+    <txtFileVersion>Lorentz 2019-08-30</txtFileVersion>
     <fileDescription>NIST DTSA-II Lorentz</fileDescription>
     <copyright>Not subject to copyright (US government work)</copyright>
-    <productVersion>2019.05.29.1</productVersion>
-    <txtProductVersion>Lorentz 2019-05-29</txtProductVersion>
+    <productVersion>2019.8.30.1</productVersion>
+    <txtProductVersion>Lorentz 2019-08-30</txtProductVersion>
     <productName>NIST DTSA-II Lorentz</productName>
     <companyName>National Insitute of Standards and Technology</companyName>
     <internalName>DTSA-II</internalName>
