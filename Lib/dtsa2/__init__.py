@@ -1263,9 +1263,6 @@ Example:
           sp.setDetector(det)
           comp = sp.getCompositionProperty(epq.SpectrumProperties.StandardComposition)
           qus.addStandard(elm, comp, ju.Collections.EMPTY_SET, spec)
-          coating = sp.getObjectWithDefault(epq.SpectrumProperties.ConductiveCoating, null)
-          if coating:
-              qus.assignCoatingToStandard(spec, coating)
    for xrt, spec in refs.iteritems():
       xrt = transition(xrt)
       elm = xrt.getElement()
@@ -1319,7 +1316,7 @@ references to use for shape information.
     if e0<0.0:
        raise "Please specify a beam energy in the unknown spectrum"
     qus = multiQuant(det, e0, stds, refs, preferred, elmByDiff, oByStoic, oxidizer, extraKRatios, fiat)
-    qus.setUnkCoating(coating)
+    qus.setCoating(unknown.getProperties().getObjectWithDefault(epq.SpectrumProperties.ConductiveCoating, None))
     return qus.compute(unknown)
 
 def multiKRatios(det, e0, stds, refs={}):
