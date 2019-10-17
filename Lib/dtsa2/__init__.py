@@ -1316,7 +1316,7 @@ references to use for shape information.
     if e0<0.0:
        raise "Please specify a beam energy in the unknown spectrum"
     qus = multiQuant(det, e0, stds, refs, preferred, elmByDiff, oByStoic, oxidizer, extraKRatios, fiat)
-    qus.setCoating(unknown.getProperties().getObjectWithDefault(epq.SpectrumProperties.ConductiveCoating, None))
+                                                                                                                
     return qus.compute(unknown)
 
 def multiKRatios(det, e0, stds, refs={}):
@@ -1518,6 +1518,7 @@ def tabulateHelper(specs, withErrs, normalize, prop, precision, massFrac, asOxid
       for ax in map(cmap.get, coords) :
          res = "%s\t%s" % (res, pcoord(ax, coord))        
       return res
+   ans = ""
    if isinstance(prop, str):
       propMap = { 
              'k' : epq.SpectrumProperties.KRatios,
@@ -1553,7 +1554,8 @@ def tabulateHelper(specs, withErrs, normalize, prop, precision, massFrac, asOxid
                tmp = "%s\tU(Total)" % tmp
          if len(stageCoords) > 0:
             tmp = tmp + "\t" + "\t".join(map(lambda s : s.upper(), stageCoords)) 
-         print tmp
+
+         ans = ans + "\n" + tmp
          for spec in specs:
             if res.has_key(spec):
                c = res[spec]
@@ -1571,21 +1573,24 @@ def tabulateHelper(specs, withErrs, normalize, prop, precision, massFrac, asOxid
                       tmp = fmtStr % (tmp, 100.0 * u.uncertainty())
                if len(stageCoords) > 0:
                    tmp = "%s%s" % (tmp, prStgCoord(spec, stageCoords))
-               print tmp
+
+               ans = ans + "\n" + tmp
          if len(specs) > 1:
             tmp = "Average"
             for elm in elms:
                tmp = fmtStr % (tmp, 100.0 * stats[elm].average())
                if withErrs:
                   tmp = tmp + "\t"
-            print tmp   
+
+            ans = ans + "\n" + tmp   
          if len(specs) > 2:            
             tmp = "Std. Dev."
             for elm in elms:
                tmp = fmtStr % (tmp, 100.0 * stats[elm].standardDeviation())
                if withErrs:
                   tmp = tmp + "\t"
-            print tmp   
+
+            ans = ans + "\n" + tmp   
    else:
       res = {}
       xrtss = ju.TreeSet()
@@ -1601,7 +1606,8 @@ def tabulateHelper(specs, withErrs, normalize, prop, precision, massFrac, asOxid
          tmp = "%s\t%s" % (tmp, xrts)
          if withErrs:
             tmp = "%s\td(%s)" % (tmp, xrts)
-      print tmp
+
+      ans = ans + "\n" + tmp
       fmtStr = "%s\t%2." + str(precision) + "f"
       for spec in specs:
          if res.has_key(spec):
@@ -1613,19 +1619,23 @@ def tabulateHelper(specs, withErrs, normalize, prop, precision, massFrac, asOxid
                tmp = fmtStr % (tmp, u.doubleValue())
                if withErrs:
                   tmp = fmtStr % (tmp, u.uncertainty())
-            print tmp
+
+            ans = ans + "\n" + tmp
       tmp = "Average"
       for xrts in xrtss:
          tmp = fmtStr % (tmp, stats[xrts].average())
          if withErrs:
             tmp = "%s\t" % tmp
-      print tmp   
+
+      ans = ans + "\n" + tmp   
       tmp = "Std. Dev."
       for xrts in xrtss:
          tmp = fmtStr % (tmp, stats[xrts].standardDeviation())
          if withErrs:
             tmp = "%s\t" % tmp
-      print tmp   
+
+      ans = ans + "\n" + tmp   
+   return ans 
       
       
 def latexulate(specs, withErrs=False, normalize=False, prop=epq.SpectrumProperties.MicroanalyticalComposition, precision=2, massFrac=True, asOxides=False, total=True, stageCoords=tuple(), certified=None):
