@@ -3,12 +3,12 @@
   <dontWrapJar>true</dontWrapJar>
   <headerType>gui</headerType>
   <jar>relocate.jar</jar>
-  <outfile>C:\Users\nritchie\git\nist-dtsa-ii\Installer\DTSA-II Build\Relocate.exe</outfile>
+  <outfile>C:\Users\nritchie\git\DTSA-II\Installer\DTSA-II Build\Relocate.exe</outfile>
   <errTitle></errTitle>
   <cmdLine></cmdLine>
   <chdir>.</chdir>
   <priority>normal</priority>
-  <downloadUrl>http://java.com/download</downloadUrl>
+  <downloadUrl>https://docs.aws.amazon.com/corretto/latest/corretto-11-ug/downloads-list.html</downloadUrl>
   <supportUrl></supportUrl>
   <stayAlive>false</stayAlive>
   <restartOnCrash>false</restartOnCrash>

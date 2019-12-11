@@ -18,7 +18,7 @@
         <property name="info.url" value="http://www.cstl.nist.gov/div837/837.02/epq/dtsa2/index.html"/>
         <property name="info.company.name" value="NIST"/>
         <property name="info.version" value="Lorentz"/>
-        <property name="info.release-date" value="2019-10-18"/>
+        <property name="info.release-date" value="2019-12-10"/>
     </properties>
     <info>
         <appname>@{info.company.name} @{info.appName}</appname>
@@ -104,7 +104,7 @@
             <file override="update" src="$BUILDPATH/Newbury2014_Limits_of_Quantitative_EDS.pdf" targetdir="$INSTALL_PATH/doc/"/>
             <file override="update" src="$BUILDPATH/Standard Bundles.pdf" targetdir="$INSTALL_PATH/doc/"/>
         </pack>
-        <!---<pack name="NIST Relocation Application" preselected="no" required="no">
+        <pack name="NIST Relocation Application" preselected="no" required="no">
             <description>Coordinate translation application for relocating features on translated, scaled and rotated coordinate systems.  A useful utility to help to relocate a feature on a sample based on pre-recorded and relocated fiducial points.</description>
             <file override="update" src="$BUILDPATH/relocate.jar" targetdir="$INSTALL_PATH/"/>
             <file override="update" src="$BUILDPATH/Relocate.exe" targetdir="$INSTALL_PATH/"/>
@@ -132,7 +132,7 @@
             <file override="update" src="$BUILDPATH/multiRCA.py" targetdir="$INSTALL_PATH/"/>
             <file override="update" src="$BUILDPATH/bbb.py" targetdir="$INSTALL_PATH/"/>
             <file override="update" src="$BUILDPATH/TESCAN_backdrop theme.themepack" targetdir="$INSTALL_PATH/"/>
-        </pack>-->
+        </pack>
     </packs>
     <listeners>
         <listener classname="RegistryInstallerListener" stage="install" >
