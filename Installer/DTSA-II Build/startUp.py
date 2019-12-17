@@ -79,6 +79,8 @@ if SITE==NIST:
 	defaultArchivePath = "P:"
 elif (SITE==PNNL) or (SITE==PAS) or (SITE==AEM):
 	rootPath = "C:\\Users\\Tescan\\My Documents\\Data"
+elif SITE==ORNL:
+    rootPath = "C:\\Users\\Tescan\\Data"                                
 else:  # SITE==MCCRONE:
 	rootPath = "C:\\Data"
 
@@ -111,7 +113,7 @@ defaultStds = { "C": "C std.msa", "Al": "Al std.msa", "Na": "NaCl std.msa", "Cl"
 #		 "Ag" : "Ag std.msa", "Au" : "Au std.msa", "La" : "LaF3 std.msa", "Pb" : "K227 std.msa"
 }
 
-if (SITE==NIST) or (SITE==MCCRONE):
+if (SITE==NIST) or (SITE==MCCRONE) or (SITE==ORNL):
 	availableDets = ( True, )*4 # False, False, False )
 else:
 	availableDets = ( True, )*3 # False, False, False )
@@ -146,7 +148,10 @@ _saverizeTh.start()
 connect = (jop.showConfirmDialog(MainFrame, "Connect to the TESCAN?", "Start-up Script", jop.YES_NO_OPTION) == jop.YES_OPTION)
 
 # Location of the Image Magick executables 'convert' and 'montage' 
-IMAGE_MAGICK = "C:\\Program Files\\ImageMagick-6.9.6-Q16"
+if SITE==ORNL:
+	IMAGE_MAGICK = "C:\\Program Files\\ImageMagick-6.9.9-Q16"
+else:
+	IMAGE_MAGICK = "C:\\Program Files\\ImageMagick-6.9.6-Q16"
 
 def pascalToTorr(pa):
 	return pa * 0.0075006
@@ -862,16 +867,13 @@ index of 0 loads the most recent, index=1, 2, 3,... first, second third...., ind
 	dirs = []
 	for f in os.listdir(path): 
 		ff = path+os.path.sep+f 
-                                                       
 		if os.path.isdir(ff) and f.startswith("Analysis "):
-			dirs.append(f)
-                   
+			dirs.append(f)                   
 	dirs.sort()
 	if index<=0:
 		return Zepp(path+os.path.sep+dirs[-1+index]+os.path.sep+dataFile)
 	else:
-		return Zepp(path+os.path.sep+dirs[index-1]+os.path.sep+dataFile)
-        
+		return Zepp(path+os.path.sep+dirs[index-1]+os.path.sep+dataFile)        
 		
 class Zepp:
 	"""The Zepp class is designed as a wrapper around a Zeppelin (AFA) data set.
