@@ -644,7 +644,7 @@ public class SimulationWizard extends JWizardDialog {
 					setProgress(100);
 					return null;
 				}
-				progress(90);
+				progress(100);
 			} else
 				try {
 					mDetector.reset();
