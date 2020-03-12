@@ -2,7 +2,7 @@
 # Name: 	startUp.py
 # Purpose:	This script initializes the SEMantics library.   It optionally connects to the
 #	TESCAN SEM and provides a mechanism to control the SEM, collect data and process SEM data.
-# Modified: 3-Nov-2017
+# Modified: 6-Mar-2020
 # Set the SITE to account for site specific hardware variations
 NIST, MCCRONE, PNNL, PAS, AEM, ORNL = ( "NIST", "McCRONE", "PNNL", "PAS", "AEM", "ORNL" )
 SITE = NIST
@@ -371,43 +371,43 @@ if connect:
 		finally:
 			turnOff()
 			
-	def moveTo(pt, xyOnly=False):
-		"""moveTo(pt, xyOnly=false) - (Works)
-		Moves the stage to the specified stage point.  If pt is a ISpectrumData derived object then the stage /
+	def moveTo(pnt, xyOnly=False):
+		"""moveTo(pnt, xyOnly=false) - (Works)
+		Moves the stage to the specified stage point.  If pnt is a ISpectrumData derived object then the stage /
 is moved to the StagePosition associated with the spectrum."""
 		global terminated
 		if terminated:
 			return
-		if isinstance(pt, epq.ISpectrumData):
-			pt = pt.getProperties().getObjectWithDefault(epq.SpectrumProperties.StagePosition, None)
-		if not pt:
+		if isinstance(pnt, epq.ISpectrumData):
+			pnt = pnt.getProperties().getObjectWithDefault(epq.SpectrumProperties.StagePosition, None)
+		if not pnt:
 			return
 		if xyOnly:
 			newPt = epq.StageCoordinate()
-			newPt.set(X_AXIS, pt.get(X_AXIS))
-			newPt.set(Y_AXIS, pt.get(Y_AXIS))
+			newPt.set(X_AXIS, pnt.get(X_AXIS))
+			newPt.set(Y_AXIS, pnt.get(Y_AXIS))
 			_stg.setPosition(newPt)
 			time.sleep(0.1)
 			while (_stg.getStatus() == _stg.StageStatus.MOVING) and (not terminated):
 				time.sleep(0.1)
 		else:
 			start = epq.StageCoordinate(position())
-			if pt.get(Z_AXIS) > start.get(Z_AXIS):
+			if pnt.get(Z_AXIS) > start.get(Z_AXIS):
 				# Move to larger Z first
-				start.set(Z_AXIS, pt.get(Z_AXIS))
+				start.set(Z_AXIS, pnt.get(Z_AXIS))
 				_stg.setPosition(start)
 				time.sleep(0.1)
 				while (_stg.getStatus() == _stg.StageStatus.MOVING) and (not terminated):
 					time.sleep(0.1)
-			newPt = epq.StageCoordinate(pt)
-			newPt.set(Z_AXIS, jl.Math.max(pt.get(Z_AXIS), start.get(Z_AXIS)))
+			newPt = epq.StageCoordinate(pnt)
+			newPt.set(Z_AXIS, jl.Math.max(pnt.get(Z_AXIS), start.get(Z_AXIS)))
 			_stg.setPosition(newPt)
 			time.sleep(0.1)
 			while (_stg.getStatus() == _stg.StageStatus.MOVING) and (not terminated):
 				time.sleep(0.1)
-			if newPt.get(Z_AXIS) != pt.get(Z_AXIS):
+			if newPt.get(Z_AXIS) != pnt.get(Z_AXIS):
 				# Move closer last
-				_stg.setPosition(pt)
+				_stg.setPosition(pnt)
 				time.sleep(0.1)
 				while (_stg.getStatus() == _stg.StageStatus.MOVING) and (not terminated):
 					time.sleep(0.1)
@@ -750,10 +750,10 @@ fov: An optional field of view width to which to set the SEM imaging while colle
 			collectImages(baseName, fov, dims=(1024,1024),dwell=5,path=path, writeMask=SAVE_IMAGE_MASK)
 			_ts.setViewField(fov)
 			_ts.scStopScan()
-			for i, pt in enumerate(pts):
-				_ts.scSetBeamPosition(pt[0],pt[1])
+			for i, pnt in enumerate(pts):
+				_ts.scSetBeamPosition(pnt[0],pnt[1])
 				time.sleep(0.1)
-				spec=collect2(acqTime, "%s[Pt %i](%0.3g,%0.3g)" % (baseName, i, pt[0],pt[1]), mode='L', pc=False, disp=disp, path=path, fov=None)
+				spec=collect2(acqTime, "%s[Pt %i](%0.3g,%0.3g)" % (baseName, i, pnt[0],pnt[1]), mode='L', pc=False, disp=disp, path=path, fov=None)
 				if pc and spec:
 					sp = spec.getProperties()
 					sp.setNumericProperty(sp.FaradayBegin, pcb.average())
@@ -1409,7 +1409,7 @@ areaCriterion(...), maxCriterion(...) build common criteria."""
 						kr = self._vecs.getKRatios(spec)
 						props = spec.getProperties()
 						props.setKRatioProperty(epq.SpectrumProperties.KRatios, kr)
-						ps = epq.ParticleSignature(kr, [epq.Element.O])
+						ps = epq.ParticleSignature(kr, [epq.Element.C], [epq.Element.O])
 						props.setParticleSignatureProperty(epq.SpectrumProperties.ParticleSignature, ps)
 						props.setImageProperty(epq.SpectrumProperties.MicroImage, ps.createBarGraph(256,0.01))
 						props.setNumericProperty(epq.SpectrumProperties.RealTime, self._edsRealTime)
@@ -1760,7 +1760,7 @@ areaCriterion(...), maxCriterion(...) build common criteria."""
 					tmp = tmp + u"   Tiles & %d of $\\SI{%g}{\\milli\\meter} \\times \\SI{%g}{\\milli\\meter}$\\\\\n" % (tiling.size(), tiling.getTileDimension()[0], tiling.getTileDimension()[0])
 					tmp = tmp + u"   Area: \\SI{%g}{\\milli\\meter\\squared}\\\\\n" % (tiling.getArea(), )
 					tmp = tmp + u"\end{tabular}"
-				tmp.replace("α","$\alpha$")
+				tmp.replace(u"α",u"$\alpha$")
 
 				fos = jio.FileOutputStream(jio.File(self._path, "%s.tex" % self._sample))
 				try:
@@ -2442,9 +2442,9 @@ def annotateImages(path = None):
 			img = []
 			for i in range(0, 4):
 				if m["TYPE"]=="SI":
-					pt=jio.File(path, m["NAME"])
-					i0 = jio.File(pt, "Image[0][[%d]].png" % (i, ))
-					outFile = jio.File(pt, "Image[0][[%d]][SC].png" % (i, ))
+					fpt=jio.File(path, m["NAME"])
+					i0 = jio.File(fpt, "Image[0][[%d]].png" % (i, ))
+					outFile = jio.File(fpt, "Image[0][[%d]][SC].png" % (i, ))
 				else:
 					i0 = jio.File(path, "%s[%d].png" % (m["NAME"], i))
 					outFile = jio.File(path, "%s[%d][SC].png" % (m["NAME"], i))
@@ -2483,9 +2483,9 @@ if connect:
 		Mark an analysis point. 'sample' is the sample name, 'pts' is a point list(), 'comp' is the point name."""
 		next = (comp, [])
 		add = True
-		for pt in pts:
-			if pt[0] == comp:
-				next = pt
+		for pnt in pts:
+			if pnt[0] == comp:
+				next = pnt
 				add = False
 				break
 		if add:
@@ -2509,10 +2509,10 @@ if True:
 		home = _stg.getPosition()
 		for x in range(0, xDim):
 			for y in range(0, yDim):
-				pt = home.clone()
-				pt.set(X_AXIS, pt0[0] + x*xStep)
-				pt.set(Y_AXIS, pt0[1] + y*yStep)
-				_stg.moveTo(pt)
+				pnt = home.clone()
+				pnt.set(X_AXIS, pt0[0] + x*xStep)
+				pnt.set(Y_AXIS, pt0[1] + y*yStep)
+				_stg.moveTo(pnt)
 				markPoint(std, comp, withImg)
 
 	def traverse(ends, std, comp, n):
@@ -2520,10 +2520,10 @@ if True:
 		Marks a series of n points from end[0] to end[1]. Stores the result to a list of points in std associated with the composition comp."""
 		xStep, yStep = (ends[1].get(X_AXIS)-ends[0].get(X_AXIS))/(n-1.0), (ends[1].get(Y_AXIS)-ends[0].get(Y_AXIS))/(n-1.0)
 		for i in range(0, n):
-			pt = ends[0].clone()
-			pt.set(X_AXIS, ends[0].get(X_AXIS) + i*xStep)
-			pt.set(Y_AXIS, ends[0].get(Y_AXIS) + i*yStep)
-			_stg.moveTo(pt)
+			pnt = ends[0].clone()
+			pnt.set(X_AXIS, ends[0].get(X_AXIS) + i*xStep)
+			pnt.set(Y_AXIS, ends[0].get(Y_AXIS) + i*yStep)
+			_stg.moveTo(pnt)
 			markPoint(std, comp, False)
 	def scatter(pts, comp, withImg=False, n=5, d=0.1):
 		"""scatter(pts, comp, withImg=False, n=5, d=0.1)
@@ -2531,11 +2531,11 @@ if True:
 		home = _stg.getPosition()
 		for i in range(0, n):
 			if i <> 0:
-				pt = home.clone()
+				pnt = home.clone()
 				th = 2.0 * jl.Math.PI * jl.Math.random()
-				pt.set(X_AXIS, pt.get(X_AXIS) + jl.Math.cos(th) * d * jl.Math.random())
-				pt.set(Y_AXIS, pt.get(Y_AXIS) + jl.Math.sin(th) * d * jl.Math.random())
-				_stg.moveTo(pt)
+				pnt.set(X_AXIS, pnt.get(X_AXIS) + jl.Math.cos(th) * d * jl.Math.random())
+				pnt.set(Y_AXIS, pnt.get(Y_AXIS) + jl.Math.sin(th) * d * jl.Math.random())
+				_stg.moveTo(pnt)
 			markPoint(pts, comp, withImg)
 
 class Elapse:
@@ -2575,10 +2575,10 @@ if connect:
 		"""collectSpectra(sample, pts, liveTime=60.0, fov=0.005)
 		Collect spectra on the named sample at each of the stage points in pts for the specified live time and field-of-view.  The \
 results are written to the defaultDir."""
-		for i, pt in enumerate(pts):
+		for i, pnt in enumerate(pts):
 			if terminated:
 				return
-			moveTo(pt)
+			moveTo(pnt)
 			name = "%s Auto%d.msa" % (sample, i)
 			collectImages(name, 0.256, (1024, 1024), writeMask=SAVE_IMAGE_MASK)
 			_ts.setViewField(fov)
@@ -2607,16 +2607,16 @@ results are written to the defaultDir."""
 				comp = material(item[0])
 			except:
 				comp = None
-			for i, pt in enumerate(item[1]):
+			for i, pnt in enumerate(item[1]):
 				done = False
 				while not (done or terminated):
 					try:
 						name = "%s %s[%d]" % (sample, item[0], i)
 						newPt = startPt.clone()
-						newPt.set(X_AXIS, pt.get(X_AXIS))
-						newPt.set(Y_AXIS, pt.get(Y_AXIS))
-						newPt.set(Z_AXIS, pt.get(Z_AXIS))
-						newPt.set(R_AXIS, pt.get(R_AXIS))
+						newPt.set(X_AXIS, pnt.get(X_AXIS))
+						newPt.set(Y_AXIS, pnt.get(Y_AXIS))
+						newPt.set(Z_AXIS, pnt.get(Z_AXIS))
+						newPt.set(R_AXIS, pnt.get(R_AXIS))
 						_stg.moveTo(newPt)
 						collectImages(name, 0.256, (512, 512), writeMask=SAVE_IMAGE_MASK)
 						specs = collect(liveTime, name=name, pc=True, mode='L', disp=disp, forcePC=False, fov=fov)
@@ -2645,7 +2645,7 @@ results are written to the defaultDir."""
 								sp.setCompositionProperty(epq.SpectrumProperties.StandardComposition, comp)
 							sp.setObjectProperty(epq.SpectrumProperties.StagePosition, _stg.getPosition())
 						write(specs, "%s" % name, fmt="msa")
-						prev = pt
+						prev = pnt
 						done = True
 			completed = completed + 1
 			el.update(completed)
@@ -2669,8 +2669,8 @@ defined by oldFids."""
 	newPts = []
 	for item in pts:
 		tmp = []
-		for pt in item[1]:
-			tmp.append(epq.StageCoordinate(pt, td2))
+		for pnt in item[1]:
+			tmp.append(epq.StageCoordinate(pnt, td2))
 		newPts.append((item[0], tmp,))
 	return newPts
 
@@ -2679,9 +2679,9 @@ if connect:
 		"""extractStd(pts, name):
 		Extract the stage points associated with the specified name from the standard point list."""
 		res = []
-		for pt in pts:
-			if pt[0] == name:
-				for sp in pt[1]:
+		for pnt in pts:
+			if pnt[0] == name:
+				for sp in pnt[1]:
 					res.append(sp)
 		return res
 
@@ -2689,9 +2689,9 @@ if connect:
 		"""removeStd(pts, name):
 	Remove the stage points associated with the specified name from the standard point list."""
 		res = []
-		for pt in pts:
-			if pt[0] != name:
-				res.append(pt)
+		for pnt in pts:
+			if pnt[0] != name:
+				res.append(pnt)
 		return res
 
 	def validatePts(sample, pts):
@@ -2796,8 +2796,8 @@ def setProjectBasedPaths(project, sample, mode="Manual"):
 def updateZ(pts, newZ):
 	"""updateZ(pts, newZ)
 	Change the Z stage position to the specified value for all points in the point list pts"""
-	for pt in pts:
-		pt.set(Z_AXIS, newZ)
+	for pnt in pts:
+		pnt.set(Z_AXIS, newZ)
 	return pts
 
 if connect:
@@ -3092,8 +3092,8 @@ def collectMe(pts, lt=300, name="Spectrum", volatile=False, fov=0.2):
 	if terminated:
 		return
 	res = []
-	for i, pt in enumerate(pts):
-		moveTo(pt)
+	for i, pnt in enumerate(pts):
+		moveTo(pnt)
 		time.sleep(1.0)
 		collectImages("%s%d" % (name, i), fov, writeMask=SAVE_IMAGE_MASK)
 		if volatile:
@@ -3362,7 +3362,9 @@ If p is a point on the plane then dot(n,p)=d. Knowing any two coordinates we can
 
 def meshZ(point, points):
 	"""meshZ(point, points)
-	Computes the z-height for 'point' from a list of x,y,z stage positions called 'points'.  The x,z,z stage positions form a mesh.  The closes three 'points' to 'point' are used to define a plane that is used to interpolate the x-y position in 'point' into a z-height.  meshZ returns a float, the z-height at x-y coordinates in 'point'."""
+	Computes the z-height for 'point' from a list of x,y,z stage positions called 'points'.  The x,z,z stage positions form a mesh.  
+	The closes three 'points' to 'point' are used to define a plane that is used to interpolate the x-y position in 'point' into a z-height.  
+	meshZ returns a float, the z-height at x-y coordinates in 'point'."""
 	def cmpDist(x,y):
 		if x[0]<y[0]:
 			return -1
@@ -3376,10 +3378,10 @@ def meshZ(point, points):
 	res = 10.0
 	distPts = []
 	minZ, maxZ = (100.0, -100.0)
-	for pt in points:
-		dist = jl.Math.pow(point.get(X_AXIS)-pt.get(X_AXIS),2.0)+jl.Math.pow(point.get(Y_AXIS)-pt.get(Y_AXIS),2.0)
-		distPts.append( (dist, pt) )
-		z = pt.get(Z_AXIS)
+	for pnt in points:
+		dist = jl.Math.pow(point.get(X_AXIS)-pnt.get(X_AXIS),2.0)+jl.Math.pow(point.get(Y_AXIS)-pnt.get(Y_AXIS),2.0)
+		distPts.append( (dist, pnt) )
+		z = pnt.get(Z_AXIS)
 		if z<minZ:
 			minZ=z
 		if z>maxZ:

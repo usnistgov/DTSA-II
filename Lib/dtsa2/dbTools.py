@@ -4,6 +4,7 @@
 import dtsa2
 import gov.nist.microanalysis.EPQLibrary.Detector as epd
 import gov.nist.microanalysis.EPQLibrary as epq
+from telnetlib import DET
 
 def standardExists(comp):
     """standardExists(comp)
@@ -55,3 +56,18 @@ customize the detector.
 def addDetector(dd):
     """Add a detector to the database.  (Create one with createDetector.)"""
     dtsa2.Database.addDetector(dd)
+    
+    
+def listQCProjects():
+    """listQCProjects()
+List all the QC projects defined in the database."""
+    qcdets=dtsa2.Database.findDetectorsWithQCProjects()
+    all=[]
+    for det in qcdets:
+        all.extend(dtsa2.Database.findQCProjects(det))
+    print "Index\tSize\tName"
+    for i in all:
+        print "%d\t%d\t%s" % (i.getIndex(), i.getEntries().size(), i)
+ 
+def deleteQCProject(index):
+    dtsa2.Database.deleteQCProject(index)
