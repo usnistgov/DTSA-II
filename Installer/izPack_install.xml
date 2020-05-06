@@ -18,7 +18,7 @@
         <property name="info.url" value="http://www.cstl.nist.gov/div837/837.02/epq/dtsa2/index.html"/>
         <property name="info.company.name" value="NIST"/>
         <property name="info.version" value="Lorentz"/>
-        <property name="info.release-date" value="2020-04-07"/>
+        <property name="info.release-date" value="2020-05-06"/>
     </properties>
     <info>
         <appname>@{info.company.name} @{info.appName}</appname>
@@ -87,7 +87,7 @@
             <fileset dir="$BUILDPATH/../../Lib/dtsa2" targetdir="${INSTALL_PATH}/Lib/dtsa2" excludes="*/.class"/>
         </pack>
         <pack name="Java Runtime for Windows" preselected="yes" required="no">
-            <description>An integrated Java 11.0 JRE (run-time environment) for MS Windows only!!.</description>
+            <description>An integrated Java 14.0 JRE (run-time environment) for MS Windows only!!.</description>
             <fileset dir="$BUILDPATH/java-runtime" targetdir="${INSTALL_PATH}/java-runtime"/>
         </pack>
         <pack name="NIST DTSA-II Application" preselected="yes" required="no">
@@ -114,7 +114,7 @@
             <file override="update" src="$BUILDPATH/NISTGlassDB.jar" targetdir="$INSTALL_PATH/"/>
             <file override="update" src="$BUILDPATH/GlassDatabase.exe" targetdir="$INSTALL_PATH/"/>
         </pack>
-        <pack name="NIST Graf Application" preselected="no" required="no">
+        <!--<pack name="NIST Graf Application" preselected="no" required="no">
             <description>Data analysis for RJ Lee Group / ASPEX automated particle analysis data files.  DON'T INSTALL THIS UNLESS YOU KNOW YOU NEED IT!</description>
             <file override="update" src="$BUILDPATH/graf.jar" targetdir="$INSTALL_PATH/"/>
             <file override="update" src="$BUILDPATH/Graf.exe" targetdir="$INSTALL_PATH/"/>
@@ -123,7 +123,7 @@
             <file override="update" src="$JARPATH/org/apache/commons/commons-collections4/4.1/commons-collections4-4.1.jar" targetdir="$INSTALL_PATH/"/>
             <file override="update" src="$JARPATH/org/apache/commons/commons-math3/3.6.1/commons-math3-3.6.1.jar" targetdir="$INSTALL_PATH/"/>
         </pack> 
-        <!--<pack name="SEMantics" preselected="no" required="no">
+        <pack name="SEMantics" preselected="no" required="no">
             <description>An application for automating a TESCAN SEM through DTSA-II.</description>
             <file override="update" src="$BUILDPATH/semantics.jar" targetdir="$INSTALL_PATH/"/>
             <file override="update" src="$BUILDPATH/graf.jar" targetdir="$INSTALL_PATH/"/>

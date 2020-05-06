@@ -52,7 +52,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.prefs.Preferences;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -338,6 +337,7 @@ public class MainFrame extends JFrame {
 	private final JMenuItem jMenuItem_Annotation = new JMenuItem();
 	private final JMenuItem jMenuItem_OpenInBrowser = new JMenuItem();
 
+	private final JMenuItem jMenuItem_SetKLMs = new JMenuItem("Set KLMs");
 	// private final JMenu jMenu_PlugIn = new JMenu();
 	// private final JMenuItem jMenuItem_Install = new JMenuItem();
 
@@ -591,8 +591,10 @@ public class MainFrame extends JFrame {
 
 		@Override
 		public void mousePressed(MouseEvent me) {
-			if (me.isPopupTrigger())
+			if (me.isPopupTrigger()) {
 				mMenu.show(mReport, me.getX(), me.getY());
+
+			}
 		}
 
 		@Override
@@ -734,11 +736,8 @@ public class MainFrame extends JFrame {
 	}
 
 	public void showKLMLines(Collection<Element> elms) {
-		TreeSet<KLMLine> lines = new TreeSet<KLMLine>();
-		for (Element elm : elms)
-			lines.addAll(KLMLine.suggestKLM(elm, ToSI.keV(20.0)));
 		clearKLMs();
-		jSpecDisplay_Main.addKLMs(lines);
+		jKLMTreePanel.parseElementField(Element.toString(elms, true));
 	}
 
 	public void clearKLMs() {
@@ -1589,6 +1588,7 @@ public class MainFrame extends JFrame {
 			final JPopupMenu pum = new JPopupMenu();
 			final JMenuItem copy = new JMenuItem("Copy");
 			final JMenuItem html = new JMenuItem("Copy to HTML");
+			final JMenuItem setklms = new JMenuItem("Set KLMs");
 			copy.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
@@ -1622,8 +1622,23 @@ public class MainFrame extends JFrame {
 					}
 				}
 			});
+			setklms.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					if (jTable_SpecComposition.getModel() instanceof CompositionTableModel) {
+						final CompositionTableModel model = (CompositionTableModel) jTable_SpecComposition.getModel();
+						showKLMLines(model.getComposition().getElementSet());
+					}
+					if (jTable_SpecComposition.getModel() instanceof ParticleSignatureTableModel) {
+						final ParticleSignatureTableModel model = (ParticleSignatureTableModel) jTable_SpecComposition
+								.getModel();
+						showKLMLines(model.getSignature().getAllElements());
+					}
+				}
+			});
 			pum.add(copy);
 			pum.add(html);
+			pum.add(setklms);
 			jTable_SpecComposition.addMouseListener(new PopupMenuMouseAdapter(jTable_SpecComposition, pum));
 		}
 
@@ -1655,11 +1670,18 @@ public class MainFrame extends JFrame {
 					final String str = header + " = " + val.toString();
 					jStatusBar_Main.setText(str);
 					jTable_SpecProperties.setToolTipText(wordWrap("<html>" + str, 40));
-					if (val instanceof Composition)
+					if (val instanceof Composition) {
 						updateCompositionTable(header, (Composition) val);
-					if (val instanceof ParticleSignature)
+						jMenuItem_SetKLMs.setEnabled(jTable_SpecProperties.getSelectedRowCount() == 1);
+					} else if (val instanceof ParticleSignature) {
 						updateParticleSignature((ParticleSignature) val);
-				}
+						jMenuItem_SetKLMs.setEnabled(jTable_SpecProperties.getSelectedRowCount() == 1);
+					} else if (header == "Element List")
+						jMenuItem_SetKLMs.setEnabled(jTable_SpecProperties.getSelectedRowCount() == 1);
+					else
+						jMenuItem_SetKLMs.setEnabled(false);
+				} else
+					jMenuItem_SetKLMs.setEnabled(false);
 			}
 		});
 		final JPopupMenu pum = new JPopupMenu();
@@ -1685,6 +1707,48 @@ public class MainFrame extends JFrame {
 			}
 		});
 		pum.add(copy);
+		final JMenuItem copyvalue = new JMenuItem("Copy value(s)");
+		copyvalue.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				final int[] rows = jTable_SpecProperties.getSelectedRows();
+				final StringBuffer sb = new StringBuffer();
+				final TableModel model = jTable_SpecProperties.getModel();
+				for (final int sr : rows)
+					if (sr >= 0) {
+						if (sb.length() > 0)
+							sb.append("\n");
+						sb.append(model.getValueAt(sr, 1).toString());
+					}
+				if (sb.length() > 0) {
+					final StringSelection ss = new StringSelection(sb.toString());
+					getToolkit().getSystemClipboard().setContents(ss, ss);
+				}
+			}
+		});
+		pum.add(copyvalue);
+		jMenuItem_SetKLMs.addActionListener(new AbstractAction() {
+
+			private static final long serialVersionUID = 9129506582520064690L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				final int[] rows = jTable_SpecProperties.getSelectedRows();
+				if (rows.length == 1) {
+					final TableModel model = jTable_SpecProperties.getModel();
+					int row = rows[0];
+					Object obj = model.getValueAt(row, 1);
+					if (model.getValueAt(row, 0).toString() == "Element List")
+						showKLMLines(Element.parseElementString(obj.toString()));
+					else if (obj instanceof Composition)
+						showKLMLines(((Composition) obj).getElementSet());
+					else if (obj instanceof ParticleSignature)
+						showKLMLines(((ParticleSignature) obj).getAllElements());
+
+				}
+			}
+		});
+		pum.add(jMenuItem_SetKLMs);
 		jTable_SpecProperties.addMouseListener(new PopupMenuMouseAdapter(jTable_SpecProperties, pum));
 
 		{
@@ -1700,7 +1764,10 @@ public class MainFrame extends JFrame {
 
 		jButton_OpenPy.setText("Open");
 		jButton_OpenPy.setToolTipText("Open and run a Python script file.");
-		jButton_OpenPy.addActionListener(new ActionListener() {
+		jButton_OpenPy.addActionListener(new AbstractAction() {
+
+			private static final long serialVersionUID = 5130508190825691790L;
+
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				openPythonScript();
@@ -1710,7 +1777,10 @@ public class MainFrame extends JFrame {
 
 		jButton_Stop.setText("Terminate");
 		jButton_Stop.setToolTipText("Request that a script terminate execution.");
-		jButton_Stop.addActionListener(new ActionListener() {
+		jButton_Stop.addActionListener(new AbstractAction() {
+
+			private static final long serialVersionUID = -7587081379423939674L;
+
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				jCommandLine_Main.terminateScript();
@@ -1722,7 +1792,10 @@ public class MainFrame extends JFrame {
 		if (mRecentPyModel.getSize() > 0)
 			mRecentPyModel.setSelectedItem(mRecentPyModel.getElementAt(0));
 		jComboBox_PrevPy.setToolTipText("Select a recent script to rerun.");
-		final ActionListener pyActionListener = new ActionListener() {
+		final AbstractAction pyActionListener = new AbstractAction() {
+
+			private static final long serialVersionUID = -5513291816424696859L;
+
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				runRecentPy();
@@ -2351,7 +2424,10 @@ public class MainFrame extends JFrame {
 				}
 			});
 			JButton ok = new JButton("\u2713");
-			ok.addActionListener(new ActionListener() {
+			ok.addActionListener(new AbstractAction() {
+
+				private static final long serialVersionUID = -1733997090311936802L;
+
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					mResult = jTextField_Name.getText();
@@ -2359,7 +2435,10 @@ public class MainFrame extends JFrame {
 				}
 			});
 			JButton cancel = new JButton("\u2718");
-			cancel.addActionListener(new ActionListener() {
+			cancel.addActionListener(new AbstractAction() {
+
+				private static final long serialVersionUID = 3840241556783104777L;
+
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					mResult = null;
