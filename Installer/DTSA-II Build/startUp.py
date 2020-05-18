@@ -2,10 +2,10 @@
 # Name: 	startUp.py
 # Purpose:	This script initializes the SEMantics library.   It optionally connects to the
 #	TESCAN SEM and provides a mechanism to control the SEM, collect data and process SEM data.
-# Modified: 6-Mar-2020
+# Modified: 18-May-2020
 # Set the SITE to account for site specific hardware variations
 NIST, MCCRONE, PNNL, PAS, AEM, ORNL = ( "NIST", "McCRONE", "PNNL", "PAS", "AEM", "ORNL" )
-SITE = NIST
+SITE = ORNL
 
 if (SITE == NIST) and (jl.System.getProperty('sun.java.command') == u'gov.nist.microanalysis.dtsa2.DTSA2'):
 	print "JAR paths based on workspace."
