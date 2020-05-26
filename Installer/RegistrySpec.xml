@@ -10,5 +10,18 @@
     </pack>    
     <pack name="NIST Relocate Application">
         <key root="HKCU" keypath="Software/NIST/Relocate"/>
-    </pack>    
+    </pack>
+    <pack name="Core Libraries">
+        <key root="HKCU" keypath="Software/NIST/Core Libraries"/>
+    </pack>
+    <pack name="Java Runtime for Windows">
+    	<key root="HKCU" keypath="Software/NIST/Java Runtime for Windows"/>
+    </pack>
+    <pack name="NIST Glass Database">
+    	<key root="HKCU" keypath="Software/NIST/NIST Glass Database"/>
+    </pack>
+    <pack name="SEMantics">
+    	<key root="HKCU" keypath="Software/NIST/SEMantics"/>
+    </pack>
+    
 </izpack:registry>

@@ -1081,7 +1081,7 @@ public class SimulationWizard extends JWizardDialog {
 							final Set<XRayTransitionSet> xrtss = new TreeSet<XRayTransitionSet>();
 							for (final Element elm : elms)
 								for (final String family : families) {
-									final XRayTransitionSet xrts = new XRayTransitionSet(elm, family, 0.0, ToSI.eV(200),
+									final XRayTransitionSet xrts = new XRayTransitionSet(elm, family, 0.0, ToSI.eV(50.0),
 											mBeamEnergy / 1.1);
 									if (xrts.size() > 0)
 										xrtss.add(xrts);

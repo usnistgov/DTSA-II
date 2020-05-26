@@ -18,7 +18,7 @@
         <property name="info.url" value="http://www.cstl.nist.gov/div837/837.02/epq/dtsa2/index.html"/>
         <property name="info.company.name" value="NIST"/>
         <property name="info.version" value="Lorentz"/>
-        <property name="info.release-date" value="2020-05-18"/>
+        <property name="info.release-date" value="2020-05-26"/>
     </properties>
     <info>
         <appname>@{info.company.name} @{info.appName}</appname>
@@ -114,7 +114,7 @@
             <file override="update" src="$BUILDPATH/NISTGlassDB.jar" targetdir="$INSTALL_PATH/"/>
             <file override="update" src="$BUILDPATH/GlassDatabase.exe" targetdir="$INSTALL_PATH/"/>
         </pack>
-        <pack name="NIST Graf Application" preselected="no" required="no">
+        <!--<pack name="NIST Graf Application" preselected="no" required="no">
             <description>Data analysis for RJ Lee Group / ASPEX automated particle analysis data files.  DON'T INSTALL THIS UNLESS YOU KNOW YOU NEED IT!</description>
             <file override="update" src="$BUILDPATH/graf.jar" targetdir="$INSTALL_PATH/"/>
             <file override="update" src="$BUILDPATH/Graf.exe" targetdir="$INSTALL_PATH/"/>
@@ -132,7 +132,7 @@
             <file override="update" src="$BUILDPATH/multiRCA.py" targetdir="$INSTALL_PATH/"/>
             <file override="update" src="$BUILDPATH/bbb.py" targetdir="$INSTALL_PATH/"/>
             <file override="update" src="$BUILDPATH/TESCAN_backdrop theme.themepack" targetdir="$INSTALL_PATH/"/>
-        </pack>
+        </pack>-->
     </packs>
     <listeners>
         <listener classname="RegistryInstallerListener" stage="install" >
