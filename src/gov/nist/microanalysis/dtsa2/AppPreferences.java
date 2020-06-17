@@ -305,7 +305,6 @@ public class AppPreferences {
          add(new JLabel("Correction Algorithm"), cc.xy(2, 1));
          jComboBox_ZAFAlgorithm = new JComboBox<String>();
          jComboBox_ZAFAlgorithm.addItem(CorrectionAlgorithm.XPPExtended.getName());
-         jComboBox_ZAFAlgorithm.addItem(CorrectionAlgorithm.Proza96Extended.getName());
          jComboBox_ZAFAlgorithm.addItem(CorrectionAlgorithm.PouchouAndPichoir.getName());
          jComboBox_ZAFAlgorithm.addItem(CorrectionAlgorithm.ZAFCorrection.getName());
          jComboBox_ZAFAlgorithm.addItem(CorrectionAlgorithm.NullCorrection.getName());
