@@ -2339,6 +2339,33 @@ def lod(unk, std, elm):
         zaf = epq.CorrectionAlgorithm.XPP.relativeZAF(cUnk, xrts, sp, cStd)
         print "           ZAF\t%0.3f" % zaf[3]
         print "           LOD\t%0.0f PPM" % (1.0e6 * minK * cStd.weightFraction(elm, False) / zaf[3],)    
+"""
+splittiff(path, test=False)
+
+
+Split out the images from within a TIFF file.
+"""
+def splittiff(path, test=False):
+    from os import listdir
+    from os.path import join
+    from fnmatch import fnmatch
+    from javax.imageio.stream import FileImageInputStream
+    tifffiles = [ f for f in listdir(path) if fnmatch(f, "*.tif") ]
+    for f in tifffiles:
+        fn = join(path, f)
+        print "Reading %s" % fn
+        ir = ii.ImageIO.getImageReadersByFormatName("tiff").next()
+        fis = FileImageInputStream(jio.File(fn))
+        try:
+            ir.setInput(fis)
+            for i in range(0,ir.getNumImages(True)):
+                bi = ir.read(i)
+                ofn = "%s[%s].png" % ( fn[0:-4],  i)
+                print "  Writing %s" % ofn
+                if not test:
+                    ii.ImageIO.write(bi, "png", jio.File(ofn))
+        finally:
+            fis.close()
 
    
 _xxx_ = init_dets(globals())
