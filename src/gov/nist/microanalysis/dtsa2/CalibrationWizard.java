@@ -505,7 +505,7 @@ public class CalibrationWizard
       protected SpectrumFitter8 doInBackground()
             throws Exception {
          final Strategy strat = new Strategy();
-         strat.addAlgorithm(TransitionEnergy.class, TransitionEnergy.DeslattesSuperSet);
+         strat.addAlgorithm(TransitionEnergy.class, TransitionEnergy.Default);
          AlgorithmUser.applyGlobalOverride(strat);
          try {
             final SpectrumProperties sp = mSpectrum.getProperties();

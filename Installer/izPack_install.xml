@@ -3,7 +3,8 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://izpack.org/schema/installation http://izpack.org/schema/5.0/izpack-installation-5.0.xsd">
     <!-- The script doesn't work within Eclipse but can be build from the command line 
-    C:\Users\nritchie\git\nist-dtsa-ii\Installer>"C:\Program Files (x86)\IzPack\bin\compile.bat" -h ${IZPACK_HOME} izPack_install.xml -b . -o dtsa2_lorentz.jar -k standard -->
+    C:\Users\nritchie\git\nist-dtsa-ii\Installer>"C:\Program Files (x86)\IzPack\bin\compile.bat" -h ${IZPACK_HOME} izPack_install.xml -b . -o dtsa2_lorentz.jar -k standard 
+    -->
     <variables>
         <variable name="TargetPanel.dir.windows" value="$USER_HOME\AppData\Local\NIST\$APP_NAME $APP_VER"/>
         <variable name="TargetPanel.dir.unix" value="/usr/local/NIST/$APP_NAME $APP_VER"/>
@@ -114,7 +115,8 @@
             <file override="update" src="$BUILDPATH/NISTGlassDB.jar" targetdir="$INSTALL_PATH/"/>
             <file override="update" src="$BUILDPATH/GlassDatabase.exe" targetdir="$INSTALL_PATH/"/>
         </pack>
-        <!--<pack name="NIST Graf Application" preselected="no" required="no">
+        <!--
+        <pack name="NIST Graf Application" preselected="no" required="no">
             <description>Data analysis for RJ Lee Group / ASPEX automated particle analysis data files.  DON'T INSTALL THIS UNLESS YOU KNOW YOU NEED IT!</description>
             <file override="update" src="$BUILDPATH/graf.jar" targetdir="$INSTALL_PATH/"/>
             <file override="update" src="$BUILDPATH/Graf.exe" targetdir="$INSTALL_PATH/"/>
@@ -132,7 +134,8 @@
             <file override="update" src="$BUILDPATH/multiRCA.py" targetdir="$INSTALL_PATH/"/>
             <file override="update" src="$BUILDPATH/bbb.py" targetdir="$INSTALL_PATH/"/>
             <file override="update" src="$BUILDPATH/TESCAN_backdrop theme.themepack" targetdir="$INSTALL_PATH/"/>
-        </pack>-->
+        </pack>
+        -->
     </packs>
     <listeners>
         <listener classname="RegistryInstallerListener" stage="install" >

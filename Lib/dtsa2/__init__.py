@@ -522,8 +522,8 @@ def listTransitions(elmName):
     except jl.IllegalArgumentException:
         pass
 
-def listEdges(elmName, alg=epq.EdgeEnergy.Chantler2005):
-   """listEdge('Si',[alg=epq.EdgeEnergy.Chantler2005])
+def listEdges(elmName, alg=epq.EdgeEnergy.Default):
+   """listEdge('Si',[alg=epq.EdgeEnergy.Default])
    Lists all absorption edges associated with the element specified by abbreviation or name."""
    elm = element(elmName)
    print "IUPAC\tSiegbahn\tEnergy\tJump\tIon..\tFluor\tOccupancy"
@@ -669,8 +669,8 @@ def majorTransitionSets(det, comp, e0, minW=0.01):
    return res
 
 
-def zaf(comp, det, e0, alg=epq.XPP1991(), mac=epq.MassAbsorptionCoefficient.Chantler2005, xtra=epq.SpectrumProperties(), stds=None, mode="WDS"):
-   """zaf(comp, d1, 20.0, [alg=epq.XPP1991()], [mac=epq.MassAbsorptionCoefficient.Henke1993], [xtra=epq.SpectrumProperties()],[stds=None],[mode="WDS"|"EDS"|"EXHAUSTIVE"])
+def zaf(comp, det, e0, alg=epq.XPP1991(), mac=epq.MassAbsorptionCoefficient.Default, xtra=epq.SpectrumProperties(), stds=None, mode="WDS"):
+   """zaf(comp, d1, 20.0, [alg=epq.XPP1991()], [mac=epq.MassAbsorptionCoefficient.Default], [xtra=epq.SpectrumProperties()],[stds=None],[mode="WDS"|"EDS"|"EXHAUSTIVE"])
    Display the ZAF correction associated with the specified composition (comp),  detector (d1) and beam energy (20.0) using the correction algorithm specified.  If no algorithm is specified then Pouchou and Pichoir's XPP algorithm is used. \
    If you don't specify stds then pure elements are assumed.  Otherwise standards is a dictionary mapping an element to a composition."""
    if isinstance(comp, epq.ISpectrumData):
@@ -869,9 +869,9 @@ def report(html):
    Append the specific syntactically correct HTML to the end of the report in the report tab."""
    MainFrame.appendHTML(html)
 
-def mac(mat, xx, alg=epq.MassAbsorptionCoefficient.Chantler2005):
-   """mac(mat, xx, [alg=epq.MassAbsorptionCoefficient.Chantler2005])
-   where mat is a material or element (by name, Material or Element object), xx is an element, atomic shell or x-ray transition and alg is the tabulation to use (by default Chantler2005). Displays the mass absorption coefficient for the specified element or x-ray transition in the specified material."""
+def mac(mat, xx, alg=epq.MassAbsorptionCoefficient.Default):
+   """mac(mat, xx, [alg=epq.MassAbsorptionCoefficient.Default])
+   where mat is a material or element (by name, Material or Element object), xx is an element, atomic shell or x-ray transition and alg is the tabulation to use (by default Default). Displays the mass absorption coefficient for the specified element or x-ray transition in the specified material."""
    mat = material(mat)
    if not isinstance(mat, epq.Material):
        mat = epq.Material(mat, epq.ToSI.gPerCC(1.0))
@@ -915,9 +915,9 @@ Builds a Material or Composition object from mass fractions."""
         c = epq.Material(c, epq.ToSI.gPerCC(density))
     return c
 
-def getMac(elm, det=None, alg=epq.MassAbsorptionCoefficient.Chantler2005):
-   """getMac(elm, [det=d1], [alg=epq.MassAbsorptionCoefficient.Chantler2005])
-   Gets the mass absorption coefficient for the specified Element or Composition as a spectrum-like object. The det term (=d1) and the alg term (=epq.MassAbsorptionCoefficient.Chantler2005) are optional arguments."""
+def getMac(elm, det=None, alg=epq.MassAbsorptionCoefficient.Default):
+   """getMac(elm, [det=d1], [alg=epq.MassAbsorptionCoefficient.Default])
+   Gets the mass absorption coefficient for the specified Element or Composition as a spectrum-like object. The det term (=d1) and the alg term (=epq.MassAbsorptionCoefficient.Default) are optional arguments."""
    if not det:
        det = findDetector("")
    elm = material(elm)
@@ -934,9 +934,9 @@ def getMac(elm, det=None, alg=epq.MassAbsorptionCoefficient.Chantler2005):
    epq.SpectrumUtils.rename(res, "MAC[%s,%s]" % (elm, alg.getName()))
    return ScriptableSpectrum(res)
 
-def displayMac(elm, eMax=20.48, alg=epq.MassAbsorptionCoefficient.Chantler2005):
-   """displayMac(elm, eMax=20.48, alg=epq.MassAbsorptionCoefficient.Chantler2005)
-   Displays the mass absorption coefficient for the specified Element or Composition in the spectrum display. The eMax term (=20.48) and the alg term (=epq.MassAbsorptionCoefficient.Chantler2005) are optional arguments."""
+def displayMac(elm, eMax=20.48, alg=epq.MassAbsorptionCoefficient.Default):
+   """displayMac(elm, eMax=20.48, alg=epq.MassAbsorptionCoefficient.Default)
+   Displays the mass absorption coefficient for the specified Element or Composition in the spectrum display. The eMax term (=20.48) and the alg term (=epq.MassAbsorptionCoefficient.Default) are optional arguments."""
    display(getMac(elm, int(eMax / 0.01), alg))
 
 def windowTransmission(name):
@@ -1497,7 +1497,22 @@ You can use 'k', 'c' or 's' for prop for k-ratios, measured composition or stand
 additional decimal digits of precision. [massFrac->False for atomic fraction.] [total -> True|False] \
 [stageCoords->( ['x',] ['y',] ['z',] ['r',] ['t',] ['b'] )"""
    print tabulateHelper(specs, withErrs, normalize, prop, precision, massFrac, asOxides, total, stageCoords)
+   
+   
 
+def digest(specs, date):
+   """digest(specs, date)
+Displays a summary report for N spectra with mass fraction values and standard deviations for each element."""
+   elms = ju.TreeSet()
+   for spec in specs:
+      c = spec.getProperties().getObjectWithDefault(epq.SpectrumProperties.MicroanalyticalComposition, None)
+      elms.addAll(c.getElementSet())
+   for i, elm in enumerate(elms):
+      se = epu.DescriptiveStatistics()
+      for spec in specs:
+         c = spec.getProperties().getObjectWithDefault(epq.SpectrumProperties.MicroanalyticalComposition, None)
+         se.add(c.weightFraction(elm, False))
+      print("%s\t%s\t%g\t%g" % (elm.toAbbrev(), date, se.average(), se.standardDeviation()))
 
 def printTab(file, specs, withErrs=False, normalize=False, prop=epq.SpectrumProperties.MicroanalyticalComposition, precision=4, massFrac=True, asOxides=False, total=True, stageCoords=tuple()):
    with open(file,"a") as pw:

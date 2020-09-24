@@ -5,7 +5,7 @@ props.addAll(d2.getProperties())
 props.setNumericProperty(epq.SpectrumProperties.BeamEnergy,25.0)
 xpp = epq.CorrectionAlgorithm.XPP
 xrts=[transition("Si K-L3"),transition("O K-L3"),transition("Pb L3-M5"),transition("Pb M5-N7")]
-mac=epq.MassAbsorptionCoefficient.Chantler2005
+mac=epq.MassAbsorptionCoefficient.Default
 for xrt in xrts:
 	matMac=mac.computeWithUncertaintyEstimate(mat,xrt)
 	print "%s\t%f\t%f" % (xrt,matMac.doubleValue(),matMac.uncertainty())
