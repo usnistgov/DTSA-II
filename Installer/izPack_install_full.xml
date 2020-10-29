@@ -3,7 +3,9 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://izpack.org/schema/installation http://izpack.org/schema/5.0/izpack-installation-5.0.xsd">
     <!-- The script doesn't work within Eclipse but can be build from the command line 
-    C:\Users\nritchie\git\nist-dtsa-ii\Installer>"C:\Program Files (x86)\IzPack\bin\compile.bat" -h ${IZPACK_HOME} izPack_install_full.xml -b . -o dtsa2_lorentz_full.jar -k standard 
+    > c:
+    > cd C:\Users\nritchie\git\nist-dtsa-ii\Installer
+    >"C:\Program Files (x86)\IzPack\bin\compile.bat" -h ${IZPACK_HOME} izPack_install_full.xml -b . -o dtsa2_lorentz_full.jar -k standard 
     -->
     <variables>
         <variable name="TargetPanel.dir.windows" value="$USER_HOME\AppData\Local\NIST\$APP_NAME $APP_VER"/>
@@ -19,7 +21,7 @@
         <property name="info.url" value="http://www.cstl.nist.gov/div837/837.02/epq/dtsa2/index.html"/>
         <property name="info.company.name" value="NIST"/>
         <property name="info.version" value="Lorentz"/>
-        <property name="info.release-date" value="2020-06-26"/>
+        <property name="info.release-date" value="2020-10-08"/>
     </properties>
     <info>
         <appname>@{info.company.name} @{info.appName}</appname>
