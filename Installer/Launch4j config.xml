@@ -26,13 +26,13 @@
     <maxHeapPercent>70</maxHeapPercent>
   </jre>
   <versionInfo>
-    <fileVersion>1.2.1.0</fileVersion>
-    <txtFileVersion>Lorentz 2020-10-08</txtFileVersion>
-    <fileDescription>NIST DTSA-II Lorentz</fileDescription>
+    <fileVersion>1.3.0.0</fileVersion>
+    <txtFileVersion>Microscopium 2021-01-06</txtFileVersion>
+    <fileDescription>NIST DTSA-II Microscopium</fileDescription>
     <copyright>Not subject to copyright (US government work)</copyright>
-    <productVersion>1.2.1.0</productVersion>
-    <txtProductVersion>Lorentz 2020-10-08</txtProductVersion>
-    <productName>NIST DTSA-II Lorentz</productName>
+    <productVersion>1.3.0.0</productVersion>
+    <txtProductVersion>Microscopium 2021-01-06</txtProductVersion>
+    <productName>NIST DTSA-II Microscopium</productName>
     <companyName>National Insitute of Standards and Technology</companyName>
     <internalName>DTSA-II</internalName>
     <originalFilename>DTSA-II.exe</originalFilename>

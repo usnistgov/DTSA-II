@@ -4,7 +4,7 @@
     xsi:schemaLocation="http://izpack.org/schema/installation http://izpack.org/schema/5.0/izpack-installation-5.0.xsd">
     <!-- The script doesn't work within Eclipse but can be build from the command line 
     > cd  C:\Users\nritchie\git\nist-dtsa-ii\Installer
-    > "C:\Program Files (x86)\IzPack\bin\compile.bat" -h ${IZPACK_HOME} izPack_install.xml -b . -o dtsa2_lorentz.jar -k standard 
+    > "C:\Program Files (x86)\IzPack\bin\compile.bat" -h ${IZPACK_HOME} izPack_install.xml -b . -o dtsa2_microscopium.jar -k standard 
     -->
     <variables>
         <variable name="TargetPanel.dir.windows" value="$USER_HOME\AppData\Local\NIST\$APP_NAME $APP_VER"/>
@@ -19,8 +19,8 @@
         <property name="info.appName" value="DTSA-II"/>
         <property name="info.url" value="http://www.cstl.nist.gov/div837/837.02/epq/dtsa2/index.html"/>
         <property name="info.company.name" value="NIST"/>
-        <property name="info.version" value="Lorentz"/>
-        <property name="info.release-date" value="2020-10-08"/>
+        <property name="info.version" value="Microscopium"/>
+        <property name="info.release-date" value="2021-01-06"/>
     </properties>
     <info>
         <appname>@{info.company.name} @{info.appName}</appname>
@@ -75,7 +75,7 @@
             <file override="update" src="$JARPATH/org/apache/derby/derbyclient/10.14.1.0/derbyclient-10.14.1.0.jar" targetdir="$INSTALL_PATH/"/>
             <file override="update" src="$JARPATH/junit/junit/4.13/junit-4.13.jar" targetdir="$INSTALL_PATH/"/>
             <file override="update" src="$JARPATH/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar" targetdir="$INSTALL_PATH/"/>
-            <file override="update" src="$JARPATH/com/thoughtworks/xstream/xstream/1.4.11.1/xstream-1.4.11.1.jar" targetdir="$INSTALL_PATH/"/>
+            <file override="update" src="$JARPATH/com/thoughtworks/xstream/xstream/1.4.15/xstream-1.4.15.jar" targetdir="$INSTALL_PATH/"/>
             <file override="update" src="$JARPATH/xmlpull/xmlpull/1.1.3.1/xmlpull-1.1.3.1.jar" targetdir="$INSTALL_PATH/"/>
             <file override="update" src="$JARPATH/xpp3/xpp3_min/1.1.4c/xpp3_min-1.1.4c.jar" targetdir="$INSTALL_PATH/"/>
             <file override="update" src="$JARPATH/gov/nist/math/jama/1.0.3/jama-1.0.3.jar" targetdir="$INSTALL_PATH/"/>
@@ -84,7 +84,7 @@
             <file override="update" src="$JARPATH/com/sun/jna/jna/3.0.9/jna-3.0.9.jar" targetdir="$INSTALL_PATH/"/>
             <file override="update" src="$JARPATH/com/github/jai-imageio/jai-imageio-core/1.4.0/jai-imageio-core-1.4.0.jar" targetdir="$INSTALL_PATH/"/>
             <file override="update" src="$JARPATH/com/toedter/jcalendar/1.4/jcalendar-1.4.jar" targetdir="$INSTALL_PATH/"/>
-            <file override="update" src="$JARPATH/org/python/jython-standalone/2.7.2b3/jython-standalone-2.7.2b3.jar" targetdir="$INSTALL_PATH/"/>
+            <file override="update" src="$JARPATH/org/python/jython-standalone/2.7.2/jython-standalone-2.7.2.jar" targetdir="$INSTALL_PATH/"/>
             <file override="update" src="$BUILDPATH/epq.jar" targetdir="$INSTALL_PATH/"/>
             <fileset dir="$BUILDPATH/../../Lib/dtsa2" targetdir="${INSTALL_PATH}/Lib/dtsa2" excludes="*/.class"/>
         </pack>

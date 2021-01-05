@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
-Class-Path: Jama-1.0.3.jar xmlpull-1.1.3.1.jar xpp3_min-1.1.4c.jar xstream-1.4.11.1.jar junit-4.13.jar jgoodies-forms-1.8.0.jar jgoodies-common-1.8.0.jar jython-standalone-2.7.2b3.jar jcalendar-1.4.jar epq.jar graf.jar semantics.jar FastQuant.jar  
+Class-Path: Jama-1.0.3.jar xmlpull-1.1.3.1.jar xpp3_min-1.1.4c.jar xstream-1.4.15.jar junit-4.13.jar jgoodies-forms-1.8.0.jar jgoodies-common-1.8.0.jar jython-standalone-2.7.2.jar jcalendar-1.4.jar epq.jar graf.jar semantics.jar FastQuant.jar  
 Main-Class: gov.nist.microanalysis.dtsa2.DTSA2
 SplashScreen-Image: Splash.png
 
