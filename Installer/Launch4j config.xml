@@ -8,7 +8,7 @@
   <cmdLine></cmdLine>
   <chdir></chdir>
   <priority>normal</priority>
-  <downloadUrl>https://adoptopenjdk.net/</downloadUrl>
+  <downloadUrl>https://adoptopenjdk.net/?variant=openjdk15&amp;jvmVariant=hotspot</downloadUrl>
   <supportUrl>http://www.cstl.nist.gov/div837/837.02/epq/dtsa2/index.html</supportUrl>
   <stayAlive>false</stayAlive>
   <restartOnCrash>false</restartOnCrash>
@@ -26,12 +26,12 @@
     <maxHeapPercent>70</maxHeapPercent>
   </jre>
   <versionInfo>
-    <fileVersion>1.3.0.0</fileVersion>
-    <txtFileVersion>Microscopium 2021-01-06</txtFileVersion>
+    <fileVersion>1.3.0.1</fileVersion>
+    <txtFileVersion>Microscopium 2021-01-22</txtFileVersion>
     <fileDescription>NIST DTSA-II Microscopium</fileDescription>
     <copyright>Not subject to copyright (US government work)</copyright>
-    <productVersion>1.3.0.0</productVersion>
-    <txtProductVersion>Microscopium 2021-01-06</txtProductVersion>
+    <productVersion>1.3.0.1</productVersion>
+    <txtProductVersion>Microscopium 2021-01-22</txtProductVersion>
     <productName>NIST DTSA-II Microscopium</productName>
     <companyName>National Insitute of Standards and Technology</companyName>
     <internalName>DTSA-II</internalName>
