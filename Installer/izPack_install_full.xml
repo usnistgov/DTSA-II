@@ -88,6 +88,8 @@
             <file override="update" src="$JARPATH/org/python/jython-standalone/2.7.2/jython-standalone-2.7.2.jar" targetdir="$INSTALL_PATH/"/>
             <file override="update" src="$BUILDPATH/epq.jar" targetdir="$INSTALL_PATH/"/>
             <fileset dir="$BUILDPATH/../../Lib/dtsa2" targetdir="${INSTALL_PATH}/Lib/dtsa2" excludes="*/.class"/>
+            <file override="update" src="$BUILDPATH/../../Lib/to10dash1.py" targetdir="${INSTALL_PATH}/Lib/dtsa2"/>
+            
         </pack>
         <pack name="Java Runtime for Windows" preselected="yes" required="no">
             <description>An integrated Java 14.0 JRE (run-time environment) for MS Windows only!!.</description>
