@@ -26,12 +26,12 @@
     <maxHeapPercent>70</maxHeapPercent>
   </jre>
   <versionInfo>
-    <fileVersion>1.3.0.1</fileVersion>
-    <txtFileVersion>Microscopium 2021-01-22</txtFileVersion>
+    <fileVersion>1.3.0.3</fileVersion>
+    <txtFileVersion>Microscopium 2021-02-09</txtFileVersion>
     <fileDescription>NIST DTSA-II Microscopium</fileDescription>
     <copyright>Not subject to copyright (US government work)</copyright>
-    <productVersion>1.3.0.1</productVersion>
-    <txtProductVersion>Microscopium 2021-01-22</txtProductVersion>
+    <productVersion>1.3.0.3</productVersion>
+    <txtProductVersion>Microscopium 2021-02-09</txtProductVersion>
     <productName>NIST DTSA-II Microscopium</productName>
     <companyName>National Insitute of Standards and Technology</companyName>
     <internalName>DTSA-II</internalName>
