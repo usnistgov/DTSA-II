@@ -43,6 +43,7 @@ import java.nio.charset.Charset;
 import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -2869,6 +2870,10 @@ public class MainFrame extends JFrame {
 			if (res != null) {
 				if (jfc.getFileFilter() instanceof SimpleFileFilter)
 					res = ((SimpleFileFilter) jfc.getFileFilter()).forceExtension(res);
+				if( res.exists() && !res.isDirectory()) {
+					Date mod = new Date(res.lastModified());
+					res.renameTo(new File(replaceExtension(res.getAbsolutePath(), " - "+formatDate(mod)+".zstd")));
+				}
 				DTSA2.updateSpectrumDirectory(res.getParentFile());
 				try {
 					sd.getProperties().setTextProperty(SpectrumProperties.SourceFile, res.getCanonicalPath());
@@ -2949,6 +2954,12 @@ public class MainFrame extends JFrame {
 			}
 		}
 	}
+	
+	
+	public static String formatDate(Date fn) {
+		DateFormat df =new SimpleDateFormat("yyyyMMdd HHmmss z");
+		return df.format(fn);
+	}
 
 	/**
 	 * Replaces or appends a new extension onto the specified file name.
@@ -2968,54 +2979,62 @@ public class MainFrame extends JFrame {
 	}
 
 	public static String exportSpectrumAsCSV(ISpectrumData sd, String filename) throws Exception {
-		if (filename.toUpperCase().endsWith(".CSV"))
+		if (!filename.toUpperCase().endsWith(".CSV"))
 			filename = filename + ".csv";
-		File newFile = new File(filename);
-		for (int i = 1; newFile.exists(); ++i)
-			newFile = new File(replaceExtension(filename, "." + Integer.toString(i) + ".csv"));
-		try (final FileOutputStream os = new FileOutputStream(newFile)) {
+		File file = new File(filename);
+		if(file.exists() && !file.isDirectory()) {
+			Date mod = new Date(file.lastModified());
+			file.renameTo(new File(replaceExtension(filename, " - "+formatDate(mod)+".csv")));
+		}
+		try (final FileOutputStream os = new FileOutputStream(file)) {
 			WriteSpectrumAsCSV.write(sd, os);
 		}
-		return newFile.getName();
+		return file.getName();
 	}
 
 	public static String exportSpectrumAsEMSA(ISpectrumData sd, String filename) throws Exception {
 		final String fu = filename.toUpperCase();
 		if (!(fu.endsWith(".MSA") || fu.endsWith(".EMSA") || fu.endsWith(".TXT")))
 			filename = filename + ".msa";
-		File newFile = new File(filename);
-		for (int i = 1; newFile.exists(); ++i)
-			newFile = new File(replaceExtension(filename, "." + Integer.toString(i) + ".msa"));
-		try (final FileOutputStream os = new FileOutputStream(newFile)) {
+		File file = new File(filename);
+		if(file.exists() && !file.isDirectory()) {
+			Date mod = new Date(file.lastModified());
+			file.renameTo(new File(replaceExtension(filename, " - "+formatDate(mod)+".msa")));
+		}
+		try (final FileOutputStream os = new FileOutputStream(file)) {
 			WriteSpectrumAsEMSA1_0.write(sd, os, WriteSpectrumAsEMSA1_0.Mode.COMPATIBLE);
 		}
-		return newFile.getName();
+		return file.getName();
 	}
 
 	public static String exportSpectrumAsTIFF(ISpectrumData sd, String filename) throws Exception {
 		final String fu = filename.toUpperCase();
 		if (!(fu.endsWith(".TIFF") || fu.endsWith(".TIF")))
 			filename = filename + ".tif";
-		File newFile = new File(filename);
-		for (int i = 1; newFile.exists(); ++i)
-			newFile = new File(replaceExtension(filename, "." + Integer.toString(i) + ".tif"));
-		try (final FileOutputStream os = new FileOutputStream(newFile)) {
+		File file = new File(filename);
+		if(file.exists() && !file.isDirectory()) {
+			Date mod = new Date(file.lastModified());
+			file.renameTo(new File(replaceExtension(filename, " - "+formatDate(mod)+".tif")));
+		}
+		try (final FileOutputStream os = new FileOutputStream(file)) {
 			WriteSpectrumAsTIFF.write(sd, os);
 		}
-		return newFile.getName();
+		return file.getName();
 	}
 
 	public static String exportSpectrumAsTiaEMSA(ISpectrumData sd, String filename) throws Exception {
 		final String fu = filename.toUpperCase();
 		if (!(fu.endsWith(".TIA.MSA") || fu.endsWith(".TIA.EMSA") || fu.endsWith(".TIA.TXT")))
 			filename = filename + ".tia.msa";
-		File newFile = new File(filename);
-		for (int i = 1; newFile.exists(); ++i)
-			newFile = new File(replaceExtension(filename, "." + Integer.toString(i) + ".tia.msa"));
-		try (final FileOutputStream os = new FileOutputStream(newFile)) {
+		File file = new File(filename);
+		if(file.exists() && !file.isDirectory()) {
+			Date mod = new Date(file.lastModified());
+			file.renameTo(new File(replaceExtension(filename, " - "+formatDate(mod)+".msa")));
+		}
+		try (final FileOutputStream os = new FileOutputStream(file)) {
 			WriteSpectrumAsEMSA1_0.write(sd, os, WriteSpectrumAsEMSA1_0.Mode.FOR_TIA);
 		}
-		return newFile.getName();
+		return file.getName();
 	}
 
 	/**
@@ -3032,7 +3051,12 @@ public class MainFrame extends JFrame {
 			list.setHeader("Exporting spectra to <i>" + path.getAbsolutePath() + "</i> as CSV");
 			for (final ISpectrumData spec : getSelectedSpectra())
 				try {
-					final String fn = exportSpectrumAsCSV(spec, new File(path, spec.toString()).getAbsolutePath());
+					File file = new File(path, spec.toString());
+					if(file.exists() && !file.isDirectory()) {
+						Date mod = new Date(file.lastModified());
+						file.renameTo(new File(replaceExtension(file.getAbsolutePath(), " - "+formatDate(mod)+".csv")));
+					}
+					final String fn = exportSpectrumAsCSV(spec, file.getAbsolutePath());
 					if (fn != null)
 						list.add(
 								"The spectrum <i>" + spec.toString() + "</i> was exported as CSV to <i>" + fn + "</i>");
@@ -3066,8 +3090,14 @@ public class MainFrame extends JFrame {
 				try {
 					try {
 						final String name = TextUtilities.normalizeFilename(spec.toString() + "[" + i + "]");
-						File ff = new File(path, name);
-						final String fn = exportSpectrumAsEMSA(spec, ff.getAbsolutePath());
+						File file = new File(path, name);
+						if(file.exists() && !file.isDirectory()) {
+							Date mod = new Date(file.lastModified());
+							String newname = replaceExtension(file.getAbsolutePath(), " - "+formatDate(mod)+".msa");
+							file.renameTo(new File(newname));
+							list.add("Renaming existing file to <i>"+newname+"</i>.");
+						}
+						final String fn = exportSpectrumAsEMSA(spec, file.getAbsolutePath());
 						list.add("The spectrum <i>" + spec.toString() + "</i> was exported as EMSA to <i>" + fn
 								+ "</i>");
 					} catch (final Exception ex) {
