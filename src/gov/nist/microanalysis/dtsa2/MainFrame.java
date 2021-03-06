@@ -2512,7 +2512,7 @@ public class MainFrame extends JFrame {
 							msd.addSpectrum(sd);
 						msd.setLocationRelativeTo(MainFrame.this);
 						msd.setVisible(true);
-						if (msd.shouldSave()) {
+						if (msd.shouldSave()  && (!msd.isCancelled())) {
 							final ISpectrumData res = msd.getResult();
 							if (res != null) {
 								mDataManager.addSpectrum(res, true);
