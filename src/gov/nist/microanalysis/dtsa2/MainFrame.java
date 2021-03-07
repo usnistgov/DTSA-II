@@ -122,6 +122,7 @@ import gov.nist.microanalysis.EPQLibrary.ISpectrumData;
 import gov.nist.microanalysis.EPQLibrary.ParticleSignature;
 import gov.nist.microanalysis.EPQLibrary.PeakROISearch;
 import gov.nist.microanalysis.EPQLibrary.PeakStripping;
+import gov.nist.microanalysis.EPQLibrary.RegionOfInterestSet;
 import gov.nist.microanalysis.EPQLibrary.SpectrumProperties;
 import gov.nist.microanalysis.EPQLibrary.SpectrumSmoothing;
 import gov.nist.microanalysis.EPQLibrary.SpectrumUtils;
@@ -2523,14 +2524,15 @@ public class MainFrame extends JFrame {
 								final StringBuffer hl = new StringBuffer();
 								hl.append("<h3>Making " + res.toString() + "</h3>\n");
 								DescriptiveStatistics cpnas = new DescriptiveStatistics();
-								final List<ISpectrumData> spectra = msd.getSpectra();
+								final List<ISpectrumData> spectra = msd.getSelected();
+								final RegionOfInterestSet rois = msd.computeROIS();
 								for (final ISpectrumData spec : spectra)
 									cpnas.add(SpectrumUtils.totalCounts(spec, true)
 											/ SpectrumUtils.getDose(spec.getProperties()));
 								if (spectra.size() > 1) {
 									hl.append("<p><table>\n");
 									hl.append(
-											"<tr><th>Spectrum</th><th>Beam Energy<br>(keV)</th><th>Probe Current<br>(nA)</th><th>Live Time<br>(s)</th><th>Counts/(nA\u00B7S)</th><th>Variance<br>(&sigma;)</th></tr>\n");
+											"<tr><th>Spectrum</th><th>Beam Energy<br>(keV)</th><th>Probe Current<br>(nA)</th><th>Live Time<br>(s)</th><th>Counts/(nA\u00B7S)</th><th>Score</th></tr>\n");
 									for (final ISpectrumData spec : spectra) {
 										final SpectrumProperties sp = spec.getProperties();
 										hl.append("<tr>");
@@ -2548,14 +2550,13 @@ public class MainFrame extends JFrame {
 												.createGaussian(SpectrumUtils.totalCounts(spec, true), spec.toString()),
 												SpectrumUtils.getDose(sp));
 										hl.append("<td>" + uv2.format(hu) + "</td>");
-										final UncertainValue2 tmp = UncertainValue2.divide(uv2, cpnas.average());
-										hl.append("<td>" + hu.format((1.0 - tmp.doubleValue()) / tmp.uncertainty())
-												+ "</td>");
+										hl.append("<td>" + hu.format(MakeStandardDialog.score(spec, spectra, rois)) + "</td>");
 										hl.append("</tr>\n");
 									}
 									hl.append("</table></p>");
 									hl.append("<p><table>\n");
 								}
+								// Report the standard properties...
 								hl.append(
 										"<tr><th>Spectrum</th><th>Beam Energy<br>(keV)</th><th>Probe Current<br>(nA)</th><th>Live Time<br>(s)</th><th>Counts/(nA\u00B7S)</th></tr>\n");
 								{
@@ -2573,10 +2574,10 @@ public class MainFrame extends JFrame {
 											+ hu.format(
 													sp.getNumericWithDefault(SpectrumProperties.LiveTime, Double.NaN))
 											+ "</td>");
-									hl.append("<td>"
-											+ hu.format(
-													SpectrumUtils.totalCounts(res, true) / SpectrumUtils.getDose(sp))
-											+ "</td>");
+									final UncertainValue2 uv2 = UncertainValue2.divide(UncertainValue2
+											.createGaussian(SpectrumUtils.totalCounts(res, true), res.toString()),
+											SpectrumUtils.getDose(sp));
+									hl.append("<td>"+ uv2.format(hu)+ "</td>");
 									hl.append("</tr>\n");
 								}
 								hl.append("</table></p>");
