@@ -2582,14 +2582,20 @@ public class MainFrame extends JFrame {
 								}
 								hl.append("</table></p>");
 								final List<File> files = MainFrame.this.saveStandards(msd.getBundle());
+								File msafile = new File(DTSA2.getSpectrumDirectory(), normalizeFilename(msd.getResult().toString()));
 								if (files.size() > 0) {
 									hl.append("<ul>\n");
 									for (File file : files)
 										hl.append("<li>Standard saved as " + file.getName() + "</li>\n");
 									hl.append("</ul>\n");
+									try {
+										exportSpectrumAsEMSA(msd.getResult(), msafile.getAbsolutePath());
+										hl.append("<li>Spectrum saved as " + msafile.getName() + "</li>\n");
+									} catch (Exception e) {
+										e.printStackTrace();
+									}
 								}
 								appendHTML(hl.toString());
-								saveStandardAsEMSA(msd.getResult());
 							}
 						}
 					} else
@@ -2855,45 +2861,38 @@ public class MainFrame extends JFrame {
 		return fn.replace(":", "").replace('\\', '-').replace('/', '-');
 	}
 
-	public File saveStandard(Element elm, StandardBundle bundle) {
-		ISpectrumData sd = bundle.getStandard();
-		final String fn = normalizeFilename(elm.toAbbrev() + " std - " + sd.toString().replace(" std", ""));
-		final String dir = DTSA2.getSpectrumDirectory();
-		final JFileChooser jfc = new JFileChooser(dir);
-		final SimpleFileFilter std = new SimpleFileFilter(new String[] { "zstd" }, "DTSA-II Standard Bundle");
-		jfc.addChoosableFileFilter(std);
-		jfc.setFileFilter(std);
-		jfc.setSelectedFile(new File(dir, fn));
-		jfc.setDialogTitle("Save " + fn + " as...");
-		final int option = jfc.showSaveDialog(MainFrame.this);
-		if (option == JFileChooser.APPROVE_OPTION) {
-			File res = jfc.getSelectedFile();
-			if (res != null) {
-				if (jfc.getFileFilter() instanceof SimpleFileFilter)
-					res = ((SimpleFileFilter) jfc.getFileFilter()).forceExtension(res);
-				if( res.exists() && !res.isDirectory()) {
-					Date mod = new Date(res.lastModified());
-					res.renameTo(new File(replaceExtension(res.getAbsolutePath(), " - "+formatDate(mod)+".zstd")));
-				}
-				DTSA2.updateSpectrumDirectory(res.getParentFile());
-				try {
-					sd.getProperties().setTextProperty(SpectrumProperties.SourceFile, res.getCanonicalPath());
-					bundle.write(res);
-					return res;
-				} catch (final Exception ex) {
-					ErrorDialog.createErrorMessage(MainFrame.this, "Error saving spectrum", ex);
-				}
-			}
+	public File saveStandard(Element elm, StandardBundle bundle, File res) {
+		if( res.exists() && !res.isDirectory()) {
+			Date mod = new Date(res.lastModified());
+			res.renameTo(new File(replaceExtension(res.getAbsolutePath(), " - "+formatDate(mod)+".zstd")));
+		}
+		try {
+			bundle.write(res);
+			return res;
+		} catch (final Exception ex) {
+			ErrorDialog.createErrorMessage(MainFrame.this, "Error saving spectrum", ex);
 		}
 		return null;
 	}
 
 	public List<File> saveStandards(Map<Element, StandardBundle> bundles) {
+		final String dir = DTSA2.getSpectrumDirectory();
+		final JFileChooser jfc = new JFileChooser(dir);
+		jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+		jfc.setDialogTitle("Save standards to...");
+		jfc.setSelectedFile(new File(dir));
+		final int option = jfc.showSaveDialog(MainFrame.this);
 		ArrayList<File> res = new ArrayList<>();
-		for (Map.Entry<Element, StandardBundle> me : bundles.entrySet()) {
-			File f = saveStandard(me.getKey(), me.getValue());
-			if (f != null)
-				res.add(f);
+		if (option == JFileChooser.APPROVE_OPTION) {
+			File seldir = jfc.getSelectedFile();
+			DTSA2.updateSpectrumDirectory(seldir);
+			for (Map.Entry<Element, StandardBundle> me : bundles.entrySet()) {
+				ISpectrumData sd = me.getValue().getStandard();
+				final String fn = normalizeFilename(me.getKey().toAbbrev() + " std - " + sd.toString().replace(" std", "")+".zstd");
+				File f = saveStandard(me.getKey(), me.getValue(), new File(seldir, fn));
+				if (f != null)
+					res.add(f);
+			}
 		}
 		return res;
 	}

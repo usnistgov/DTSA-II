@@ -102,6 +102,102 @@ import gov.nist.microanalysis.Utility.Math2;
 public class MakeStandardDialog extends JWizardDialog {
 
 	private static final long serialVersionUID = -1921213224984265198L;
+	
+	
+	public class DosePanel extends JWizardPanel {
+
+		private final JTable jTable_Dose = new JTable();
+		private final JTextField jTextField_ProbeCurrent = new JTextField();
+		private final JTextField jTextField_LiveTime = new JTextField();
+		private final JButton jButton_UpdatePC = new JButton("Update");
+		private final JButton jButton_UpdateLT = new JButton("Update");
+		
+		public DosePanel(JWizardDialog wiz) {
+			super(wiz);
+			initialize();
+		}
+		
+		private void initialize() {
+			final FormLayout fl = new FormLayout("50dlu, 5dlu, pref, 25dlu, 50dlu, 5dlu, pref",
+					"100dlu, 5dlu, pref, 5dlu, pref, 5dlu, pref");
+			final PanelBuilder pb = new PanelBuilder(fl);
+			final CellConstraints cc0 = new CellConstraints();
+			pb.add(new JScrollPane(jTable_Dose), cc0.xyw(1, 1, 7));
+			pb.addSeparator("Update selected spectra", CC.xyw(1, 3, 7));
+			pb.addLabel("Probe Current", cc0.xyw(1, 5, 3));
+			pb.addLabel("Live Time", cc0.xyw(5, 5, 3));
+			pb.add(jTextField_ProbeCurrent, cc0.xy(1, 7));
+			pb.add(jButton_UpdatePC, cc0.xy(3, 7));
+			pb.add(jTextField_LiveTime, cc0.xy(5, 7));
+			pb.add(jButton_UpdateLT, cc0.xy(7, 7));
+			add(pb.getPanel());
+			
+			jButton_UpdatePC.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					int[] sels = jTable_Dose.getSelectedRows();
+					double pc = Double.parseDouble(jTextField_ProbeCurrent.getText());
+					for(int sel:sels) {
+						mSpectra.get(sel).getProperties().setNumericProperty(SpectrumProperties.FaradayBegin, pc);
+						mSpectra.get(sel).getProperties().setNumericProperty(SpectrumProperties.FaradayEnd, pc);
+					}
+					update();
+				}
+			});
+			jButton_UpdateLT.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					int[] sels = jTable_Dose.getSelectedRows();
+					double lt = Double.parseDouble(jTextField_LiveTime.getText());
+					for(int sel:sels) {
+						mSpectra.get(sel).getProperties().setNumericProperty(SpectrumProperties.LiveTime, lt);
+						mSpectra.get(sel).getProperties().setNumericProperty(SpectrumProperties.LiveTime, lt);
+					}
+					update();
+				}
+			});			
+			
+		}
+		
+		public void onShow() {
+			update();
+			setNextPanel(mStandardPanel, "Standard Properties");
+			enableFinish(false);
+		}
+		
+		public boolean permitNext() {
+			boolean ok = checkDoses(mSpectra);
+			if(ok)
+				MakeStandardDialog.this.setMessageText("");
+			else
+				MakeStandardDialog.this.setErrorText("Please specify a probe current and live time for all spectra.");
+			return ok;
+		}
+		
+		private void update() {
+			DefaultTableModel model = new DefaultTableModel(new Object[] { "Spectrum", "Probe Current", "Live Time" }, 0);
+			for(ISpectrumData spec : mSpectra) {
+				model.addRow(new Object[] {
+						spec,
+						spec.getProperties().getTextWithDefault(SpectrumProperties.FaradayBegin, "missing"),
+						spec.getProperties().getTextWithDefault(SpectrumProperties.LiveTime, "missing")
+				});
+			}
+			jTable_Dose.setModel(model);
+		}
+	}
+	
+	public static boolean checkDoses(Collection<ISpectrumData> specs) {
+		for(ISpectrumData spec : specs) {
+			SpectrumProperties sp = spec.getProperties();
+			final double fb=sp.getNumericWithDefault(SpectrumProperties.FaradayBegin, -1.0);
+			final double fe=sp.getNumericWithDefault(SpectrumProperties.FaradayEnd, fb);
+			final double lt=sp.getNumericWithDefault(SpectrumProperties.LiveTime, -1.0);
+			if((fe<0.0)||(lt<0.0))
+				return false;
+		}
+		return true;
+	}	
 
 	public class StandardPanel extends JWizardPanel {
 		private static final long serialVersionUID = 1L;
@@ -120,6 +216,18 @@ public class MakeStandardDialog extends JWizardDialog {
 		}
 
 		public void onShow() {
+			if (mSpectra.size() == 1)
+				setMessageText("Creating a standard from a single spectrum.");
+			else
+				setMessageText("Creating a standard from " + Integer.valueOf(mSpectra.size()) + " spectra.");
+			updateMaterialField(mMaterial);
+			buildBundles();
+			final DecimalFormat df = new HalfUpFormat("0.0");
+			jTextField_BeamEnergy.setText(df.format(mBeamEnergy));
+			jTextField_Dose.setText(df.format(getProbeDose()));
+			jTextField_Detector.setText(mDetector != null ? mDetector.getName() : "--------");
+			jTextField_Material.requestFocus();
+
 			setNextPanel(mFilterPanel, "Select Spectra");
 			enableFinish(false);
 		}
@@ -265,7 +373,7 @@ public class MakeStandardDialog extends JWizardDialog {
 
 			addInScrollPane(pb.getPanel());
 		}
-
+		
 		public boolean permitNext() {
 			return mMaterial.getElementCount() > 0;
 		}
@@ -467,6 +575,11 @@ public class MakeStandardDialog extends JWizardDialog {
 		}
 
 		public void onShow() {
+			
+			jCheckBox_Film.setSelected(mThinFilmStandard);
+			updateThicknessCheckBox();
+			updateCoatingCheckBox();
+
 			setNextPanel(mReferencePanel, "Specify References");
 			enableFinish(true);
 			mSave = true;
@@ -809,6 +922,7 @@ public class MakeStandardDialog extends JWizardDialog {
 		}
 	}
 
+	private final DosePanel mDosePanel = new DosePanel(this);
 	private final StandardPanel mStandardPanel = new StandardPanel(this);
 	private final FilterPanel mFilterPanel = new FilterPanel(this);
 	private final SpecialPanel mSpecialPanel = new SpecialPanel(this);
@@ -838,13 +952,12 @@ public class MakeStandardDialog extends JWizardDialog {
 		super(frame, "Build standard bundle", true);
 		mSession = session;
 		initialize();
-		update();
 		pack();
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 	}
 
 	private void initialize() {
-		setActivePanel(mStandardPanel, "Standard Properties");
+		setActivePanel(mDosePanel, "Standard Dose");
 		enableFinish(false);
 	}
 
@@ -855,13 +968,9 @@ public class MakeStandardDialog extends JWizardDialog {
 		else if (!mDetector.equals(sp.getDetector()))
 			throw new EPQException("The detector for " + spec.toString() + " does not match the previous spectra.");
 		double e0 = sp.getNumericWithDefault(SpectrumProperties.BeamEnergy, Double.NaN);
-		double lt = sp.getNumericWithDefault(SpectrumProperties.LiveTime, Double.NaN);
-		double pc = SpectrumUtils.getAverageFaradayCurrent(sp, Double.NaN);
-		if (Double.isNaN(lt) || Double.isNaN(pc) || Double.isNaN(e0))
-			sp.addAll(mStandardPanel.editSpectrumProperties(sp));
 		e0 = sp.getNumericWithDefault(SpectrumProperties.BeamEnergy, Double.NaN);
-		if (Double.isNaN(lt) || Double.isNaN(pc) || Double.isNaN(e0))
-			throw new EPQException("Please provide the beam energy, live time and probe current for each spectrum.");
+		if (Double.isNaN(e0))
+			throw new EPQException("Please provide the beam energy for each spectrum.");
 		if (mSpectra.size() == 0) {
 			mBeamEnergy = e0;
 			mThickness = getThickness(sp);
@@ -891,9 +1000,9 @@ public class MakeStandardDialog extends JWizardDialog {
 			mCoatingMaterial = Material.Null;
 		}
 		mStandardPanel.jPanel_Element.setAvailableElements(mMaterial.getElementSet());
-		update();
+		setActivePanel(mDosePanel, "Standard Dose");
 	}
-
+	
 	private double getProbeDose() {
 		double dose = 0.0;
 		try {
@@ -912,23 +1021,6 @@ public class MakeStandardDialog extends JWizardDialog {
 				return ((SampleShape.ThinFilm) ss).getThickness();
 		}
 		return Double.NaN;
-	}
-
-	private void update() {
-		if (mSpectra.size() == 1)
-			setMessageText("Creating a standard from a single spectrum.");
-		else
-			setMessageText("Creating a standard from " + Integer.valueOf(mSpectra.size()) + " spectra.");
-		mStandardPanel.updateMaterialField(mMaterial);
-		buildBundles();
-		final DecimalFormat df = new HalfUpFormat("0.0");
-		mStandardPanel.jTextField_BeamEnergy.setText(df.format(mBeamEnergy));
-		mStandardPanel.jTextField_Dose.setText(df.format(getProbeDose()));
-		mStandardPanel.jTextField_Detector.setText(mDetector != null ? mDetector.getName() : "--------");
-		mSpecialPanel.jCheckBox_Film.setSelected(mThinFilmStandard);
-		mSpecialPanel.updateThicknessCheckBox();
-		mSpecialPanel.updateCoatingCheckBox();
-		mStandardPanel.jTextField_Material.requestFocus();
 	}
 
 	protected void buildBundles() {
