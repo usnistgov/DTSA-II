@@ -549,34 +549,55 @@ public class SimulationWizard extends JWizardDialog {
 				final Set<VoxelatedDetector.XRayType> acc = mVoxelatedDetector.getAccumulatorObjects();
 				sb.append("<table>");
 				sb.append(
-						"<tr><th>Ionization<br/>Edge</th><th>Ionization<br/>Energy<br/>(keV)<th>F(50 &#37;)<br/>Depth<br/>(&micro;m)</th><th>F(90 &#37;)<br/>Depth<br/>(&micro;m)</th><th>F(99.9 &#37;)<br/>Depth<br/>(&micro;m)</th><th>F(50 &#37;)<br/>Volume<br/>(&micro;m)<sup>3</sup></th><th>F(90 &#37;)<br/>Volume<br/>(&micro;m)<sup>3</sup></th><th>F(99.9 &#37;)<br/>Volume<br/>(&micro;m)<sup>3</sup></th></tr>\n");
+						"<tr><th>Ionization<br/>Edge</th><th>Ionization<br/>Energy<br/>(keV)</th>"
+						+ "<th>F(50 &#37;)<br/>Depth<br/>(&micro;m)</th><th>F(90 &#37;)<br/>Depth<br/>(&micro;m)</th><th>F(99.9 &#37;)<br/>Depth<br/>(&micro;m)</th>"
+						+ "<th>F(50 &#37;)<br/>Radial<br/>(&micro;m)</th><th>F(90 &#37;)<br/>Radial<br/>(&micro;m)</th><th>F(99.9 &#37;)<br/>Radial<br/>(&micro;m)</th>"
+						+ "<th>F(50 &#37;)<br/>Volume<br/>(&micro;m)<sup>3</sup></th><th>F(90 &#37;)<br/>Volume<br/>(&micro;m)<sup>3</sup></th><th>F(99.9 &#37;)<br/>Volume<br/>(&micro;m)<sup>3</sup></th>"
+						+ "</tr>\n");
+				final double[] origin = new double[] { 0.0, 0.0, 0.0 };
 				for (final VoxelatedDetector.XRayType obj : acc) {
 					final AtomicShellType sh = obj instanceof AtomicShellType ? (AtomicShellType) obj : null;
 					if ((sh != null) && (sh.getEdgeEnergy() >= ToSI.keV(0.1))) {
-						sb.append("<tr>");
-						final double depth50 = mVoxelatedDetector.getFractionalGenerationDepth(obj, 0.50);
-						final double volume50 = mVoxelatedDetector.getFractionalGenerationVolume(obj, 0.50);
-						final double depth90 = mVoxelatedDetector.getFractionalGenerationDepth(obj, 0.90);
-						final double volume90 = mVoxelatedDetector.getFractionalGenerationVolume(obj, 0.90);
-						final double depth100 = mVoxelatedDetector.getFractionalGenerationDepth(obj, 0.999);
-						final double volume100 = mVoxelatedDetector.getFractionalGenerationVolume(obj, 0.999);
-						sb.append("<td>");
+						sb.append("<tr><td>");
 						sb.append(sh.toString());
-						sb.append("</td>");
-						sb.append("<td>");
+						sb.append("</td><td>");
 						sb.append(nf3.format(FromSI.keV(sh.getEdgeEnergy())));
 						sb.append("</td><td>");
-						sb.append(nf3.format(depth50 * 1.0e6));
+						{
+							double[] mm= mVoxelatedDetector.getFractionalGenerationDepth(obj, 0.50);
+							sb.append(nf3.format(mm[0] * 1.0e6)+" &lt; d &lt; "+nf3.format(mm[1] * 1.0e6));
+							sb.append("</td><td>");
+						}
+						{
+							double[] mm= mVoxelatedDetector.getFractionalGenerationDepth(obj, 0.90);
+							sb.append(nf3.format(mm[0] * 1.0e6)+" &lt; d &lt; "+nf3.format(mm[1] * 1.0e6));
+							sb.append("</td><td>");
+						}
+						{
+							double[] mm= mVoxelatedDetector.getFractionalGenerationDepth(obj, 0.999);
+							sb.append(nf3.format(mm[0] * 1.0e6)+" &lt; d &lt; "+nf3.format(mm[1] * 1.0e6));
+							sb.append("</td><td>");
+						}
+						{
+							double[] mm= mVoxelatedDetector.getFractionalGenerationRadius(origin, obj, 0.50);
+							sb.append(nf3.format(mm[0] * 1.0e6)+" &lt; d &lt; "+nf3.format(mm[1] * 1.0e6));
+							sb.append("</td><td>");
+						}
+						{
+							double[] mm= mVoxelatedDetector.getFractionalGenerationRadius(origin, obj, 0.90);
+							sb.append(nf3.format(mm[0] * 1.0e6)+" &lt; d &lt; "+nf3.format(mm[1] * 1.0e6));
+							sb.append("</td><td>");
+						}
+						{
+							double[] mm= mVoxelatedDetector.getFractionalGenerationRadius(origin, obj, 0.999);
+							sb.append(nf3.format(mm[0] * 1.0e6)+" &lt; d &lt; "+nf3.format(mm[1] * 1.0e6));
+							sb.append("</td><td>");
+						}
+						sb.append(nf3.format(mVoxelatedDetector.getFractionalGenerationVolume(obj, 0.50) * 1.0e18));
 						sb.append("</td><td>");
-						sb.append(nf3.format(depth90 * 1.0e6));
+						sb.append(nf3.format(mVoxelatedDetector.getFractionalGenerationVolume(obj, 0.90) * 1.0e18));
 						sb.append("</td><td>");
-						sb.append(nf3.format(depth100 * 1.0e6));
-						sb.append("</td><td>");
-						sb.append(nf3.format(volume50 * 1.0e18));
-						sb.append("</td><td>");
-						sb.append(nf3.format(volume90 * 1.0e18));
-						sb.append("</td><td>");
-						sb.append(nf3.format(volume100 * 1.0e18));
+						sb.append(nf3.format(mVoxelatedDetector.getFractionalGenerationVolume(obj, 0.999) * 1.0e18));
 						sb.append("</td></tr>\n");
 					}
 				}
@@ -1123,7 +1144,7 @@ public class SimulationWizard extends JWizardDialog {
 							}
 							if ((ctr != null) && (mMode == SimulationMode.MCBulk)) {
 								final double[] size = Math2.v3(2.0 * sc, 2.0 * sc, 2.0 * sc);
-								final int[] dims = new int[] { 20, 20, 40 };
+								final int[] dims = new int[] { 200, 200, 200 };
 								mVoxelatedDetector = new VoxelatedDetector(origin, size, dims, false);
 								mVoxelatedDetector.addShells(xrtss);
 								ctr.addXRayListener(mVoxelatedDetector);

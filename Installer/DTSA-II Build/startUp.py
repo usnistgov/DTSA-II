@@ -1057,13 +1057,13 @@ Get the spectrum associated with the specified row number"""
 			fn = "P%0.5d%s" % (partNum , ("" if not postFix else " - "+postFix), )
 			collectSI(fn, fov, frameCount=1, dwell=dwell, dims=dims, path=path, rotation=rotation)
 		
-		def collectImages(self, partNum, fov, dims=(512,512), dwell=6, postFix=None, writeMask=SAVE_IMAGE_MASK):
+		def collectImages(self, partNum, fov, dims=(512,512), dwell=6, postFix=None, markCenter=False, writeMask=SAVE_IMAGE_MASK):
 			"""z.collectImages(partNum, fov, dims=(512,512), dwell=5, postFix="")
 	Collects images of a relocated particle 'partNum' with the specified field-of-view (fov), dims and dwell.
 	The images are saved in the RCA project directory under 'Relocated'"""
 			path = self.getRelocated().getAbsolutePath()
 			fn = "%0.5d%s" % (partNum , (" - I" if not postFix else " - "+postFix), )
-			collectImages(fn, fov=fov, dims=dims, dwell=dwell, path=path, writeMask=writeMask)
+			collectImages(fn, fov=fov, dims=dims, dwell=dwell, path=path, writeMask=writeMask, markCenter=markCenter)
 			
 		def collectZoom(self, partNum, fov, dims=(512,512), dwell=6, writeMask=SAVE_IMAGE_MASK):
 			"""z.collectImages(partNum, fov, dims=(512,512), dwell=5, postFix="")
