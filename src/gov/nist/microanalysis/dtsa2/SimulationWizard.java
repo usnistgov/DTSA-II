@@ -230,6 +230,7 @@ public class SimulationWizard extends JWizardDialog {
 		public String asHTML() {
 			final StringBuffer sb = new StringBuffer();
 			final NumberFormat nf3 = new HalfUpFormat("0.000");
+			final NumberFormat nf6 = new HalfUpFormat("0.000000");
 			final NumberFormat nf1 = new HalfUpFormat("0.0");
 			sb.append("<h2>Simulation Configuration</h2>");
 			sb.append("<p><table>");
@@ -563,45 +564,27 @@ public class SimulationWizard extends JWizardDialog {
 						sb.append("</td><td>");
 						sb.append(nf3.format(FromSI.keV(sh.getEdgeEnergy())));
 						sb.append("</td><td>");
-						{
-							double[] mm= mVoxelatedDetector.getFractionalGenerationDepth(obj, 0.50);
-							sb.append(nf3.format(mm[0] * 1.0e6)+" &lt; d &lt; "+nf3.format(mm[1] * 1.0e6));
+						for(double f : new double[] { 0.5, 0.9, 0.999}){
+							double[] mm= mVoxelatedDetector.getFractionalGenerationDepth(obj, f);
+							sb.append(nf3.format(mm[0] * 1.0e6)+" &lt; z &lt; "+nf3.format(mm[1] * 1.0e6));
 							sb.append("</td><td>");
 						}
-						{
-							double[] mm= mVoxelatedDetector.getFractionalGenerationDepth(obj, 0.90);
-							sb.append(nf3.format(mm[0] * 1.0e6)+" &lt; d &lt; "+nf3.format(mm[1] * 1.0e6));
+						for(double f : new double[] { 0.5, 0.9, 0.999}){
+							double[] mm= mVoxelatedDetector.getFractionalGenerationRadius(origin, obj, f);
+							sb.append(nf3.format(mm[0] * 1.0e6)+" &lt; r &lt; "+nf3.format(mm[1] * 1.0e6));
 							sb.append("</td><td>");
 						}
-						{
-							double[] mm= mVoxelatedDetector.getFractionalGenerationDepth(obj, 0.999);
-							sb.append(nf3.format(mm[0] * 1.0e6)+" &lt; d &lt; "+nf3.format(mm[1] * 1.0e6));
+						for(double f : new double[] { 0.5, 0.9, 0.999}){
+							final double v = mVoxelatedDetector.getFractionalGenerationVolume(obj, f)*1.0e18;
+							String n = v < 0.01 ? nf6.format(v) :nf3.format(v);
+							sb.append("v &asymp; "+ n);
 							sb.append("</td><td>");
 						}
-						{
-							double[] mm= mVoxelatedDetector.getFractionalGenerationRadius(origin, obj, 0.50);
-							sb.append(nf3.format(mm[0] * 1.0e6)+" &lt; d &lt; "+nf3.format(mm[1] * 1.0e6));
-							sb.append("</td><td>");
-						}
-						{
-							double[] mm= mVoxelatedDetector.getFractionalGenerationRadius(origin, obj, 0.90);
-							sb.append(nf3.format(mm[0] * 1.0e6)+" &lt; d &lt; "+nf3.format(mm[1] * 1.0e6));
-							sb.append("</td><td>");
-						}
-						{
-							double[] mm= mVoxelatedDetector.getFractionalGenerationRadius(origin, obj, 0.999);
-							sb.append(nf3.format(mm[0] * 1.0e6)+" &lt; d &lt; "+nf3.format(mm[1] * 1.0e6));
-							sb.append("</td><td>");
-						}
-						sb.append(nf3.format(mVoxelatedDetector.getFractionalGenerationVolume(obj, 0.50) * 1.0e18));
-						sb.append("</td><td>");
-						sb.append(nf3.format(mVoxelatedDetector.getFractionalGenerationVolume(obj, 0.90) * 1.0e18));
-						sb.append("</td><td>");
-						sb.append(nf3.format(mVoxelatedDetector.getFractionalGenerationVolume(obj, 0.999) * 1.0e18));
 						sb.append("</td></tr>\n");
 					}
 				}
 				sb.append("</table>\n");
+				sb.append("Distances and volumes are approximate due to limits imposed by voxelation.  This is particularly a problem at high beam energies.</p>\n");
 			}
 			return sb.toString();
 		}
