@@ -474,10 +474,8 @@ public class SimulationWizard extends JWizardDialog {
 						sb.append("<tr>");
 					sb.append("<td align=center><img src=\"");
 					sb.append(me.getValue());
-					sb.append("\" alt=");
-					sb.append(me.getKey().toString());
-					sb.append(" width = 256 height = 256 /><br/>");
-					sb.append(me.getKey().toString());
+					sb.append("\" width = 256 height = 256 /><br/>");
+					sb.append("<p><center>" + me.getKey().toString() + "</center></p>");
 					sb.append("</td>");
 					if ((i % IMGS_PER_ROW) == 2)
 						sb.append("</tr>\n");
@@ -549,8 +547,7 @@ public class SimulationWizard extends JWizardDialog {
 				sb.append("<h3>Fractional Emission Depths and Volumes</h3>\n");
 				final Set<VoxelatedDetector.XRayType> acc = mVoxelatedDetector.getAccumulatorObjects();
 				sb.append("<table>");
-				sb.append(
-						"<tr><th>Ionization<br/>Edge</th><th>Ionization<br/>Energy<br/>(keV)</th>"
+				sb.append("<tr><th>Ionization<br/>Edge</th><th>Ionization<br/>Energy<br/>(keV)</th>"
 						+ "<th>F(50 &#37;)<br/>Depth<br/>(&micro;m)</th><th>F(90 &#37;)<br/>Depth<br/>(&micro;m)</th><th>F(99.9 &#37;)<br/>Depth<br/>(&micro;m)</th>"
 						+ "<th>F(50 &#37;)<br/>Radial<br/>(&micro;m)</th><th>F(90 &#37;)<br/>Radial<br/>(&micro;m)</th><th>F(99.9 &#37;)<br/>Radial<br/>(&micro;m)</th>"
 						+ "<th>F(50 &#37;)<br/>Volume<br/>(&micro;m)<sup>3</sup></th><th>F(90 &#37;)<br/>Volume<br/>(&micro;m)<sup>3</sup></th><th>F(99.9 &#37;)<br/>Volume<br/>(&micro;m)<sup>3</sup></th>"
@@ -564,27 +561,28 @@ public class SimulationWizard extends JWizardDialog {
 						sb.append("</td><td>");
 						sb.append(nf3.format(FromSI.keV(sh.getEdgeEnergy())));
 						sb.append("</td><td>");
-						for(double f : new double[] { 0.5, 0.9, 0.999}){
-							double[] mm= mVoxelatedDetector.getFractionalGenerationDepth(obj, f);
-							sb.append(nf3.format(mm[0] * 1.0e6)+" &lt; z &lt; "+nf3.format(mm[1] * 1.0e6));
+						for (double f : new double[] { 0.5, 0.9, 0.999 }) {
+							double[] mm = mVoxelatedDetector.getFractionalGenerationDepth(obj, f);
+							sb.append(nf3.format(mm[0] * 1.0e6) + " &lt; z &lt; " + nf3.format(mm[1] * 1.0e6));
 							sb.append("</td><td>");
 						}
-						for(double f : new double[] { 0.5, 0.9, 0.999}){
-							double[] mm= mVoxelatedDetector.getFractionalGenerationRadius(origin, obj, f);
-							sb.append(nf3.format(mm[0] * 1.0e6)+" &lt; r &lt; "+nf3.format(mm[1] * 1.0e6));
+						for (double f : new double[] { 0.5, 0.9, 0.999 }) {
+							double[] mm = mVoxelatedDetector.getFractionalGenerationRadius(origin, obj, f);
+							sb.append(nf3.format(mm[0] * 1.0e6) + " &lt; r &lt; " + nf3.format(mm[1] * 1.0e6));
 							sb.append("</td><td>");
 						}
-						for(double f : new double[] { 0.5, 0.9, 0.999}){
-							final double v = mVoxelatedDetector.getFractionalGenerationVolume(obj, f)*1.0e18;
-							String n = v < 0.01 ? nf6.format(v) :nf3.format(v);
-							sb.append("v &asymp; "+ n);
+						for (double f : new double[] { 0.5, 0.9, 0.999 }) {
+							final double v = mVoxelatedDetector.getFractionalGenerationVolume(obj, f) * 1.0e18;
+							String n = v < 0.01 ? nf6.format(v) : nf3.format(v);
+							sb.append("v &asymp; " + n);
 							sb.append("</td><td>");
 						}
 						sb.append("</td></tr>\n");
 					}
 				}
 				sb.append("</table>\n");
-				sb.append("Distances and volumes are approximate due to limits imposed by voxelation.  This is particularly a problem at high beam energies.</p>\n");
+				sb.append(
+						"Distances and volumes are approximate due to limits imposed by voxelation.  This is particularly a problem at high beam energies.</p>\n");
 			}
 			return sb.toString();
 		}
@@ -1085,8 +1083,8 @@ public class SimulationWizard extends JWizardDialog {
 							final Set<XRayTransitionSet> xrtss = new TreeSet<XRayTransitionSet>();
 							for (final Element elm : elms)
 								for (final String family : families) {
-									final XRayTransitionSet xrts = new XRayTransitionSet(elm, family, 0.0, ToSI.eV(50.0),
-											mBeamEnergy / 1.1);
+									final XRayTransitionSet xrts = new XRayTransitionSet(elm, family, 0.0,
+											ToSI.eV(50.0), mBeamEnergy / 1.1);
 									if (xrts.size() > 0)
 										xrtss.add(xrts);
 								}
@@ -1119,7 +1117,7 @@ public class SimulationWizard extends JWizardDialog {
 										ctrFl.addXRayListener(ei);
 									mEmissionImages3.add(ei);
 								}
-								ti = new TrajectoryImage(1024, 1024, sc);
+								ti = new TrajectoryImage(1024, 1024, sc, false);
 								ti.setXRange(-sc + origin[0], sc + origin[0]);
 								ti.setYRange((-0.2 * sc) + origin[2], (1.8 * sc) + origin[2]);
 								ti.setMaxTrajectories(100);
@@ -1181,20 +1179,35 @@ public class SimulationWizard extends JWizardDialog {
 									final ImageWriter writer = writers.next();
 									EmissionImageBase.scaleEmissionImages(mEmissionImages3);
 									for (final EmissionImage3 ei : mEmissionImages3) {
+										ei.setLabel(false);
 										final File f = File.createTempFile("ei(" + ei.getTransition().toString() + ")_",
 												".png", base);
 										try (final ImageOutputStream ios = ImageIO.createImageOutputStream(f)) {
 											writer.setOutput(ios);
 											writer.write(ei.getImage());
 										}
-										mEmissionFiles.put(ei.getTransition().toString(), f.toURI().toURL().toString());
+										{
+											final double[] fov = ei.getFOV();
+											HalfUpFormat huf = new HalfUpFormat(fov[0] > 100.0e-6 ? "0.0" : "0.00");
+											String label = ei.getTransition().toString() + " " + ei.getType() + "<br/>"
+													+ //
+													"FOV = " + huf.format(1.0e6 * fov[0]) + " &mu;m &times; " + //
+													huf.format(1.0e6 * fov[1]) + " &mu;m<br/>" + //
+													"I<sub>scale</sub> = "
+													+ (new HalfUpFormat("0.000")).format(ei.getIntensityScaleFactor());
+											mEmissionFiles.put(label, f.toURI().toURL().toString());
+										}
 									}
 								}
 							}
 							if (ti != null) {
 								final File tf = File.createTempFile("trajectory", ".png", base);
 								ti.dump(tf);
-								mEmissionFiles.put("Trajectories", tf.toURI().toURL().toString());
+								final double[] fov = ti.getFOV();
+								HalfUpFormat huf = new HalfUpFormat(fov[0] > 100.0e-6 ? "0.0" : "0.00");
+								final String lbl = "Tajectories<br/>FOV = " + huf.format(1.0e6 * fov[0]) + " &mu;m &times; " + //
+										huf.format(1.0e6 * fov[1]) + " &mu;m";
+								mEmissionFiles.put(lbl, tf.toURI().toURL().toString());
 							}
 							/*
 							 * Scale the spectrum from TRAJECTORIES electrons to the requested beam dose.
