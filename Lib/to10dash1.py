@@ -83,7 +83,9 @@ assumed to come from the same material.  The "_error" columns reflect the standa
 			instrument_analysis_date, operator, weight_percent, weight_percent_error, atom_percent, atom_percent_error, 
 			amount, k_value, normalization_factor, normalization_model, count_rate, diffracting_crystal, spectrometer, 
 			e0, beam_current, spot_size, star_elemental_comments )
-		res = "%1s%07i %-6s %1s %1s %-3s %-2s %-3s %-11s %12s %12s %12s %12s %12s %5s %12s %12s %3s %12s %-6s %5s %4s %5s %5s %s" % item
+		if isinstance(sample_id,int):
+			sample_id = "%07i" % sample_id
+		res = "%1s%-7s %-6s %1s %1s %-3s %-2s %-3s %-11s %12s %12s %12s %12s %12s %5s %12s %12s %3s %12s %-6s %5s %4s %5s %5s %s" % item
 		full = "%s%s\n" % (full, res)
 		print(res)
 	return full[0:-1]
