@@ -20,7 +20,9 @@ import javax.swing.border.TitledBorder;
 
 import gov.nist.microanalysis.EPQDatabase.ReferenceDatabase;
 import gov.nist.microanalysis.EPQDatabase.Session;
+import gov.nist.microanalysis.EPQLibrary.MaterialFactory;
 import gov.nist.microanalysis.EPQLibrary.StandardsDatabase2;
+import gov.nist.microanalysis.EPQTools.EPQXStream;
 import gov.nist.microanalysis.EPQTools.ErrorDialog;
 import gov.nist.microanalysis.EPQTools.SwingUtils;
 
@@ -249,6 +251,40 @@ public class DTSA2 {
 
    // Main method
    public static void main(String[] args) {
+      if(Integer.parseInt(System.getProperty("java.specification.version"))>16) {
+         ErrorDialog.createErrorMessage(
+            null,
+            "NIST DTSA-II Initialization Error", 
+            "NIST DTSA-II does not support Java Runtime Environments more recent than version 16.",
+            "JRE versions 17 and later remove functionality used by DTSA-II to record system data\n"+
+            "in XML format.  Until we can find an alternative, DTSA-II will only run on Java\n"+
+            "Runtime Environments between version 11 and version 16.\n"+
+            "You will also need to specify the `--illegal-access=permit` at the java command line.\n"+
+            "This flag entails some minor risks which would be unacceptable if we were running a\n"+
+            "web server but, in a desktop application like DTSA-II, we do not believe that they\n"+
+            "represent a significant risk.");
+          System.exit(1);
+      }
+      EPQXStream xst = EPQXStream.getInstance();
+      try {
+         xst.fromXML(xst.toXML(MaterialFactory.createCompound("Al2O3", 3.4)));
+      }
+      catch (Exception e3){
+         ErrorDialog.createErrorMessage(
+            null,
+            "NIST DTSA-II Initialization Error", 
+            "Please specify the `--illegal-access=permit` java command line option when starting DTSA-II.",
+            "You need to specify the `--illegal-access=permit` at the java command line.\n"+
+            "   > java --illegal-access=permit -jar dtsa2.jar\n"+
+            "This flag entails some risks which would be unacceptable in a web server but,\n"+
+            "in a desktop application like DTSA-II, we do not believe that they represent\n"+
+            "a significant risk.  We have imposed limits on the types of objects that can"+
+            "be read into the application.  We are also looking into alternatives but the\n"+
+            "nature of the problem means that the alternatives we've identified suffer from\n"+
+            "the same issue.  Any code that introspectively reconstructs Java objects from\n"+
+            "disk has been made illegal.");
+         System.exit(1);
+      }
       final String os = System.getProperty("os.name").toLowerCase();
       if((os.indexOf("mac") >= 0) || (os.indexOf("os x") >= 0)) {
          System.setProperty("apple.laf.useScreenMenuBar", "true");
