@@ -5,7 +5,7 @@
 
 analyst = jl.System.getProperty("user.name") # Replace with your analyst = "your name"! 
 
-beamEnergy = 25.0 # keV (Checked, not set, used to select standards)
+beamEnergy = 20.0 # keV (Checked, not set, used to select standards)
 ruleFile = "generic.zrr" # or you can specify one in 'basicRCA', 'highZRCA' etc.
 realTime = 0.3 # seconds per particle
 randomize = True
@@ -178,8 +178,8 @@ def basicHighMagRCA(project, sample, tiling, stageZ):
 
 #pts3 = parseCoords("[{X:-9.291,Y:-0.871,Z:21.427,Rotate:-0.00,Tilt:-0.00}, {X:-3.039,Y:11.609,Z:21.427,Rotate:-0.00,Tilt:-0.00}, {X:-15.946,Y:12.313,Z:21.427,Rotate:-0.00,Tilt:-0.00}]")
 
-pts4 = parseCoords("[{X:-10.093,Y:-14.296,Z:25.331,Rotate:-0.00,Tilt:-0.00}, {X:-14.606,Y:-0.516,Z:25.331,Rotate:-0.00,Tilt:-0.00}]")
-
+pts4 = parseCoords("[{X:-3.054,Y:-2.164,Z:13.863,Rotate:53.90,Tilt:-0.00}, {X:-1.333,Y:-0.437,Z:13.863,Rotate:53.90,Tilt:-0.00}, {X:-5.166,Y:-0.470,Z:13.863,Rotate:53.90,Tilt:-0.00}]")
+z4 = lambda xy : meshZ(xy, pts4)
 #pts5 = parseCoords("[{X:5.437,Y:-18.676,Z:21.703,Rotate:-0.00,Tilt:-0.00}, {X:12.555,Y:-6.561,Z:21.703,Rotate:-0.00,Tilt:-0.00}, {X:0.915,Y:-7.008,Z:21.703,Rotate:-0.00,Tilt:-0.00}]")
 
 #pts6 = parseCoords("[{X:11.412,Y:-12.044,Z:24.244,Rotate:-0.00,Tilt:-0.00}, {X:16.858,Y:-2.361,Z:24.244,Rotate:-0.00,Tilt:-0.00}, {X:6.466,Y:-2.236,Z:24.244,Rotate:-0.00,Tilt:-0.00}]")
@@ -191,7 +191,7 @@ tilt = parseCoords("[{X:-13.415,Y:-0.563,Z:24.644,Rotate:-0.00,Tilt:-0.00}, {X:-
 # WARNING: Working distance has been replaced by stageZ.  Now a stage motion instead of a change in focal distance.
 analyses = (
    # ( "project", "sample", tiling, stageZ, rcaFunc ),
-   ( "ORNL_Shawn", "MA-35 Sample E", rectangularTiling(pts4), lambda xy : meshZ(xy, tilt), highZRCA ),
+   ( "TEST", "TEST", rectangularTiling(pts4), z4, highZRCA ),
    # ( "Greg's Package Test", "Package Swipe Ref and Control Apr-2019 - wafer", circularTiling(pts5), 21.703, basicRCA ),
    #( "Background Swipes", "ASPEX", circularTiling(pts3), 24.514, highZRCA ),
    #( "Background Swipes", "Blank", circularTiling(pts4), 24.581, highZRCA ),
