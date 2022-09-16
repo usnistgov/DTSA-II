@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
-# Name: 	startUp.py
-# Purpose:	This script initializes the SEMantics library.   It optionally connects to the
+# Name:		startUp.py
+# Purpose:	This script initializes the SEMantics library.	 It optionally connects to the
 #	TESCAN SEM and provides a mechanism to control the SEM, collect data and process SEM data.
-# Modified: 18-May-2020
+# Modified: 11-July-2022
 # Set the SITE to account for site specific hardware variations
-NIST, MCCRONE, PNNL, PAS, AEM, ORNL = ( "NIST", "McCRONE", "PNNL", "PAS", "AEM", "ORNL" )
-SITE = ORNL
+NIST, MCCRONE, PNNL, PAS, AEM, ORNL, SRNL, PLEASANTON, WARRENDALE = ( "NIST", "McCRONE", "PNNL", "PAS", "AEM", "ORNL", "SRNL", "PLEASANTON", "WARRENDALE" )
+SITE = MCCRONE
 
 if (SITE == NIST) and (jl.System.getProperty('sun.java.command') == u'gov.nist.microanalysis.dtsa2.DTSA2'):
 	print "JAR paths based on workspace."
-	sys.path.append("C:\\Users\\nritchie\\Documents\\workspace\\SEMantics\\bin")	
+	sys.path.append("C:\\Users\\nritchie\\Documents\\workspace\\SEMantics\\bin")
 	sys.path.append("C:\\Users\\nritchie\\Documents\\workspace\\Graf\\classes")
 	sys.path.append("C:\\Users\\nritchie\\Documents\\workspace\\FastQuant\\bin")
 else:
@@ -73,29 +73,54 @@ def setDefaultPath(path):
 	report("<p>Writing session data to <i>%s</i></p>" % defaultPath)
 
 defaultArchivePath = None
-	
+
 if SITE==NIST:
 	rootPath = "D:"
 	defaultArchivePath = "P:"
 elif (SITE==PNNL) or (SITE==PAS) or (SITE==AEM):
 	rootPath = "C:\\Users\\Tescan\\My Documents\\Data"
 elif SITE==ORNL:
-    rootPath = "C:\\Users\\Tescan\\Data"                                
+	rootPath = "C:\\Users\\Tescan\\Data"
+elif SITE==PLEASANTON:
+	rootPath = "C:\\Users\\Tescan\\Documents\\DTSA-II Reports\\Data" 
+elif SITE==WARRENDALE:
+	rootPath = "C:\\Users\\EdaxAdmin\\Documents\\DTSA-II Reports\\Data"
 else:  # SITE==MCCRONE:
 	rootPath = "C:\\Data"
 
+
+BLANKER_INDEX = 0
+if SITE == WARRENDALE:
+	BLANKER_INDEX = 1
+
 # Configure this to determine which field images to save.
-#   Image 1 => 0x1, Image 2 => 0x2, Image N => 2^(N-1) and Image 1+2 = 0x1 + 0x2 etc.
-SAVE_FIELD_MASK = (0x0 if (SITE == AEM) or (SITE == PAS) else 0x3)
+#	Image 1 => 0x1, Image 2 => 0x2, Image N => 2^(N-1) and Image 1+2 = 0x1 + 0x2 etc.
+if SITE==WARRENDALE:
+	SAVE_FIELD_MASK = 0x9
+elif (SITE==AEM) or (SITE==PAS):
+	SAVE_FIELD_MASK = 0x0
+else:
+	SAVE_FIELD_MASK = 0x3
+
 # Default images to save using collectImages(...)
-DEF_IMAGE_MASK = 0x3
-# Mask to use for other functions that save images 
+
+if SITE==PLEASANTON:
+	DEF_IMAGE_MASK = 0x2F
+elif SITE==WARRENDALE:
+	DEF_IMAGE_MASK = 0x9 # 0x2F
+else:
+	DEF_IMAGE_MASK = 0x3
+# Mask to use for other functions that save images
 SAVE_IMAGE_MASK = 0x3
+
+DEFAULT_E0 = 25
+if (SITE == NIST) or (SITE==WARRENDALE):
+	DEFAULT_E0 = 20
 
 if SITE<>PNNL:
 	setDefaultPath("%s\\Daily\\%s" % (rootPath, jtext.SimpleDateFormat("dd-MMM-yyyy").format(ju.Date())))
 	defaultRulePath = "%s\\Standards\\Combined" % rootPath
-	defaultVecPath = "%s\\Standards\\Combined\\25 keV" % rootPath
+	defaultVecPath = "%s\\Standards\\Combined\\%d keV" % (rootPath, DEFAULT_E0)
 	nullImagePath = "%s\\Standards\\Null images" % rootPath
 	keyPath = "%s\\Standards\\Null images" % rootPath
 else:
@@ -106,40 +131,34 @@ else:
 	keyPath = nullImagePath
 
 defaultStds = { "C": "C std.msa", "Al": "Al std.msa", "Na": "NaCl std.msa", "Cl": "NaCl std.msa",
-		 "O": "MgO std.msa", "Si": "Si std.msa", "Fe": "Fe std.msa", "Ca": "CaF2 std.msa", 
+		 "O": "MgO std.msa", "Si": "Si std.msa", "Fe": "Fe std.msa", "Ca": "CaF2 std.msa",
 		 "Cr": "Cr std.msa", "Ni":"Ni std.msa", "Cu": "Cu std.msa", "Ti": "Ti std.msa", "Mn":"Mn std.msa",
-		 "Mg": "Mg std.msa", "S": "FeS2 std.msa", "Zn" : "Zn std.msa", "Ba":"BaF2 std.msa", 
-#		 "Co":"Co std.msa", "K": "KBr std.msa", "Zr":"Zr std.msa", "Mo":"Mo std.msa", 
+		 "Mg": "Mg std.msa", "S": "FeS2 std.msa", "Zn" : "Zn std.msa", "Ba":"BaF2 std.msa",
+#		 "Co":"Co std.msa", "K": "KBr std.msa", "Zr":"Zr std.msa", "Mo":"Mo std.msa",
 #		 "Ag" : "Ag std.msa", "Au" : "Au std.msa", "La" : "LaF3 std.msa", "Pb" : "K227 std.msa"
 }
 
-if (SITE==NIST) or (SITE==MCCRONE) or (SITE==ORNL):
+if (SITE==MCCRONE) or (SITE==ORNL) or (SITE==NIST):
 	availableDets = ( True, )*4 # False, False, False )
+elif (SITE==PLEASANTON) or (SITE==WARRENDALE):
+	availableDets = ( True, )
 else:
-	availableDets = ( True, )*3 # False, False, False )
-	
+	availableDets = ( True, )*2 # False, False, False )
+
 defaultDetCount = len(availableDets)
 defaultDetMask = 0
 for i in range(0, defaultDetCount):
 	if availableDets[i]:
 		defaultDetMask = defaultDetMask + (1 << i)
+_edsResolution="Medium"
 
 defLED = True
 
 pt_det = []
-if SITE==NIST:
-	bd="Detector %d"
-	det_off=0
-	all = "Global - 10 eV/ch"
-else:
-	bd="EDAX Det %d"
-	all = "EDAX All"
-	det_off=1
-	
 for i in range(0, defaultDetCount):
 	if availableDets[i]:
-		pt_det.append(findDetector(bd % (i+det_off, )))
-pt_det_all = findDetector(all)
+		pt_det.append(findDetector("EDAX Det %d" % (i+1, )))
+pt_det_all = findDetector("EDAX All")
 
 _saverize = semantics.Saverize()
 _saverizeTh = jl.Thread(_saverize)
@@ -147,7 +166,7 @@ _saverizeTh.start()
 
 connect = (jop.showConfirmDialog(MainFrame, "Connect to the TESCAN?", "Start-up Script", jop.YES_NO_OPTION) == jop.YES_OPTION)
 
-# Location of the Image Magick executables 'convert' and 'montage' 
+# Location of the Image Magick executables 'convert' and 'montage'
 if SITE==ORNL:
 	IMAGE_MAGICK = "C:\\Program Files\\ImageMagick-6.9.9-Q16"
 else:
@@ -174,14 +193,12 @@ def parseCoords(ps):
 				cs = cs + ps[i]
 		elif ps[i]=='{':
 			cs=ps[i]
-	return tuple(res)	
-	
+	return tuple(res)
+
 if connect:
-	if SITE==NIST:
-		_vendor = semss.ScanningElectronMicroscope.EDSVendor.Pulsetor
-	else:
-		_vendor = semss.ScanningElectronMicroscope.EDSVendor.EDAX
+	_vendor = semss.ScanningElectronMicroscope.EDSVendor.EDAX
 	_sem = semss.ScanningElectronMicroscope(_vendor)
+	# _sem = semss.ScanningElectronMicroscope("192.168.1.104", 8300, 8400, _vendor)
 	sem = _sem
 	_sem.initializeEDS(defaultDetMask)
 	_stg = _sem.getStage()
@@ -196,43 +213,62 @@ if connect:
 	eds = _eds
 	_pt = sem.getPulseTorEDS()
 	_afafb = None
-	
+
 	pt = _pt
 	cx = 0
 	for i in range(0, defaultDetCount):
 		if availableDets[i]:
 			_sem.setDetector(cx, pt_det[cx])
 			cx = cx + 1
-	
+
 	cx = 0
 	for i in range(0, defaultDetCount):
 		if availableDets[i]:
-			print "     %s - Gain: %f" % (pt_det[cx], _pt.getADCGain(i))
+			print "		%s - Gain: %f" % (pt_det[cx], _pt.getADCGain(i))
 			cx = cx + 1
 	report("<p>Connected to TESCAN with %d SDD</p>" % defaultDetCount)
 	
+	def findEDet(name):
+		for d in _sem.getElectronDetectors():
+			if d.getName()==name:
+				return d
+		print "Unable to find a detector named: %s" % name
+		return None
+
+	if SITE==MCCRONE:
+		_apaDet = findEDet("BSED")
+	elif SITE==WARRENDALE:
+		_apaDet = findEDet("LE BSE")
+	elif SITE==PLEASANTON:
+		_apaDet = findEDet("BSE Q4")
+	else:
+		_apaDet = findEDet("BSE")
+
 	# Initialize the PulseTor detectors
-	
+
 	def activeDetectors(mask=defaultDetMask):
 		res = []
 		for i in range(0, 8):
 			if (1 << i) & mask:
 				res.append(i)
 		return tuple(res)
-	
+
 	print "Active detectors: (%s)" % ", ".join("(%d @ %s)" % (d, _pt.getResolutionMode(d)) for d in activeDetectors())
-	
+
 	def setResolution(res, mask=defaultDetMask):
 		"""setResolution(res, mask=defaultDetMask)
 		Set the EDS detector resolution to one of 'Best', 'Medium', 'Fast', 'VeryFast', 'Adaptive'"""
-		_pt.setResolutionMode(_pt.ResolutionMode.valueOf(res), mask)
-		
-		
+		if _pt:
+			_pt.setResolutionMode(_pt.ResolutionMode.valueOf(res), mask)
+			_edsResolution = res
+			updateCalibration(False)
+
+
 	def turnOff():
 		"""turnOff()
 		Turns the instrument (high voltage, scanning etc.) off."""
 		_sem.mainPower(False)
-		
+
 	def vent():
 		"""vent()
 		Turn off the beam and went the chamber"""
@@ -241,27 +277,33 @@ if connect:
 		# _pt.enablePeltier(defaultDetMask, False)
 		# time.sleep(60.0)
 		_ts.vacVent()
-	
+
 	def pump():
 		"""pump()
 		Evacuate the sample chamber"""
 		_ts.vacPump()
 		time.sleep(30.0)
-		_pt.enablePeltier(defaultDetMask, True)
-	
+		if _pt:
+			_pt.enablePeltier(defaultDetMask, True)
+			
+			
+	def listElectronDetectors():
+		for d in _sem.getElectronDetectors():
+			print "Name: \"%s\"\n\tIndex: %d\n\tMask:  0x%x" % ( d.getName(), d.getIndex(), (1<<d.getIndex()))
+
 	def collectImages(name, fov=1.0, dims=(512, 512), dwell=4, subRaster=None, path=None, rotation=0.0, markCenter=False, writeMask=DEF_IMAGE_MASK):
 		"""collectImages(
-			name,            # Base file name
-			fov=1.0,         # Field of view in mm
+			name,			 # Base file name
+			fov=1.0,		 # Field of view in mm
 			dims=(512, 512), # Image dimensions in pixels
-			dwell=4,         # Dwell index
-			subRaster=None,  # A rectangle within dims to limit the image
-			path=None,       # If path=None => defaultPath otherwise => path
-			rotation=0.0,    # Image rotation in degrees
+			dwell=4,		 # Dwell index
+			subRaster=None,	 # A rectangle within dims to limit the image
+			path=None,		 # If path=None => defaultPath otherwise => path
+			rotation=0.0,	 # Image rotation in degrees
 			markCenter=False,# Place a marker at the center of the image
-			writeMask=0xFF   # Which images to write 0x1 -> 1, 0x2 -> 2, 0x4 -> 3 0x3 -> 1 & 2
+			writeMask=0xFF	 # Which images to write 0x1 -> 1, 0x2 -> 2, 0x4 -> 3 0x3 -> 1 & 2
 		)
-		Collect and save images to a file named 'name' with the specified 'fov' (in mm) and image dimensions 'dims', scan speed 'dwell'."""		
+		Collect and save images to a file named 'name' with the specified 'fov' (in mm) and image dimensions 'dims', scan speed 'dwell'."""
 		global terminated
 		if terminated:
 			return
@@ -284,7 +326,7 @@ if connect:
 			logImage(path, name, "Images", fov, dims, dwell, sem.beamEnergy/1000.0)
 		# report("<p>Collected images <i>%s</i> - %0.1f &mu;m FOV %d &times; %d at dwell %d</p>" % (name, 1000.0*fov, dims[0], dims[1], dwell))
 		return res
-	
+
 	def logImage(path, name, typ, fov, dims, dwell, e0, frameCount=1):
 		"""Used internally to log the acquisition of images and spectrum images."""
 		ff = jio.File(path, "images.txt")
@@ -303,11 +345,11 @@ if connect:
 				pw.flush()
 		finally:
 			fos.close()
-	
+
 	def collectSI(name, fov, frameCount=1, dwell=9, dims=(1024, 1024), vectorSet=None, subRaster=None, path=None, rotation=0.0):
 		"""collectSI(name, fov, frameCount=1, dwell=9, dims=(1024, 1024), subRaster=None, path=defaultPath, rotation=0.0)
 		Collect x-ray spectrum image data, write the results to a directory called 'name' in 'path'.
-		fov is the horizontal field-of-view in mm, 
+		fov is the horizontal field-of-view in mm,
 		frameCount is number of frame scans
 		dwell is the integer scan speed index (9=1 ms/pixel)
 		dims in (pixels,pixels)
@@ -316,6 +358,7 @@ if connect:
 		if terminated:
 			return
 		_ts.chamberLed(False)
+		setResolution(_edsResolution)
 		asi = sem.getAcquireSpectrumImage()
 		ci=asi.getConfigureImage()
 		ci.setImageDimensions(dims[0], dims[1])
@@ -353,9 +396,9 @@ if connect:
 		logImage((path if path else defaultPath), name, "SI", fov, dims, dwell, sem.beamEnergy, frameCount)
 		report("<p>Collected SI <i>%s</i> %0.1f &mu;m FOV %d &times; %d with %d frames at dwell %d </p>" % (name, 1000.0*fov, dims[0], dims[1], frameCount, dwell ))
 
-		
+
 	def collectSIs(pts, dwell=6, dims=(1024, 1024)):
-		"""Collects a sequence of spectrum images.  Each item in 'pts' is a list containing 
+		"""Collects a sequence of spectrum images.	Each item in 'pts' is a list containing
 	[ 'name', stgPos, fieldOfView, workingDistance ].
 	The algorithm moves to "stgPos", sets the image width to fieldOfView (in mm), sets the focal distance to "workingDistance". The resulting spectrum image is recorded in a directory named "name"."""
 		try:
@@ -370,7 +413,7 @@ if connect:
 					print e
 		finally:
 			turnOff()
-			
+
 	def moveTo(pnt, xyOnly=False):
 		"""moveTo(pnt, xyOnly=false) - (Works)
 		Moves the stage to the specified stage point.  If pnt is a ISpectrumData derived object then the stage /
@@ -422,7 +465,7 @@ is moved to the StagePosition associated with the spectrum."""
 				return
 		pos.set(Z_AXIS, z)
 		moveTo(pos, xyOnly=False)
-					
+
 	def home():
 		"""home()
 		Return the stage to (0.0, 0.0)"""
@@ -431,15 +474,15 @@ is moved to the StagePosition associated with the spectrum."""
 		newPt.set(Y_AXIS, 0.0)
 		newPt.set(Z_AXIS, jl.Math.max(40.0, newPt.get(Z_AXIS)))
 		moveTo(newPt)
-		
-			
+
+
 	def position():
 		"""position()
 		Waits for the stage to stop moving then returns the current stage coordinate."""
 		while (_stg.getStatus() == _stg.StageStatus.MOVING) and (not terminated):
 			time.sleep(0.01)
 		return _stg.getPosition()
-			
+
 	def collect2(acqTime=60, name=None, pc=True, mode='L', disp=True, forcePC=False, comp=None, path=None, fov=None):
 		"""collect2(acqTime=60, name=None, pc=True, mode='L', disp=True, forcePC=False, comp=None, path=None)
 	Collect a single combined EDS spectrum for the specified live time or real time.  Name the spectrum as specified and display.
@@ -455,7 +498,7 @@ fov: An optional field of view width to which to set the SEM imaging while colle
 			return
 		# tt = _pt.getTemperature(0)
 		# if (tt < -31.3) or (tt > -29.7):
-		# 	print "Warning: The detectors may not be at the correct temperature (T=%2.1f != 30.0)" % tt
+		#	print "Warning: The detectors may not be at the correct temperature (T=%2.1f != 30.0)" % tt
 		start_ts = ju.Date()
 		if name == None:
 			name = "Spectrum"
@@ -466,6 +509,7 @@ fov: An optional field of view width to which to set the SEM imaging while colle
 			comp = None
 		name = "%s[%s]" % (name, time().ctime())
 		_ts.chamberLed(False)
+		setResolution(_edsResolution)
 		stg_pos = _stg.getPosition()
 		time.sleep(0.1)
 		if pc:
@@ -539,10 +583,10 @@ fov: An optional field of view width to which to set the SEM imaging while colle
 		wspec=wrap(spec)
 		DataManager.replaceSpectrum(rep, wspec)
 		return wspec
-		
+
 	def collect2ts(acqTime=60, name=None, pc=True, mode='L', disp=True, forcePC=False, comp=None, path=None, fov=None):
 		"""collect2ts(acqTime=60, name=None, pc=True, mode='L', disp=True, forcePC=False, comp=None, path=None)
-	Collect a time sequence of spectra representing the combined EDS spectrum for the specified live time or real time.  Name the spectrum as specified and display.
+	Collect a time sequence of spectra representing the combined EDS spectrum for the specified live time or real time.	 Name the spectrum as specified and display.
 pc = True to collect the probe current from the stage position "faraday"
 mode = "L"|"R"|"C" for live-time, real-time or counts (changes how acqTime is interpreted)
 disp=True to display the spectrum as it is acquired
@@ -555,7 +599,7 @@ fov: An optional field of view width to which to set the SEM imaging while colle
 			return
 		# tt = _pt.getTemperature(0)
 		# if (tt < -31.3) or (tt > -29.7):
-		# 	print "Warning: The detectors may not be at the correct temperature (T=%2.1f != 30.0)" % tt
+		#	print "Warning: The detectors may not be at the correct temperature (T=%2.1f != 30.0)" % tt
 		start_ts = ju.Date()
 		if name == None:
 			name = "Spectrum"
@@ -566,6 +610,7 @@ fov: An optional field of view width to which to set the SEM imaging while colle
 			comp = None
 		name = "%s[%s]" % (name, time().ctime())
 		_ts.chamberLed(False)
+		setResolution(_edsResolution)
 		stg_pos = _stg.getPosition()
 		time.sleep(0.1)
 		if pc:
@@ -639,10 +684,10 @@ fov: An optional field of view width to which to set the SEM imaging while colle
 		else:
 			report("<p>Collected %d time series spectra <i>%s</i> for %0.1f s %s at %0.1f keV</p>" % (len(specs), name, acqTime, mode, hv))
 		return tuple(specs)
-		
+
 	def collect(acqTime=60, name=None, pc=True, mode='L', disp=True, forcePC=False, comp=None, path=None, fov=None):
 		"""collect(acqTime=60, name=None, pc=True, mode="L", disp=True, forcePC=False, comp=None, path=None)
-	Simultaneously collect an EDS spectrum from each detector for the specified live time or real time.  Name the spectra as specified and display.
+	Simultaneously collect an EDS spectrum from each detector for the specified live time or real time.	 Name the spectra as specified and display.
 pc = True to collect the probe current from the stage position "faraday"
 mode = "L"|"R"|"C" for live-time, real-time or counts (changes how acqTime is interpreted)
 disp=True to display the spectrum as it is acquired
@@ -655,7 +700,7 @@ fov: An optional field of view width to which to set the SEM imaging while colle
 			return ()
 		# tt = _pt.getTemperature(0)
 		# if (tt < -31.3) or (tt > -29.7):
-		# 	print "Warning: The detectors may not be at the correct temperature (T=%2.1f != 30.0)" % tt
+		#	print "Warning: The detectors may not be at the correct temperature (T=%2.1f != 30.0)" % tt
 		start_ts = ju.Date()
 		if name == None:
 			name = "Spectrum"
@@ -667,7 +712,7 @@ fov: An optional field of view width to which to set the SEM imaging while colle
 		name = "%s[%s]" % (name, time().ctime())
 		_ts.chamberLed(False)
 		stg_pos = _stg.getPosition()
-		time.sleep(0.1)
+		setResolution(_edsResolution)
 		if pc:
 			fb = updatedPC(interval=(0 if forcePC else 300))
 		clear()
@@ -686,7 +731,7 @@ fov: An optional field of view width to which to set the SEM imaging while colle
 			_eds.start(_eds.Mode.Counts, acqTime)
 		done = False
 		while not done:
-			time.sleep(jl.Math.min(1.0, 1.3 * acqTime))
+			time.sleep(jl.Math.min(0.2, 1.3 * acqTime))
 			if terminated:
 				_eds.stop()
 			done = _eds.done()
@@ -706,7 +751,7 @@ fov: An optional field of view width to which to set the SEM imaging while colle
 							specs[det] = tmp
 							if disp:
 								display(tmp)
-				if len(rep) > 0:					
+				if len(rep) > 0:
 					DataManager.replaceSpectra(rep)
 		if pc:
 			fe = updatedPC(interval=(0 if forcePC else 300))
@@ -736,7 +781,7 @@ fov: An optional field of view width to which to set the SEM imaging while colle
 		else:
 			report("<p>Collected %d spectra <i>%s</i> for %0.1f s %s at %0.1f keV</p>" % (len(specs), name, acqTime, mode, hv))
 		return tuple(specs)
-		
+
 	def collectPoints2(fov, pts, baseName, acqTime=60, pc=True, mode='L', disp=True, path=None):
 		"""collectPoints2(fov, pts, baseName, acqTime=60, pc=True, mode='L', disp=True, path=None)
 		Collect a series of spectra by moving the beam (in point mode) around the field-of-view as specified by 'pts'.
@@ -762,23 +807,26 @@ fov: An optional field of view width to which to set the SEM imaging while colle
 		finally:
 			_ts.setViewField(oldVf)
 			_ts.scSetSpeed(oldSp)
-	
-	
+
+
 	def calibrate(det, measured, desired=10.0):
 		"""calibrate(det, measured, desired=10.0)
 		Calibrates the EDS detector where 'measured' is the measured gain and 'desired' is the desired gain (nominally 10.0 eV/ch)"""
-		print "Detector %d:\nBefore: %f" % (det, _pt.getADCGain(det))
-		_pt.setADCGain(1 << det, _pt.getADCGain(det) * measured / desired)
-		print "After:  %f" % (_pt.getADCGain(det))
-		return _pt.getADCGain(det)
-		
-	def updateCalibration():
-		cal=readCalibrations()
-		for i in range(0,min(len(cal),len(availableDets))):
-			if (cal[i]>1.0) and availableDets[i]:
-				_pt.setADCGain(1 << i, cal[i])
-				print "Detector %d gain set to %f (%f)" % (i, _pt.getADCGain(i), cal[i])
-	
+		if _pt:
+			print "Detector %d:\nBefore: %f" % (det, _pt.getADCGain(det))
+			_pt.setADCGain(1 << det, _pt.getADCGain(det) * measured / desired)
+			print "After:  %f" % (_pt.getADCGain(det))
+			return _pt.getADCGain(det)
+
+	def updateCalibration(verbose = False):
+		if _pt:
+			cal=readCalibrations()
+			for i in range(0,min(len(cal),len(availableDets))):
+				if (cal[i]>1.0) and availableDets[i]:
+					_pt.setADCGain(1 << i, cal[i])
+					if verbose:
+						print "Detector %d gain set to %f (%f)" % (i, _pt.getADCGain(i), cal[i])
+
 	def logSpectrum(path, acqTime, name, mode):
 		"""Used internally to log the acquisition of spectra"""
 		ff = jio.File(path, "spectra.txt")
@@ -797,7 +845,7 @@ fov: An optional field of view width to which to set the SEM imaging while colle
 				pw.flush()
 		finally:
 			fos.close()
-		
+
 	def measurePC(restore=True):
 		"""measurePC(restore=True) - (Works)
 		If the global variable 'faraday' is a stage point, then this function moves to this stage point collects a measurement of the sample current and returns a DescriptiveStatistics object containing the result."""
@@ -824,11 +872,11 @@ fov: An optional field of view width to which to set the SEM imaging while colle
 			return None
 	lastPCUpdate = None
 	lastPCValue = None
-	
+
 	def shouldUpdatePC(interval):
 		global lastPCUpdate, lastPCValue
 		return globals().has_key("faraday") and ((lastPCUpdate == None) or (abs(time.time() - lastPCUpdate) > interval))
-	
+
 	def updatedPC(interval=1800):
 		"""updatedPC([interval=1800]) - Works
 		Returns a measurement of the probe current, updating the measurement if more than 'interval' seconds have elapsed."""
@@ -840,45 +888,45 @@ fov: An optional field of view width to which to set the SEM imaging while colle
 
 	def trueRule(tvm):
 		return True
-	
+
 	def falseRule(tvm):
 		return False
-		
+
 	def falseTerminate(tvm, zep):
 		return False
-		
+
 	def oneInN(tvm, n=100):
 		return tvm[gzep.APA_PARTNUM] % n == 0
-		
+
 	def largerThan(tvm, dMax=10.0):
 		return tvm[gzep.APA_DMAX] > dMax
-		
+
 	def fieldNumber(tvm):
 		return tvm[gzep.APA_FIELDNUM]
-		
+
 	def particleNumber(tvm):
 		return tvm[gzep.APA_PARTNUM]
 
 def buildZepp(project, sample, index=0, dataFile="data.hdz"):
 	"""buildZepp(project, sample, index=0, dataFile="data.hdz")
-Construct a Zepp object corresponding to the specified project and sample.  The index specifies which timestamped analysis to read.  The default
+Construct a Zepp object corresponding to the specified project and sample.	The index specifies which timestamped analysis to read.	 The default
 index of 0 loads the most recent, index=1, 2, 3,... first, second third...., index = -1, -2,... second from last, third from last,...."""
 	path="%s//Projects//%s//%s//APA" % ( rootPath, project, sample )
 	dirs = []
-	for f in os.listdir(path): 
-		ff = path+os.path.sep+f 
+	for f in os.listdir(path):
+		ff = path+os.path.sep+f
 		if os.path.isdir(ff) and f.startswith("Analysis "):
-			dirs.append(f)                   
+			dirs.append(f)
 	dirs.sort()
 	if index<=0:
 		return Zepp(path+os.path.sep+dirs[-1+index]+os.path.sep+dataFile)
 	else:
-		return Zepp(path+os.path.sep+dirs[index-1]+os.path.sep+dataFile)        
-		
+		return Zepp(path+os.path.sep+dirs[index-1]+os.path.sep+dataFile)
+
 class Zepp:
 	"""The Zepp class is designed as a wrapper around a Zeppelin (AFA) data set.
 Various methods allow you to reload data and acquire relocated images, spectra and spectrum images."""
-	
+
 	def __init__(self, zepFile):
 		if isinstance(zepFile, jio.File):
 			self._path=zepFile
@@ -892,7 +940,7 @@ Various methods allow you to reload data and acquire relocated images, spectra a
 			self._path=zepFile.getFile()
 			self._zep = zepFile
 			self._zep.remapParticleImageFiles(self._path.getParentFile())
-		
+
 	def getZ(self):
 		"""z.getZ()
 Returns the Zeppelin Java object associated with this Zepp object."""
@@ -900,16 +948,16 @@ Returns the Zeppelin Java object associated with this Zepp object."""
 			self._zep = gzep(self._path)
 			self._zep.remapParticleImageFiles(self._path.getParentFile())
 		return self._zep
-		
+
 	def __str__(self):
 		collected = self._path.getParentFile()
 		sample = collected.getParentFile()
 		project = collected.getParentFile()
 		return "Data for " + sample.getName() +" from project "+project.getName() + " collected at "+collected.getName();
-		
+
 	def __len__(self):
 		return self.getZ().getParticleCount()
-		
+
 	def getRelocated(self):
 		"""z.getRelocated()
 Returns a Java IO File object representing Relocated directory."""
@@ -922,7 +970,7 @@ Returns a Java IO File object representing Relocated directory."""
 
 	def SItoMap(self, partNum, vecs, postFix=None):
 		"""z.SItoMap(partNum, vecs, postfix=None)
-Process a spectrum image into maps.  vecs is constructed using buildVectors(...)"""
+Process a spectrum image into maps.	 vecs is constructed using buildVectors(...)"""
 		fn = "P%0.5d%s" % (partNum , ("" if not postFix else " - "+postFix), )
 		SItoMap(fn, vecs, path=self.getRelocated())
 
@@ -931,7 +979,7 @@ Process a spectrum image into maps.  vecs is constructed using buildVectors(...)
 Process a spectrum image into a masked sum. see help(SItoSum)"""
 		fn = "P%0.5d%s" % (partNum , ("" if not postFix else " - "+postFix), )
 		SItoSum(fn, mask, subSample, path=self.getRelocated())
-		
+
 	def SItoSums(self, partNum, masks=None, subSample=4, postFix=None):
 		"""z.SItoMap(partNum, [mask=None],[subSample=4])
 Process a spectrum image into masked sum spectra. see help(SItoSums)"""
@@ -943,12 +991,12 @@ Process a spectrum image into masked sum spectra. see help(SItoSums)"""
 Process a spectrum image into masked sum spectra. see help(SItoSums)"""
 		fn = "P%0.5d%s" % (partNum , ("" if not postFix else " - "+postFix), )
 		SItoRPL(fn, path=self.getRelocated())
-		
+
 	def display(self, rowNum):
 		"""z.display(rowNum)
 Display the particle spectrum and images in rowNum."""
 		display(self.get(rowNum))
-		
+
 	def get(self, partNum):
 		"""z.get(partNum)
 Get the spectrum associated with the specified row number"""
@@ -980,7 +1028,7 @@ Get the spectrum associated with the specified row number"""
 		res = Zepp(self.getZ().applySignature(mllsq, 1.0e8, pm))
 		pm.close()
 		return res
-		
+
 	def save(self, filename):
 		"""z.save(filename)
 		Save the Zeppelin file to the specified file."""
@@ -990,7 +1038,7 @@ Get the spectrum associated with the specified row number"""
 		"""z.classify(ruleSet)
 		Classify the Zeppelin data set using the specified rules"""
 		self.getZ().evaluateClass(ruleSet)
-		
+
 	def archive(self, dest=defaultArchivePath):
 		"""z.archive(destPath)
 		Copies data files to 'path'"""
@@ -1022,7 +1070,7 @@ Get the spectrum associated with the specified row number"""
 				updatedPC(interval=300)
 				if jop.showConfirmDialog(MainFrame, "Centered and focused?", "Relocate", jop.YES_NO_OPTION) <> jop.YES_OPTION:
 					return
-		
+
 		def relocate(self, partNum, liveTime, fov, edsFov=0.001, dims=(256,256), dwell=6):
 			"""z.relocate(partNum, liveTime, fov, edsFov=0.001, dims=(256, 256), dwell=6)
 	An easy method to save a relocated image/spectrum in a TIFF file so that Graf can find and load it."""
@@ -1039,7 +1087,7 @@ Get the spectrum associated with the specified row number"""
 					props.setImageProperty(props.MicroImage2, imgs[0])
 			write(spec, fn, rel )	# msa
 			write(spec, fn, rel, fmt="tif")
-			
+
 		def collect(self, liveTime, partNum, postFix=None, fov=None):
 			"""z.collect(liveTime, partNum, postFix="")
 	Collects and saves a spectrum associated with the specified particle number in the 'Relocated' directory. postFix is appended on the filename to allow uniquely labeling inclusions etc."""
@@ -1048,15 +1096,15 @@ Get the spectrum associated with the specified row number"""
 			self.updatePC()
 			spec=collect2(liveTime, name=fn, fov=fov)
 			write(spec, fn, rel.getAbsolutePath() )
-			
+
 		def collectSI(self, partNum, fov, dwell=9, dims=(1024,1024), rotation=0.0, postFix=None):
 			"""z.collectSI(partNum, fov, dwell=9, dims=(1024,1024), postFix="")
 	Collects a spectrum image of a relocated particle 'partNum' with the specified field-of-view (fov), dims and dwell.
-	The images are saved in the RCA project directory under 'Relocated'"""			
+	The images are saved in the RCA project directory under 'Relocated'"""
 			path = self.getRelocated().getAbsolutePath()
 			fn = "P%0.5d%s" % (partNum , ("" if not postFix else " - "+postFix), )
 			collectSI(fn, fov, frameCount=1, dwell=dwell, dims=dims, path=path, rotation=rotation)
-		
+
 		def collectImages(self, partNum, fov, dims=(512,512), dwell=6, postFix=None, markCenter=False, writeMask=SAVE_IMAGE_MASK):
 			"""z.collectImages(partNum, fov, dims=(512,512), dwell=5, postFix="")
 	Collects images of a relocated particle 'partNum' with the specified field-of-view (fov), dims and dwell.
@@ -1064,14 +1112,14 @@ Get the spectrum associated with the specified row number"""
 			path = self.getRelocated().getAbsolutePath()
 			fn = "%0.5d%s" % (partNum , (" - I" if not postFix else " - "+postFix), )
 			collectImages(fn, fov=fov, dims=dims, dwell=dwell, path=path, writeMask=writeMask, markCenter=markCenter)
-			
+
 		def collectZoom(self, partNum, fov, dims=(512,512), dwell=6, writeMask=SAVE_IMAGE_MASK):
 			"""z.collectImages(partNum, fov, dims=(512,512), dwell=5, postFix="")
 	Collects images of a relocated particle 'partNum' with the specified field-of-view (fov), dims and dwell.
 	The images are saved in the RCA project directory under 'Relocated'"""
 			for fv in [ fov, 0.1, 1.0]:
 				self.collectImages(partNum, fv, dims, dwell, "FOV = %g" % fv, markCenter=True, writeMask=writeMask)
-		
+
 		def moveTo(self, partNum):
 			"""z.moveTo(self, rowNum)
 	Move the stage to the particle at rowNum."""
@@ -1079,7 +1127,7 @@ Get the spectrum associated with the specified row number"""
 				raise "Part number out of bounds..."
 			sc=self.getZ().getStageCoordinate(partNum-1)
 			moveTo(sc, xyOnly=True)
-			
+
 		def translate(self):
 			"""z.translate()
 	Use the coordinate relocation dialog to translate the particle coordinates into a new rotated/translated coordinate system."""
@@ -1090,8 +1138,8 @@ Get the spectrum associated with the specified row number"""
 			if res:
 				print "Setting the coordinate transform to "+res.toString()
 				self.getZ().setTranslation(res)
-		
-		
+
+
 if connect and _ts.hasRCALicense():
 
 		POINT_MODE = "Point mode EDS"
@@ -1101,13 +1149,13 @@ if connect and _ts.hasRCALicense():
 
 		class RCA:
 			"""The RCA class implements rotating chord particle analysis."""
-			
+
 			def __init__(self, project, sample, analyst, analysis=None, path=None):
 				"""RCA(project, sample, [analysis])
-	Creates an object for performing rotating chord-style automated particle analysis using the default settings for search, measure and other configuration settings.			
-	   project - The name of the project with which this analysis is associated
-	   sample - The name of the sample on which this analysis is being performed
-	   analysis - An optional name for the analysis (Otherwise a date stamp is used.)"""
+	Creates an object for performing rotating chord-style automated particle analysis using the default settings for search, measure and other configuration settings.
+		project - The name of the project with which this analysis is associated
+		sample - The name of the sample on which this analysis is being performed
+		analysis - An optional name for the analysis (Otherwise a date stamp is used.)"""
 				self._project = project
 				self._sample = sample
 				self._analyst = analyst
@@ -1120,7 +1168,7 @@ if connect and _ts.hasRCALicense():
 				if not jio.File(self._path).mkdirs():
 					raise "Unable to create data output directory: %s" % self._path
 				self._transform = semss.RCATransform(_ts)
-				self.selectDetector("BSED")
+				self.selectDetector(_apaDet)
 				self._blackLevel=None
 				self._gain=None
 				self._searchLow = 128
@@ -1137,7 +1185,6 @@ if connect and _ts.hasRCALicense():
 				self.setMorphologyCriterion(semtr.RcaTranslator.AreaCriterion(10.0, 1.0e6))
 				self.setFieldOfView(0.1, 9)
 				self._zep = None
-				self._debug = False
 				self._collectImages = False
 				self._collectPartImages = trueRule
 				self._terminateAnalysis = falseTerminate
@@ -1150,17 +1197,16 @@ if connect and _ts.hasRCALicense():
 				self._SIDim = 64
 				self._EDSMode = POINT_MODE
 				self._ParticleCount = 0
-				self._debug=False
 				self._debugPw = None
 				self._stageZ = None
-				
+
 			def setSearchThreshold(self, low, high=255, dwell=4000, maxPart=100000, maxPartPerField = 10000):
 				"""SetSearchThreshold(low,[high],[dwell],[maxPart])
 	Specify search parameters.
-	   low - Low level intensity threshold [0,high)
-	   high - High level intensity threshold [low+1,255] (nominal 255)
-	   dwell - Pixel measurement dwell in ns (nominal 4000)
-	   maxPart - Maximum number of particles per field"""
+		low - Low level intensity threshold [0,high)
+		high - High level intensity threshold [low+1,255] (nominal 255)
+		dwell - Pixel measurement dwell in ns (nominal 4000)
+		maxPart - Maximum number of particles per field"""
 				self._searchLow = low
 				if self._measureLow > low:
 					self._measureLow = low
@@ -1170,14 +1216,14 @@ if connect and _ts.hasRCALicense():
 				self._searchDwell = dwell
 				self._maxPart = maxPart
 				self._maxPartPerField = maxPartPerField
-				
+
 			def setMeasureThreshold(self, low, high=255, dwell=4000, measureStep=8):
 				"""SetMeasureThreshold(low,[high],[dwell],[measureStep])
 	Specify measure parameters.
-	   low - Low level intensity threshold [0,high)
-	   high - High level intensity threshold [low+1,255] (nominal 255)
-	   dwell - Pixel measurement dwell in ns (nominal 4000)
-	   measureStep - Particle measurement step size (nominal 8)"""
+		low - Low level intensity threshold [0,high)
+		high - High level intensity threshold [low+1,255] (nominal 255)
+		dwell - Pixel measurement dwell in ns (nominal 4000)
+		measureStep - Particle measurement step size (nominal 8)"""
 				self._measureLow = low
 				if self._searchLow < low:
 					self._searchLow = low
@@ -1186,26 +1232,26 @@ if connect and _ts.hasRCALicense():
 				self._measureHigh = high
 				self._measureDwell = dwell
 				self._measureStep = measureStep
-				
+
 			def collectImages(self, particle=trueRule, pImgDim=64, field=False, imgDim=1024):
 				"""collectImages([particle=True],[pImgDim=64],[field=False],[imgDim=1024]
 	Specify which optional types of particles to collect.
 		particle - Collect an image of each particle? "particle" is a function which takes as an argument a dictionary mapping particle properties into values. If the function evaluates True then an image is collected.
 		pImgDim - Dimension of the particle image in pixels (square image)
-		field - Collect an image of each stage field? 
-		imgDim - Dimensions of the field image in pixels"""			
+		field - Collect an image of each stage field?
+		imgDim - Dimensions of the field image in pixels"""
 				self._collectImages = field
 				self._imgDim = imgDim
 				self._collectPartImages = (particle if not isinstance(particle, bool) else (trueRule if particle else falseRule))
 				self._pImgDim = pImgDim
-				
+
 			def setStageZ(self, stageZ):
 				"""setStageZ(stageZ)
 	Specifies how the stage Z position is determined.  If 'stageZ' is a number, then the z-stage position is held fixed at z=stageZ.  //
-		'stageZ' could be a function taking a single argument that represents an X-Y position.  The function is then responsible //
+		'stageZ' could be a function taking a single argument that represents an X-Y position.	The function is then responsible //
 		for computing the z stage position."""
 				self._stageZ = stageZ
-				
+
 			def moveStage(self, pos):
 				z = None
 				if isinstance(self._stageZ, float):
@@ -1216,7 +1262,7 @@ if connect and _ts.hasRCALicense():
 					pos.set(Z_AXIS, z)
 				# print pos
 				_stg.moveTo(pos)
-					
+
 			def configEDS(self, vecs, rules=None, realTime=0.4, mode=POINT_MODE):
 				"""configEDS(vecs, [rules=None], [realTime=0.4])
 	Configure EDS acquisition parameters.
@@ -1229,8 +1275,8 @@ if connect and _ts.hasRCALicense():
 				self._vecs = (vecs if self._collectEDS else None)
 				self._rules = rules
 				self._EDSMode = mode
-				
-			def configSI(self,  collectSIFunc, dwell=10, dim=64):
+
+			def configSI(self,	collectSIFunc, dwell=10, dim=64):
 				"""configSI(collectSIFunc, dwell=10, dims=64)
 	Configure the optional acquisition of a x-ray spectrum image. /
 	If the function collectSIFunc(tvm) evaluates true then a spectrum image with the specified dwell and max dimensions (dim) /
@@ -1241,53 +1287,53 @@ if connect and _ts.hasRCALicense():
 				self._processSIStack = SIProcessor()
 				self._processSIStack.start()
 
-			
+
 			def setMorphologyCriterion(self, crit):
 				"""setMorphologyCriterion(crit)
 	Specify a RCATranslator.ParticleCriterion derived class to determine whether to measure a particle based on morphology criteria.
-crit - An instance of a RCATranslator.ParticleCriterion derived class.  The functions linearCriterion(..), 
-areaCriterion(...), maxCriterion(...) build common criteria.""" 			
+crit - An instance of a RCATranslator.ParticleCriterion derived class.	The functions linearCriterion(..),
+areaCriterion(...), maxCriterion(...) build common criteria."""
 				self._morphologyCrit = crit
-				
+
 			def setFieldOfView(self, fov, overlap=1.0, ppmRes=11):
 				"""setFieldOfView(fov, [overlap=1.0], [ppmRes=11])
 	Specify the analysis field size in mm.
 		fov - Field-of-view size in mm
 		overlap - <1 to overlap fields and >1 to leave a border around fields
-		ppmRes - Specifies the size of the search grid (grid dimensions = 2^ppmRes).  Add 1 to account for borders."""		
+		ppmRes - Specifies the size of the search grid (grid dimensions = 2^ppmRes).  Add 1 to account for borders."""
 				self._fov = fov
 				self._overlap = (overlap if overlap>0.1 and overlap<10.0 else 1.0)
-				self._rcaFov = self._transform.rcaFov(fov) 
+				self._rcaFov = self._transform.rcaFov(fov)
 				self._ppmResolution = ppmRes
-				
+
 			def searchDimension(self):
 				"""searchDimension()
 	Returns the dimenions of the search grid in pixels."""
 				return pow(2, self._ppmResolution-1)
-				
-			def selectDetector(self, det="BSED"):
+
+			def selectDetector(self, det=_apaDet):
 				"""selectDetector([det="BSED"])
 	Specify which detector is used to perform search and measure.
-		det = "SED" or "BSED" """
-				self._imgDet = (0 if det[0] == 'S' else 1)
-				
+		det = one of _et[..]"""
+				self._imgDet = det
+
 			def getDetector(self):
 				"""getDetector()
 	Returns the name of the detector used to perform search and measure."""
-				return "BSED" if self._imgDet == 1 else "SED"
-			
+				return self._imgDet.getName()
+
 			def setBrightnessContrast(self, brightness, contrast):
 				self._blackLevel=brightness
 				self._gain=contrast
-				
+
 			def getBrightnessContrast(self):
-				res=_ts.dtGetGainBlack(self._imgDet)
+				res=self._imgDet.getBrightnessContrast()
 				self._gain=res[0]
 				self._blackLevel=res[1]
-				
+
 			def setBeamIntensity(self, bi):
 				self._beamIntensity = bi
-			
+
 			def buildZep(self):
 				"""Internal use only....
 	buildZep() - Build a Zeppelin data file to contain the specified analysis with associated vector set."""
@@ -1346,7 +1392,7 @@ areaCriterion(...), maxCriterion(...) build common criteria."""
 				z.setHeaderItem("PROJECT", self._project)
 				z.setHeaderItem("COMPANY", "DOC NIST MML - 637.02")
 				z.setHeaderItem("INSTRUMENT", "NIST's TESCAN MIRA3 in 217 F101")
-				z.setHeaderItem("PROBE_CURRENT", "%g nA" % (updatedPC(300).average() , ) )
+				z.setHeaderItem("PROBE_CURRENT", "%g nA" % (updatedPC(0).average() , ) )
 				z.setHeaderItem("RULE_FILE", u"%s" % ( self._rules, ))
 				z.setHeaderItem("VEC_FILE", u"%s"  % (self._vecs, ))
 				z.setHeaderItem("STAGE_FILE", "tiling.xml")
@@ -1428,8 +1474,8 @@ areaCriterion(...), maxCriterion(...) build common criteria."""
 								klmElms.append(elm)
 					else:
 						props.setImageProperty(epq.SpectrumProperties.MicroImage, macro)
-					pNum = z.addRow(vals) 
-					row = pNum - 1 
+					pNum = z.addRow(vals)
+					row = pNum - 1
 					className = "Unclassified"
 					tvm = z.getParticleData(row)
 					className = "Unclassified"
@@ -1458,36 +1504,36 @@ areaCriterion(...), maxCriterion(...) build common criteria."""
 						_afafb.update(row)
 					# print "Particle: %d - %.2g um (average diameter) of %s" % (pNum, datum.dAvg() * scale, className)
 				return termP
-				
+
 			def collectParticleImage(self, pNum, bounds, spec):
-				"""Internal used only...			
+				"""Internal used only...
 	collectParticleImage(pNum, bounds, spec):
 		Collect a particle image."""
 				xtra = bounds.width/2
 				expBounds = jawt.Rectangle(bounds.x - xtra, bounds.y - xtra, bounds.width + 2 * xtra, bounds.height + 2 * xtra)
 				ra = self._transform.rcaToSubraster(expBounds, self._pImgDim)
 				self._pImgStack.append( (pNum, self._rcaFov, ra.getImageDimensions(), ra.getSubRaster(), spec) )
-				
+
 			def collectPartSI(self, pNum, bounds):
 				"""Internal use only..."""
 				xtra = bounds.width / 4
 				expBounds = jawt.Rectangle(bounds.x - xtra, bounds.y - xtra, bounds.width + 2 * xtra, bounds.height + 2 * xtra)
 				ra = self._transform.rcaToSubraster(expBounds, self._pImgDim)
 				self._pSIStack.append( (pNum, self._rcaFov, ra.getImageDimensions(), ra.getSubRaster()) )
-			
+
 			def path(self):
 				return self._path
-				
+
 			def setTerminateRule(self, termRule):
 				"""setTerminateRule(termRule)
 	Sets a function that can termininate the analysis prematurely by returning True.
 	def termRule(tvm) where tvm is a token-value map."""
 				self._terminateAnalysis = termRule
-						
+
 			def collectField(self, fieldNumber):
 				"""Internal used only...
 	collectField(fieldNumber)
-	Search and measure the particles in this field."""						
+	Search and measure the particles in this field."""
 				# Create the field map...
 				global terminated
 				if terminated:
@@ -1510,20 +1556,20 @@ areaCriterion(...), maxCriterion(...) build common criteria."""
 					scale = 0.001 * _ts.getViewField() / float(ri.width)
 					if self._collectEDS:
 						rt = semtr.RcaTranslator(_sem, pt_det_all, scale)
+						setResolution(_edsResolution)
 					else:
-						rt = semtr.RcaTranslator(_sem, scale)	
-					if self._debug:
-						debug = jio.PrintStream(jio.File(self._path, "debug.txt"))
-						rt.setDebugStream(debug)
+						rt = semtr.RcaTranslator(_sem, scale)
+					if self._debugPw!=None:
+						rt.setDebugStream(self._debugPw)
 					rt.setMorphologyCriterion(self._morphologyCrit)
 					rt.setStagePosition(_stg.getPosition())
 					_sem.add(rt)
 					r = self._transform.getRCARectangle()
-					rca = semss.RCAConfiguration(self._imgDet, r.width / 2, self._ppmResolution, r, self._searchDwell, self._searchLow, self._searchHigh, self._measureDwell, self._measureLow, self._measureHigh, self._measureStep)
+					rca = semss.RCAConfiguration(self._imgDet.getIndex(), r.width / 2, self._ppmResolution, r, self._searchDwell, self._searchLow, self._searchHigh, self._measureDwell, self._measureLow, self._measureHigh, self._measureStep)
 					mg.draw(rca.getRegion())
 					if self._collectImages:
 						ra = self._transform.rcaToSubraster(r, self._imgDim)
-						imgs = collectImages("%04d" % (fieldNumber+1, ), self._rcaFov, dims=ra.getImageDimensions(), dwell=3, path="%s/FIELDS" % self._path, subRaster=ra.getSubRaster(), rotation=0.0, writeMask = SAVE_FIELD_MASK)
+						imgs = collectImages("%04d" % (fieldNumber, ), self._rcaFov, dims=ra.getImageDimensions(), dwell=3, path="%s/FIELDS" % self._path, subRaster=ra.getSubRaster(), rotation=0.0, writeMask = SAVE_FIELD_MASK)
 						ii = imgs[1]
 						mg.drawImage(ii, r.x, r.y, r.x + r.width, r.y + r.height, 0, 0, ii.getWidth(), ii.getHeight(), None)
 						_afafb.updateFieldImage(map)
@@ -1539,7 +1585,7 @@ areaCriterion(...), maxCriterion(...) build common criteria."""
 							_ts.rcaEDXChordRaster(self._edsDwell, self._measureLow, self._measureHigh)
 						_sem.initMapping()
 					if self._blackLevel and self._gain:
-						_ts.dtSetGainBlack(self._imgDet, self._gain,self._blackLevel)
+						self._imgDet.setBrightnessContrast(self._gain, self._blackLevel)
 					if self._beamIntensity:
 						_ts.setPCContinual(21.0-self._beamIntensity)
 					nPart=0
@@ -1547,21 +1593,26 @@ areaCriterion(...), maxCriterion(...) build common criteria."""
 					_ts.rcaNextParticle(False, int(self._edsRealTime * 1000))
 					self.debug("CollectField 02")
 					termP=False
-					while (rt.getStatus() != semtr.RcaTranslator.RCAStatus.AllComplete) and (self._ParticleCount<self._maxPart):
+					while (rt.getStatus() != semtr.RcaTranslator.RCAStatus.AllComplete) and (self._ParticleCount < self._maxPart):
 						datum = _sem.poll()
 						if datum and isinstance(datum, semdi.RcaDatum):
 							self.debug("CollectField 03 : "+str(datum))
 							if not (datum.isDiscarded() or datum.isDuplicate()):
 								nPart=nPart+1
+								self.debug("New particle number %d in frame %d" % ( nPart, fieldNumber) )
 							if not datum.isDuplicate():
 								datum.draw(mg, self._ParticleCount)
 							termP = self.addParticle(datum, fieldNumber)
 						else:
+							if datum!=None:
+								self.debug("CollectField 03a: "+ str(datum))
 							_afafb.updateFieldImage(map)
 							jl.Thread.sleep(10)
 						if terminated or termP:
+							self.debug(("Manually terminated" if terminated else "Terminated by rule"))
 							break
 						if nPart >= self._maxPartPerField:
+							self.debug("Exceeded maxPartPerField.")
 							break
 				finally:
 					self.debug("CollectField 04")
@@ -1570,16 +1621,18 @@ areaCriterion(...), maxCriterion(...) build common criteria."""
 					datum = _sem.poll()
 					while datum:
 						if datum and isinstance(datum, semdi.RcaDatum):
+							self.debug("CollectField 04a : "+str(datum))
 							if (self._ParticleCount < self._maxPart) and (nPart < self._maxPartPerField):
 								if not (datum.isDiscarded() or datum.isDuplicate()):
 									nPart=nPart+1
+									self.debug("New particle number %d in frame %d (in terminate)" % ( nPart, fieldNumber) )
 								datum.draw(mg, self._ParticleCount)
 								self.addParticle(datum, fieldNumber)
 								_afafb.updateFieldImage(map)
 						datum = _sem.poll()
 					self.debug("CollectField 05")
 					self._zep.setHeaderItem("MAG_FMT","Mag Fields Particles Time Area")
-					self._zep.setHeaderItem("MAG0","%0.0f %d %d %0.2f %0.3f" % 
+					self._zep.setHeaderItem("MAG0","%0.0f %d %d %0.2f %0.3f" %
 						(3.5*25.4/self._fov, fieldNumber, self._ParticleCount, self._timer.inSeconds()/60.0, self._fov*self._fov*fieldNumber ))
 					self._zep.setHeaderItem("LOW_MAG","0")
 					self._zep.setHeaderItem("MAGNIFICATIONS","1")
@@ -1587,16 +1640,13 @@ areaCriterion(...), maxCriterion(...) build common criteria."""
 					_sem.remove(rt)
 					_ts.rcaFinish()
 					write(map, "%0.4d" % fieldNumber, path="%s/FIELDS" % self._path)
-					if self._debug:
-						debug.close()
-					# mg.discard()
 				try:
 					self.debug("CollectField 06")
 					for pNum, rcaFov, pixDim, sr, spec in self._pImgStack:
 						self.debug("CollectField 07: Particle %d - dim = %s, sr = %s" % ( pNum, pixDim, sr ))
 						imgs = collectImages(None, fov=rcaFov, dims=pixDim, dwell=4, subRaster=sr, path="%s/mag0" % (self._path,))
 						if imgs:
-							self.debug("CollectField 07: P%i imgs" % (pNum, ))
+							self.debug("CollectField 08: P%i imgs" % (pNum, ))
 							_afafb.updateParticleImage(imgs[0])
 							if spec:
 								props = spec.getProperties()
@@ -1607,9 +1657,9 @@ areaCriterion(...), maxCriterion(...) build common criteria."""
 									props.setImageProperty(props.MicroImage,imgs[0])
 								self._zep.writeSpectrum(spec, pNum)
 							else:
-								self.debug("CollectField 07: Missing image for P%i" % (pNum, ))
+								self.debug("CollectField 08: Missing image for P%i" % (pNum, ))
 								print "Missing spectrum for particle %d" % ( pNum )
-					self.debug("CollectField 08")
+					self.debug("CollectField 09")
 				finally:
 					self._pImgStack = []
 				try:
@@ -1620,9 +1670,9 @@ areaCriterion(...), maxCriterion(...) build common criteria."""
 						self._processSIStack.add(siName, siPath, self._vecs)
 				finally:
 					self._pSIStack = []
-				self.debug("CollectField 07")
+				self.debug("CollectField 10")
 				return termP
-			
+
 			def summarize(self, tiling=None):
 				"""Internal use only...
 	summarize(tiling)
@@ -1642,8 +1692,8 @@ areaCriterion(...), maxCriterion(...) build common criteria."""
 					tmp = tmp + u"       Overlap: %0.3g%% overlap of adjacent fields\n" % ( (1.0 - self._overlap)*100.0, )
 				tmp = tmp + u"      Detector: %s\n" % (self.getDetector())
 				sed, bsed = _ts.dtGetGainBlack(0), _ts.dtGetGainBlack(1)
-				tmp = tmp + u"          BSED: Contrast %0.2f Brightness: %0.2f\n" % (bsed[0], bsed[1]) 
-				tmp = tmp + u"           SED: Contrast %0.2f Brightness: %0.2f\n" % (sed[0], sed[1]) 
+				tmp = tmp + u"          BSED: Contrast %0.2f Brightness: %0.2f\n" % (bsed[0], bsed[1])
+				tmp = tmp + u"           SED: Contrast %0.2f Brightness: %0.2f\n" % (sed[0], sed[1])
 				tmp = tmp + u"        Search: %d to %d at %d pixels × %d pixels at %g µs/pixel\n" % (self._searchLow, self._searchHigh, self.searchDimension(), self.searchDimension(), self._searchDwell / 1000)
 				tmp = tmp + u"       Measure: %d to %d at %d µs/pixel\n" % (self._measureLow, self._measureHigh, self._measureDwell / 1000)
 				tmp = tmp + u"          Step: %d\n" % self._measureStep
@@ -1662,7 +1712,8 @@ areaCriterion(...), maxCriterion(...) build common criteria."""
 				tmp = tmp + u"       VP Mode: %s\n" % _ts.vacGetVPMode()
 				tmp = tmp + u"       Chamber: %0.5g torr\n" % pascalToTorr(_ts.vacGetPressure(0))
 				tmp = tmp + u"        Column: %0.5g torr\n" % pascalToTorr(_ts.vacGetPressure(1))
-				tmp = tmp + u"           Gun: %0.5g torr\n" % pascalToTorr(_ts.vacGetPressure(2))
+				if SITE!=WARRENDALE:
+					tmp = tmp + u"			 Gun: %0.5g torr\n" % pascalToTorr(_ts.vacGetPressure(2))
 				tmp = tmp + u"Images ==========================================\n"
 				if self._collectImages:
 					tmp = tmp + u"         Field: Collect at %d pixels × %d pixels\n" % (self._imgDim, self._imgDim)
@@ -1694,7 +1745,7 @@ areaCriterion(...), maxCriterion(...) build common criteria."""
 					osw.flush()
 				finally:
 					fos.close()
-					
+
 			def toLatex(self, tiling=None):
 				"""Internal use only...
 				toLatex(tiling)
@@ -1702,63 +1753,63 @@ areaCriterion(...), maxCriterion(...) build common criteria."""
 				i0 = (updatedPC(300) if globals().has_key('faraday') else None)
 				tmp="\\begin{tabular}{rl}"
 				tmp=tmp + "\\colspan{2}{Analysis Summary}\\\\\n"
-				tmp = tmp + u"   Project & %s\\\\\n" % self._project
-				tmp = tmp + u"   Sample & %s\\\\\n" % self._sample
-				tmp = tmp + u"   Analysis & %s\\\\\n" % self._analysis
-				tmp = tmp + u"   Instrument & TESCAN MIRA3 at %s \\\\\n" % (SITE, )
-				tmp = tmp + u"   Operator & %s\\\\\n" % self._analyst
-				tmp = tmp + u"   \\colspan{2}{Search and Measure}\\\\\n"
-				tmp = tmp + u"   FOV & $\\SI{%g}{\\milli\\meter} \\times \\SI{%g}{\\milli\\meter}$ FOV\\\\\n" % (self._fov, self._fov)
+				tmp = tmp + u"  Project & %s\\\\\n" % self._project
+				tmp = tmp + u"  Sample & %s\\\\\n" % self._sample
+				tmp = tmp + u"  Analysis & %s\\\\\n" % self._analysis
+				tmp = tmp + u"  Instrument & TESCAN MIRA3 at %s \\\\\n" % (SITE, )
+				tmp = tmp + u"  Operator & %s\\\\\n" % self._analyst
+				tmp = tmp + u"  \\colspan{2}{Search and Measure}\\\\\n"
+				tmp = tmp + u"  FOV & $\\SI{%g}{\\milli\\meter} \\times \\SI{%g}{\\milli\\meter}$ FOV\\\\\n" % (self._fov, self._fov)
 				if self._overlap>1.0:
-					tmp = tmp + u"   Border & \\SI{%0.3g}{\\%} un-analyzed border region\\\\\n" % ( (self._overlap-1.0)*100.0, )
+					tmp = tmp + u"  Border & \\SI{%0.3g}{\\%} un-analyzed border region\\\\\n" % ( (self._overlap-1.0)*100.0, )
 				elif self._overlap<1.0:
-					tmp = tmp + u"   Overlap & \\SI{%0.3g}{\\%} overlap of adjacent fields\\\\\n" % ( (1.0 - self._overlap)*100.0, )
-				tmp = tmp + u"   Detector & %s\\\\\n" % (self.getDetector())
+					tmp = tmp + u"  Overlap & \\SI{%0.3g}{\\%} overlap of adjacent fields\\\\\n" % ( (1.0 - self._overlap)*100.0, )
+				tmp = tmp + u"  Detector & %s\\\\\n" % (self.getDetector())
 				sed, bsed = _ts.dtGetGainBlack(0), _ts.dtGetGainBlack(1)
-				tmp = tmp + u"   BSED & Contrast: \\num{%0.2f} Brightness: \\num{%0.2f}\\\\\n" % (bsed[0], bsed[1]) 
-				tmp = tmp + u"   SED &  Contrast: \\num{%0.2f} Brightness: \\num{%0.2f}\\\\\n" % (sed[0], sed[1]) 
-				tmp = tmp + u"   Search & %d to %d at $\\SI{%d}{pixels} \\times \\SI{%d}{pixels}$ at \\SI{%g}{\micro\second\per pixel}\\\\\n" % (self._searchLow, self._searchHigh, self.searchDimension(), self.searchDimension(), self._searchDwell / 1000)
-				tmp = tmp + u"   Measure & %d to %d at \\SI{%d}{\\micro\\second\\per pixel}\\\\\n" % (self._measureLow, self._measureHigh, self._measureDwell / 1000)
-				tmp = tmp + u"   Step & %d\\\\\n" % self._measureStep
-				tmp = tmp + u"   Morphology & %s\\\\\n" % self._morphologyCrit
-				tmp = tmp + u"   Max Particles & %d\\\\\n" % self._maxPart
-				tmp = tmp + u"   Max per field & %d\\\\\n" % self._maxPartPerField
-				tmp = tmp + u"   Beam Intensity & \\num{%0.2f}\\\\\n" % _ts.getPCContinual()
-				tmp = tmp + u"   Spot & \\SI{%0.2f}{\\nano\\meter}\\\\\n" % _ts.getSpotSize()
+				tmp = tmp + u"  BSED & Contrast: \\num{%0.2f} Brightness: \\num{%0.2f}\\\\\n" % (bsed[0], bsed[1])
+				tmp = tmp + u"  SED &	Contrast: \\num{%0.2f} Brightness: \\num{%0.2f}\\\\\n" % (sed[0], sed[1])
+				tmp = tmp + u"  Search & %d to %d at $\\SI{%d}{pixels} \\times \\SI{%d}{pixels}$ at \\SI{%g}{\micro\second\per pixel}\\\\\n" % (self._searchLow, self._searchHigh, self.searchDimension(), self.searchDimension(), self._searchDwell / 1000)
+				tmp = tmp + u"  Measure & %d to %d at \\SI{%d}{\\micro\\second\\per pixel}\\\\\n" % (self._measureLow, self._measureHigh, self._measureDwell / 1000)
+				tmp = tmp + u"  Step & %d\\\\\n" % self._measureStep
+				tmp = tmp + u"  Morphology & %s\\\\\n" % self._morphologyCrit
+				tmp = tmp + u"  Max Particles & %d\\\\\n" % self._maxPart
+				tmp = tmp + u"  Max per field & %d\\\\\n" % self._maxPartPerField
+				tmp = tmp + u"  Beam Intensity & \\num{%0.2f}\\\\\n" % _ts.getPCContinual()
+				tmp = tmp + u"  Spot & \\SI{%0.2f}{\\nano\\meter}\\\\\n" % _ts.getSpotSize()
 				if i0:
-					tmp = tmp + u"   Faraday & \\SI{%0.2f}{\\nano\\ampere}\\\\\n" % i0.average()
+					tmp = tmp + u"  Faraday & \\SI{%0.2f}{\\nano\\ampere}\\\\\n" % i0.average()
 				else:
-					tmp = tmp + u"   IAbs & \\SI{%0.2f}{\\nano\\ampere}\\\\\n" % (_ts.getIAbsorbed() / 1000.0)
-				tmp = tmp + u"   Beam Energy & \\SI{%0.2f}{\\keV}\\\\\n" % (_ts.hvGetVoltage() / 1000.0)
-				tmp = tmp + u"   Working Distance & \\SI{%0.3f}{\\milli\\meter}\\\\\n" % _ts.getWD()
-				tmp = tmp + u"   \colspan{2}{Vacuum}\\\\\n"
-				tmp = tmp + u"   VP Mode & %s\\\\\n" % _ts.vacGetVPMode()
-				tmp = tmp + u"   Chamber& \\SI{%0.5g}{\\torr}\\\\\n" % pascalToTorr(_ts.vacGetPressure(0))
-				tmp = tmp + u"   Column & \\SI{%0.5g}{\\torr}\\\\\n" % pascalToTorr(_ts.vacGetPressure(1))
-				tmp = tmp + u"   Gun & \\SI{%0.5g}{\\torr}\\\\\n" % pascalToTorr(_ts.vacGetPressure(2))
-				tmp = tmp + u"   \colspan{2}{Images}\\\\\n"
+					tmp = tmp + u"  IAbs & \\SI{%0.2f}{\\nano\\ampere}\\\\\n" % (_ts.getIAbsorbed() / 1000.0)
+				tmp = tmp + u"  Beam Energy & \\SI{%0.2f}{\\keV}\\\\\n" % (_ts.hvGetVoltage() / 1000.0)
+				tmp = tmp + u"  Working Distance & \\SI{%0.3f}{\\milli\\meter}\\\\\n" % _ts.getWD()
+				tmp = tmp + u"  \colspan{2}{Vacuum}\\\\\n"
+				tmp = tmp + u"  VP Mode & %s\\\\\n" % _ts.vacGetVPMode()
+				tmp = tmp + u"  Chamber& \\SI{%0.5g}{\\torr}\\\\\n" % pascalToTorr(_ts.vacGetPressure(0))
+				tmp = tmp + u"  Column & \\SI{%0.5g}{\\torr}\\\\\n" % pascalToTorr(_ts.vacGetPressure(1))
+				tmp = tmp + u"  Gun & \\SI{%0.5g}{\\torr}\\\\\n" % pascalToTorr(_ts.vacGetPressure(2))
+				tmp = tmp + u"  \colspan{2}{Images}\\\\\n"
 				if self._collectImages:
-					tmp = tmp + u"   Field & Collect at $\\SI{%d}{pixels} \\times \\SI{%d}{pixels}$\\\\\n" % (self._imgDim, self._imgDim)
+					tmp = tmp + u"  Field & Collect at $\\SI{%d}{pixels} \\times \\SI{%d}{pixels}$\\\\\n" % (self._imgDim, self._imgDim)
 				else:
-					tmp = tmp + u"   Field & Don't collect\n"
-				tmp = tmp + u"   Particle & Evaluate %s at $\\SI{%d}{pixels} \\times \\SI{%d}{pixels}$\\\\\n" % (self._collectPartImages.func_name, self._pImgDim, self._pImgDim)
+					tmp = tmp + u"  Field & Don't collect\n"
+				tmp = tmp + u"  Particle & Evaluate %s at $\\SI{%d}{pixels} \\times \\SI{%d}{pixels}$\\\\\n" % (self._collectPartImages.func_name, self._pImgDim, self._pImgDim)
 				if self._collectEDS:
-					tmp = tmp + u"   \\colspan{2}{EDS Configuration}\\\\\n"
-					tmp = tmp + u"   EDS & \\SI{%g}{\\second} Real time\\\\\n" % self._edsRealTime
-					tmp = tmp + u"   Mode & %s\\\\\n" % self._EDSMode
-					tmp = tmp + u"   Vectors & %s\\\\\n" % self._vecs
-					tmp = tmp + u"   Elements & %s\\\\\n" % (", ".join("%s" % v.toAbbrev() for v in self._vecs.getElements()))
-					tmp = tmp + u"   Rules & %s\\\\\n" % self._rules
+					tmp = tmp + u"  \\colspan{2}{EDS Configuration}\\\\\n"
+					tmp = tmp + u"  EDS & \\SI{%g}{\\second} Real time\\\\\n" % self._edsRealTime
+					tmp = tmp + u"  Mode & %s\\\\\n" % self._EDSMode
+					tmp = tmp + u"  Vectors & %s\\\\\n" % self._vecs
+					tmp = tmp + u"  Elements & %s\\\\\n" % (", ".join("%s" % v.toAbbrev() for v in self._vecs.getElements()))
+					tmp = tmp + u"  Rules & %s\\\\\n" % self._rules
 				if self._collectSI:
-					tmp = tmp + u"   \\colspan{2}{SI Collection}\\\\\n"
-					tmp = tmp + u"   When & Based on rule evaluation\\\\\n"
-					tmp = tmp + u"   Dimensions & $\\SI{%d}{pixels} \\times \\SI{%d}{pixels}$\\\\\n" % (self._SIDim, self._SIDim)
-					tmp = tmp + u"   Dwell & %d\\\\\n" % self._SIDwell
+					tmp = tmp + u"  \\colspan{2}{SI Collection}\\\\\n"
+					tmp = tmp + u"  When & Based on rule evaluation\\\\\n"
+					tmp = tmp + u"  Dimensions & $\\SI{%d}{pixels} \\times \\SI{%d}{pixels}$\\\\\n" % (self._SIDim, self._SIDim)
+					tmp = tmp + u"  Dwell & %d\\\\\n" % self._SIDwell
 				if tiling:
-					tmp = tmp + u"   \\colspan{2}{Tiling}\\\\\n"
-					tmp = tmp + u"   Description & %s\\\\\n" % tiling
-					tmp = tmp + u"   Tiles & %d of $\\SI{%g}{\\milli\\meter} \\times \\SI{%g}{\\milli\\meter}$\\\\\n" % (tiling.size(), tiling.getTileDimension()[0], tiling.getTileDimension()[0])
-					tmp = tmp + u"   Area: \\SI{%g}{\\milli\\meter\\squared}\\\\\n" % (tiling.getArea(), )
+					tmp = tmp + u"  \\colspan{2}{Tiling}\\\\\n"
+					tmp = tmp + u"  Description & %s\\\\\n" % tiling
+					tmp = tmp + u"  Tiles & %d of $\\SI{%g}{\\milli\\meter} \\times \\SI{%g}{\\milli\\meter}$\\\\\n" % (tiling.size(), tiling.getTileDimension()[0], tiling.getTileDimension()[0])
+					tmp = tmp + u"  Area: \\SI{%g}{\\milli\\meter\\squared}\\\\\n" % (tiling.getArea(), )
 					tmp = tmp + u"\end{tabular}"
 				tmp.replace(u"α",u"$\alpha$")
 
@@ -1769,8 +1820,8 @@ areaCriterion(...), maxCriterion(...) build common criteria."""
 					osw.flush()
 				finally:
 					fos.close()
-					
-				
+
+
 			def postSummary(self, tos = None):
 				"""Internal use only...
 	Summarize the results of the analysis to the command output window."""
@@ -1783,57 +1834,54 @@ areaCriterion(...), maxCriterion(...) build common criteria."""
 						fos.close()
 				elif self._zep:
 					res = u"Summary Analysis Report\n"
-					res = res + u"     Path: %s\n" % self._path
-					res = res + u"    Total: %d particles\n" % self._zep.getParticleCount()
+					res = res + u"       Path: %s\n" % self._path
+					res = res + u"      Total: %d particles\n" % self._zep.getParticleCount()
 					if self._rules and (self._zep.getParticleCount() > 0):
 						res = res+ u"Particles by Class\n"
 						for i in range(0, self._rules.ruleCount()):
 							cx = self._zep.getClassMemberCount(self._rules, i)
-							res = res + u"  %20s: %d particles\n" % (self._rules.ruleName(i), cx)
+							res = res + u"	%20s: %d particles\n" % (self._rules.ruleName(i), cx)
 					print res
 					tos.println(res)
 				else:
 					print "No Zeppelin to summarize."
-			
+
 			def deleteParticles(self):
 				"""deleteParticles()
 	Clear all the mappings of particle spectra to 'PXXXX' as have been associated with this analysis."""
 				for i in range(0, self._zep.getParticleCount()):
 					exec "if globals().has_key(\"P%0.4d\"):\n\tdelete P%0.4d" % (i , i)
-					
+
 			def display(self, rowNum):
 				"""display(rowNum)
 	Display the particle spectrum and images in rowNum."""
 				spec = self.get(rowNum)
 				spec.getProperties().setDetector(pt_det_all)
 				display(spec)
-			
+
 			def getZeppelin(self):
 				"""getZeppelin()
 		Returns a Zepp object that can be used to interact with the data set."""
 				return (Zepp(self._zep.getFile()) if self._zep else None)
-				
+
 			def setDebug(self, b=True):
-				self._debug=b
-				self._debugPw=None
-			
+				if b:
+					self._debugPw = jio.PrintStream(jio.File(self._path, "debug_py.txt"))
+				else:
+					self._debugPw = None
+
 			def debug(self, ss):
 				"""debug(str)
 		For internal use primarily!"""
-				if self._debug:
-					if not self._debugPw:
-						ff = jio.File(self._path, "debug.txt")
-						fos = jio.FileOutputStream(ff, True)
-						self._debugPw = jio.PrintWriter(fos)
-					if self._debugPw:
-						try:
-							if not ss.endswith("\n"):
-								ss=ss+"\n"
-							self._debugPw.append("%s: %s" % (jtext.SimpleDateFormat("yyyy-MM-dd HH.mm.ss.Z").format(ju.Date()), ss))
-						finally:
-							self._debugPw.flush()
+				if self._debugPw:
+					try:
+						if not ss.endswith("\n"):
+							ss=ss+"\n"
+						self._debugPw.append("%s: %s" % (jtext.SimpleDateFormat("yyyy-MM-dd HH.mm.ss.Z").format(ju.Date()), ss))
+					finally:
+						self._debugPw.flush()
 
-				
+
 			def perform(self, tiling, startField=1, endField=10000):
 				"""perform(self, tiling, [startField=1]):
 	Perform RCA APA on the specified tiling.
@@ -1853,8 +1901,8 @@ areaCriterion(...), maxCriterion(...) build common criteria."""
 					old = _ts.smEnumModes()[_ts.smGetMode()]
 					_ts.smSetMode(1) # DEPTH mode
 					print "NOTIFICATION: Scan mode set to %s from %s" % ( _ts.smEnumModes()[_ts.smGetMode()], old, )
-				oldBlank = _ts.scGetBlanker()
-				_ts.scSetBlanker(0)
+				oldBlank = _ts.scGetBlanker(BLANKER_INDEX)
+				_ts.scSetBlanker(BLANKER_INDEX, 0)
 				_ts.guiSetScanning(False)
 				_ts.scStopScan()
 				# scale the image view field to account for the RCA DAC margin
@@ -1870,7 +1918,7 @@ areaCriterion(...), maxCriterion(...) build common criteria."""
 				tos.close()
 				self.summarize(tiling)
 				if SITE==NIST:
-				    self.toLatex(tiling)
+					self.toLatex(tiling)
 				write(semstg.TilingUtilities.createMap(tiling, 2048), "Summary Map", self._path) # updated at end...
 				tos2 = jio.PrintStream(jio.File(self._path, "progress.txt"))
 				print "Analysis Starting...\n"
@@ -1931,15 +1979,15 @@ areaCriterion(...), maxCriterion(...) build common criteria."""
 					if globals().has_key('faraday'):
 						updatedPC()
 					_ts.chamberLed(defLED)
-					_ts.scSetBlanker(oldBlank)
+					_ts.scSetBlanker(BLANKER_INDEX, oldBlank)
 					if self._processSIStack:
 						self._processSIStack.add( None, None, None )
 					self._debugPw = None
 
-				
+
 		def buildRCA(project, sample, vecs, rules, fov = 0.512, morph = None, analyst = None, realTime=0.3, path = None):
 			"""buildRCA(project, sample, vecs, rules, fov = 0.512, morph = semtr.RcaTranslator.AreaCriterion(0.5, 4.0e4))
-		Builds a basic, default RCA object.  This object can be used directly to perform an RCA 
+		Builds a basic, default RCA object.	 This object can be used directly to perform an RCA
 	analysis or it can be modified to change the default analysis options."""
 			rca=RCA(project, sample, analyst, path=path)
 			rca.setFieldOfView(0.512, ppmRes=11)
@@ -1953,28 +2001,28 @@ areaCriterion(...), maxCriterion(...) build common criteria."""
 			return rca
 else:
 	print "No RCA license found."
-			
+
 	def stagePoints():
 		"""stagePoints()
-Allows the user to move the stage around and mark various stage points.  The resulting list of stage coordinates is /
+Allows the user to move the stage around and mark various stage points.	 The resulting list of stage coordinates is /
 returned as a list."""
 		res = []
 		msg = "Move the stage to the next outline point.\nSelect 'OK' to record a point or 'Cancel' when the list is complete."
 		add = True
 		while add:
-			 add = (jop.showConfirmDialog(MainFrame, msg, "Collect a stage point?", jop.OK_CANCEL_OPTION) == jop.OK_OPTION)
-			 if add:
+			add = (jop.showConfirmDialog(MainFrame, msg, "Collect a stage point?", jop.OK_CANCEL_OPTION) == jop.OK_OPTION)
+			if add:
 				pos = _stg.getPosition()
 				res.append(pos)
 				print "Adding %s" % pos
 		print "Stage point list contains %d points." % len(res)
 		return res
-			
-		
+
+
 
 import threading
 import Queue
-		
+
 class SIProcessor (threading.Thread):
 	""""A class used to process spectrum images in the background as acquisition of RCA data continues."""
 
@@ -1984,13 +2032,13 @@ class SIProcessor (threading.Thread):
 		self._terminated=False
 		self._subSample = subSample
 		self._thresh=thresh
-	
+
 	def add(self, name, path, vecs):
 		self._queue.addLast( (name, path, vecs, ) )
-		
+
 	def terminate(self):
 		self._terminated = True
-	
+
 	def run(self):
 		name, path, vecs = self.next()
 		while name:
@@ -2010,7 +2058,7 @@ class SIProcessor (threading.Thread):
 				break
 			tmp = self._queue.pollFirst(100, jutilc.TimeUnit.MILLISECONDS)
 		return (tmp if tmp else (None, None, None))
-		
+
 def getSIDimensions(siFile):
 	"""getSIDimensions(siFile)
 	Return a tuple containing the ( width, height, subRaster ) for the specified spectrum image."""
@@ -2021,7 +2069,7 @@ def getSIDimensions(siFile):
 	finally:
 		fis.close()
 	return None
-	
+
 def validateStds(stds, path=None):
 	"""validateStds(stds, path=None):
 	Takes a map of element name to standard spectrum file and creates a new map in which missing spectra have been removed."""
@@ -2031,7 +2079,7 @@ def validateStds(stds, path=None):
 		if jio.File(path, std).exists():
 			res[elm]=std
 	return res
-	
+
 def buildVectors(stds, path=None, strip=(), det = pt_det_all ):
 	"""buildVectors(stds, path=None,strip=())
 	Construct a set of Schamber-style fast quant vectors
@@ -2054,7 +2102,7 @@ def buildVectors(stds, path=None, strip=(), det = pt_det_all ):
 	for elm, std in procStds.iteritems():
 		sv.addStandard(elm, std, elm in strip)
 	return sv.getVectorSet()
-	
+
 def SItoRPL(siName, subSample=4, mask=defaultDetMask, eVperCh=10.0, chCount=2048, path=None):
 	"""SItoRPL(siName, subSample=4, mask=defaultDetMask, eVperCh=10.0, chCount=2048, path=defaultPath)
 	Converts a raw SI dump file into a RPL/RAW file pair."""
@@ -2078,7 +2126,7 @@ def SItoRPL(siName, subSample=4, mask=defaultDetMask, eVperCh=10.0, chCount=2048
 		display(spec)
 	finally:
 		rt.close()
-	
+
 def checkTiling(tiling, bounds=defaultBounds):
 	"""checkTiling(tiling, bounds=(-40.0, -40.0, 40.0, 40.0))
 	Iterates through a tiling checking that the central point is within the specified stage coordinate bounds."""
@@ -2102,14 +2150,14 @@ def moveToTile(tile, xyOnly=False, bounds=defaultBounds):
 	if b:
 		moveTo(c, xyOnly)
 	return b
-	
+
 def summarizeSI(siName, path=None):
 	"""SItoRPL(siName, subSample=4, mask=defaultDetMask, eVperCh=10.0, chCount=2048, mmSize=256, path=defaultPath)
 	Summarizes the contents of the specified spectrum image in text."""
 	path = (path if path else defaultPath)
 	siFile = "%s/%s/map.ptx" % (path, siName)
 	return semss.MessageTranslator().summarize(jio.File(siFile))
-	
+
 def labelImage(bi, label):
 	"""labelImage(bi, label)
 	Write a text label onto an image bi."""
@@ -2118,7 +2166,7 @@ def labelImage(bi, label):
 	gr.setFont(jawt.Font(jawt.Font.SANS_SERIF, jawt.Font.BOLD, bi.getWidth() / 12))
 	fm = gr.getFontMetrics()
 	gr.drawString(label, bi.getWidth() - (fm.stringWidth(label) + 4) , bi.getHeight() - fm.getHeight() / 2)
-	
+
 def SItoMap(siName, vecSet, path=None, mask=defaultDetMask, imgMask=None, subSample=4, thresh=0.2, label=True):
 	"""SItoMap(siName, vecSet, path=None, mask=defaultDetMask, subSample=4, thresh=0.2, label=True):)
 	Converts a SI file (map.ptx) into a series of x-ray map images using the /
@@ -2154,7 +2202,7 @@ label=True to label each image with the element"""
 	write(mi.getKRatioSummaryImage(), "K-ratio map[%d]" % (mask), "%s/%s" % (path, siName))
 	time.sleep(0.1)
 	mapsToMontage(siName, vecSet, path=path, mask=mask, width=4)
-	
+
 def SItoImages(siName, dets=[0,1], path=None):
 	"""SItoImages(siName, path=None)
 Extracts the image data out of a spectrum image."""
@@ -2170,7 +2218,7 @@ Extracts the image data out of a spectrum image."""
 	while msg:
 		if isinstance(msg, semdi.ImageDatum):
 			write(msg, "ImageDup", "%s/%s" % (path, siName), fmt="png")
-	
+
 def processSIs(basePath, baseName, vecs, mask=defaultDetMask, imgMask=None, subSample=4, thresh=0.2, label=True):
 	"""processSIs(basePath, baseName, vecs, mask=defaultDetMask, imgMask=None, subSample=4, thresh=0.2, label=True)
 	Process all the spectrum images in the basePath with the baseName using the specified vectors."""
@@ -2183,7 +2231,7 @@ def processSIs(basePath, baseName, vecs, mask=defaultDetMask, imgMask=None, subS
 			SItoMap(fi.getName(), vecs, path = bp, mask=mask, imgMask=imgMask, subSample=subSample, thresh=thresh, label=label)
 			if terminated:
 				break
-	
+
 def SItoSum(siName, mask=None, subSample=4, path=None):
 	"""SItoSum(siName, mask=None, subSample=4, path=None):
 	Computes the sum spectrum from the specified spectrum image.  If mask!=None then the image associated with mask \
@@ -2215,7 +2263,7 @@ as siName or a BufferedImage object.  Make sure subSample matches the subSample 
 def SItoSums(siName, masks, subSample=4, path=None):
 	"""SItoSums(siName, masks=(), subSample=4, path=None):
 	Similar to SItoSum except takes an collection of masks to permit processing a single SI against multiple masks
-in a more efficient manner.  Computes a set of masked sum spectrum from the specified spectrum image and mask collection. \
+in a more efficient manner.	 Computes a set of masked sum spectrum from the specified spectrum image and mask collection. \
 The items in masks should be images in the directory path/siName."""
 	if terminated:
 		return
@@ -2250,7 +2298,7 @@ def execute(cmd, wait=False):
 	p = pb.start()
 	if wait:
 		p.waitFor()
-		
+
 def executeCmd(cmd, wait=False):
 	"""executeCmd(cmd)
 	Passes a command to cmd.exe to execute in a separate process"""
@@ -2266,7 +2314,7 @@ def mapsToMontage(name, vecs, path=None, mask=defaultDetMask, width=4, base=""):
 	_saverize.waitUntilAllSaved()
 	path = (path if path else defaultPath)
 	if isinstance(path, str):
-		path = path.replace("/", "\\")	
+		path = path.replace("/", "\\")
 	tmp = '"%s\\montage.exe" -tile %dx%d -geometry +1+1' % ( IMAGE_MAGICK, width + 1, (vecs.vectors.size() + width - 1) / width)
 	for u, v in enumerate(vecs.vectors):
 		tmp = '%s "%s\\%s\\%s%s[%d].png"' % (tmp, path, name, v.element, base, mask)
@@ -2351,7 +2399,7 @@ def mapsToOverlay(name, elms, colorspace="RGB", thresh=0.2, path=None, label=Tru
 	else:
 		cmd = ('"%s\\convert" -background black ' % IMAGE_MAGICK) + " ".join(elmStr) + (' -set colorspace %s -combine -gravity center -append "%s\\%s\\overlay[%s].png"' % (colorspace, path, name, tmp))
 	execute(cmd, True)
-	
+
 def processSI(name, vecs, path=None, subSample=4):
 	"""processSI(name, vecs=None,path=defaultPath)
 	Perform the standard default processing on an SI"""
@@ -2370,7 +2418,7 @@ def processSI(name, vecs, path=None, subSample=4):
 	if terminated:
 		return
 	animateSIImages(name, path=path)
-	
+
 def animateSIImages(name, path=None):
 	files = []
 	path = (path if path else defaultPath)
@@ -2395,10 +2443,9 @@ def write(objs, name, path=None, fmt="msa", writeMask=0xFF):
 	if isinstance(objs, javaarray.array) or isinstance(objs, tuple) or isinstance(objs, list):
 		for i, obj in enumerate(objs):
 			if isinstance(obj, ept.ScaledImage):
-				if isinstance(obj, ept.ScaledImage):
-					di = (int(obj.getDetectorIndex()) if obj.getDetectorIndex() else i)
-					if writeMask & (1<<di):
-						write(obj, "%s[%d]" % (name, di, ), path, fmt=fmt)
+				di = (int(obj.getDetectorIndex()) if obj.getDetectorIndex() else i)
+				if (writeMask & (1<<di)) != 0:
+					write(obj, "%s[%d]" % (name, di, ), path, fmt=fmt)
 			else:
 				write(obj, "%s[%d]" % (name, i), path, fmt=fmt)
 	elif isinstance(objs, semss.DataItems.ImageDatum):
@@ -2420,7 +2467,7 @@ def write(objs, name, path=None, fmt="msa", writeMask=0xFF):
 			os = jio.FileOutputStream("%s/%s.msa" % (path, name))
 			try:
 				emsa.write(objs, os, emsa.Mode.COMPATIBLE)
-                # report("<p>Spectrum <i>%s</i> written to <i>%s\\%s.msa</i></p>" % (objs, path, name))
+				# report("<p>Spectrum <i>%s</i> written to <i>%s\\%s.msa</i></p>" % (objs, path, name))
 			finally:
 				os.close()
 
@@ -2468,7 +2515,7 @@ def annotateImages(path = None):
 if connect:
 	def markFiducial(sample, fids):
 		"""markFiducial(sample, fids)
-		Mark a fiducial point.  'sample' is the sample name, fids is a list to contain the stage coordinates."""
+		Mark a fiducial point.	'sample' is the sample name, fids is a list to contain the stage coordinates."""
 		n = len(fids) + 1
 		fids.append(_stg.getPosition())
 		imgs = collectImages("%s F%d 1_0 mm" % (sample, n), fov=1.0, dims=(512, 512), markCenter=True, writeMask=SAVE_IMAGE_MASK)
@@ -2477,7 +2524,7 @@ if connect:
 		imgs=collectImages("%s F%d 0_1 mm" % (sample, n), fov=0.1, dims=(512, 512), markCenter=True, writeMask=SAVE_IMAGE_MASK)
 		for img in imgs:
 			img.applyCenterCrossHair()
-	
+
 	def markPoint(pts, comp, withImg=False):
 		"""markPoint(pts, comp, [withImg=False])
 		Mark an analysis point. 'sample' is the sample name, 'pts' is a point list(), 'comp' is the point name."""
@@ -2498,7 +2545,7 @@ if connect:
 				img.applyCenterCrossHair()
 			write(imgs, imgLabel)
 
-if True:			
+if True:
 	def markGrid(std, pts, comp, spacing =0.1, withImg = False):
 		assert len(pts)>=2
 		spacing = jl.Math.max(0.01,jl.Math.abs(spacing))
@@ -2540,26 +2587,26 @@ if True:
 
 class Elapse:
 	"""A simple elapse timer to estimate ETA from elapse time."""
-	
+
 	def __init__(self, nItems):
 		self._nItems = nItems
 		self._start = jl.System.currentTimeMillis()
-		
+
 	def inSeconds(self):
 		return 0.001 * (jl.System.currentTimeMillis() - self._start)
-	
+
 	def update(self, completed):
 		"""update(completed)
-		completed:  The number of items completed
-        Estimates the ETA based on the number of items completed since the Elapse object was constucted."""
+		completed:	The number of items completed
+		Estimates the ETA based on the number of items completed since the Elapse object was constucted."""
 		print "Completed: %d of %d" % (completed, self._nItems)
 		now = jl.System.currentTimeMillis()
 		elapse = self.inSeconds()
-		print "   Elapse: %d:%02d:%02d" % (int(elapse) / 3600, (int(elapse) / 60) % 60, int(elapse) % 60)
+		print "	  Elapse: %d:%02d:%02d" % (int(elapse) / 3600, (int(elapse) / 60) % 60, int(elapse) % 60)
 		if completed > 0:
 			eta = int((elapse * (self._nItems - completed)) / completed)
-			print "      ETA: %d:%02d:%02d" % (eta / 3600, (eta / 60) % 60, eta % 60)
-			
+			print "		 ETA: %d:%02d:%02d" % (eta / 3600, (eta / 60) % 60, eta % 60)
+
 	def updateString(self, completed):
 		now = jl.System.currentTimeMillis()
 		elapse = 0.001 * (now - self._start)
@@ -2568,8 +2615,8 @@ class Elapse:
 			eta = int((elapse * (self._nItems - completed)) / completed)
 			tmp = "%d:%02d:%02d" % (eta / 3600, (eta / 60) % 60, eta % 60)
 		return "Elapse: %d:%02d:%02d  ETA: %s" % (int(elapse) / 3600, (int(elapse) / 60) % 60, int(elapse) % 60, tmp)
-		
-			
+
+
 if connect:
 	def collectSpectra(sample, pts, liveTime=60.0, fov=0.005):
 		"""collectSpectra(sample, pts, liveTime=60.0, fov=0.005)
@@ -2586,8 +2633,8 @@ results are written to the defaultDir."""
 
 	def collectStandards(sample, pts, liveTime=60.0, fov=0.005, disp = True, combine=True, offenze=True):
 		"""collectStandards(sample, pts, liveTime=60.0, fov=0.005, combine=True, offenze)
-		Collect standard spectra from the named sample at the specified points for the specified livetime.  
-"pts" is a list containing a tuple, the first element of which is a material name and the second element of which is a list of StageCoordinate objects. 
+		Collect standard spectra from the named sample at the specified points for the specified livetime.
+"pts" is a list containing a tuple, the first element of which is a material name and the second element of which is a list of StageCoordinate objects.
 "combine=True" to build a spectrum representing the sum of the spectra.
 "offenze" turns the instrument power off at the end of the operation."""
 		global faraday
@@ -2697,7 +2744,7 @@ if connect:
 	def validatePts(sample, pts):
 		"""validatePts(sample, pts)
 		Validate the points in the point list by driving to each one and asking whether the point is ok.  If the point is not ok /
-	then you can select to delete the point or to replace the point."""  
+	then you can select to delete the point or to replace the point."""
 		newPts = []
 		for i, item in enumerate(pts):
 			mat, sps = item
@@ -2719,8 +2766,8 @@ if connect:
 
 def dumpPts(sample, pts=None, fids=None):
 	"""dumpPts(sample, pts=None, fids=None)
-	Outputs a point list and a fiducial list to the console in tab-delimited form.  'pts' is in the form created by markPoint(...) or scatter(...) and /
-'fids' is in the form of markFiducial(...)""" 
+	Outputs a point list and a fiducial list to the console in tab-delimited form.	'pts' is in the form created by markPoint(...) or scatter(...) and /
+'fids' is in the form of markFiducial(...)"""
 	print "Sample\tType\tIndex\tMaterial\tSub-Index\tX\tY"
 	if pts:
 		for i, item in enumerate(pts):
@@ -2731,10 +2778,10 @@ def dumpPts(sample, pts=None, fids=None):
 		for i, sp in enumerate(fids):
 			print "%s\tF\t%d\t%s\t%d\t%f\t%f" % (sample, i + 1, "-", 0, sp.get(X_AXIS), sp.get(Y_AXIS))
 
-def readPts(ptsStr):	
+def readPts(ptsStr):
 	"""sample, pts, fids = readPts(ptsStr)
-	readPts is the inverse of dumpPts(...).  readPts takes a string containing a tab delimited coordinate list /
-in the form 'Sample\tType\tIndex\tMaterial\tSub-Index\tX\tY'""" 
+	readPts is the inverse of dumpPts(...).	 readPts takes a string containing a tab delimited coordinate list /
+in the form 'Sample\tType\tIndex\tMaterial\tSub-Index\tX\tY'"""
 	fids = []
 	pts = []
 	last = None
@@ -2770,7 +2817,7 @@ def randomize(pts, d=0.02, n=4):
 			newItem = (item[0], newPts)
 		res.append(newItem)
 	return res
-	
+
 def buildXStream():
 	xs = xst.XStream()
 	xs.alias("StageCoordinate", epq.StageCoordinate)
@@ -2779,7 +2826,7 @@ def buildXStream():
 	return xs
 
 def toXML(obj):
-	"""toXML(obj): 
+	"""toXML(obj):
 	Converts an object into a text-based XML representation of the object."""
 	return buildXStream().toXML(obj)
 
@@ -2792,7 +2839,7 @@ def setProjectBasedPaths(project, sample, mode="Manual"):
 	"""setProjectBasedPaths(project, sample)
 	Changes the defaultPath – the path into which image and spectrum data is written by default."""
 	setDefaultPath("%s/Projects/%s/%s/%s" % (rootPath, project, sample, mode))
-	
+
 def updateZ(pts, newZ):
 	"""updateZ(pts, newZ)
 	Change the Z stage position to the specified value for all points in the point list pts"""
@@ -2803,13 +2850,13 @@ def updateZ(pts, newZ):
 if connect:
 	def collectQC(lt=30.0, path=None):
 		"""collectQC(lt=30.0, path='QC+time')
-		Collect QC spectra and process them.  
+		Collect QC spectra and process them.
 	If the results indicate that the calibration is good, the spectra and results can be added to the QC database.
 	If the results don't indicate the calibration is good, the calibration can be updated to improve the calibration."""
 		if terminated:
 			return
 		std = "Pure copper"
-		if (SITE==NIST) or (SITE==ORNL):
+		if (SITE==NIST) or (SITE==ORNL) or (SITE==WARRENDALE):
 			e0 = 20.0
 		else:
 			e0 = 25.0
@@ -2823,14 +2870,14 @@ if connect:
 		if abs(_ts.hvGetVoltage() - e0 * 1.0e3) > 100.0:
 			print "Please set the beam energy to %0.1f keV" % e0
 			return
-		i0 = updatedPC(10.0)
-		if (i0.average() < 0.4) or (i0.average() > 1.2):
-			print "The probe current (%0.3f nA) is out of range (0.4 nA to 1.2 nA)." % i0.average()
+		i0 = updatedPC(1.0)
+		if (i0.average() < 0.4) or (i0.average() > 2.5):
+			print "The probe current (%0.3f nA) is out of range (0.4 nA to 2.5 nA)." % i0.average()
 			return
-		print "Collecting %0.1f live time second spectra please wait..." % lt
+		print "Collecting %0.1f live time second spectra.\n   Please wait..." % lt
 		clear()
 		specs = collect(lt, std)
- 		if terminated:
+		if terminated:
 			return
 		cals=readCalibrations()
 		for i, spec in enumerate(specs):
@@ -2847,8 +2894,10 @@ if connect:
 			spec.getProperties().setNumericProperty(epq.SpectrumProperties.FaradayBegin, i0.average())
 			if ok:
 				qcp = Database.getQCProject(det, std, e0)
+				print "%s" % (qcp, )
 				pqc = dt2.PerformQC(qcp, spec)
 				res = pqc.compute()
+				print "QC fit complete..."
 				clear()
 				display(pqc.getResidual())
 				print "\nProperty\tValue"
@@ -2856,13 +2905,17 @@ if connect:
 					print u"%s\t%s" % (key, val)
 				cw = res.get("Channel width").doubleValue()
 				if cw:
-					okp = jop.showConfirmDialog(MainFrame, "Update calibration to %g eV/ch?" % cw, "Update calibration?", jop.YES_NO_OPTION)
+					okp = jop.showConfirmDialog(MainFrame, "Update calibration for fitted value of %g eV/ch?" % cw, "Update calibration?", jop.YES_NO_OPTION)
 					if okp == jop.YES_OPTION:
 						cals[i]=calibrate(i, cw)
 					else:
 						add = jop.showConfirmDialog(MainFrame, "Add this spectrum to the QC database?", "collectQC()", jop.YES_NO_OPTION)
-						if add== jop.YES_OPTION:
-							pqc.addToProject()
+						if add == jop.YES_OPTION:
+							radp=pqc.addToProject(res)
+							if radp==None:
+								print "Error adding spectrum to database."
+							else:
+								print "Added to the QC database."
 				f = jio.File(outPath, "%s.html" % det.getName())
 				dt2.PerformQC.generateReport(qcp, f, res.keySet())
 				print "Report written to: %s" % f
@@ -2871,33 +2924,33 @@ if connect:
 		if terminated:
 			return
 		writeCalibrations(cals)
-	
+
 	def readCalibrations():
-		cal=[]
+		cal=ju.ArrayList()
 		for i in range(0, defaultDetCount):
 			cal.append(_pt.getADCGain(i))
 		try:
 			tmp=jupref.userNodeForPackage(_pt.getClass()).get("SDDCal",None)
 			if tmp:
 				cal=fromXML(tmp)
-		except:
+		except jl.Throwable, ex:
 			print "Error loading SDD calibrations."
-		return cal
-		
+			print ex
+		return ju.ArrayList(cal)
+
 	def writeCalibrations(cals):
-		tmp=jupref.userNodeForPackage(_pt.getClass()).put("SDDCal",toXML(cals))
-		
+		tmp=jupref.userNodeForPackage(_pt.getClass()).put("SDDCal", toXML(ju.ArrayList(cals)))
+
 	# configureEDS()
-	setResolution("Medium")
-	updateCalibration()
-		
+	setResolution(_edsResolution)
+
 if connect:
 	def collectTiledImages(tiling, mags=((2.0, 0,), (0.5, 0,)), overlap=0.9, imgDim= 1024, imgDwell=4, seed=0xBADF00D):
 		"""collectTiledImage(tiling, mags[=(( 2.0, 0, ),(0.5, 0, ))], overlap[=0.9], seed[=0xBADF00D])
 		Collect a set of images for the specified tiling at the specified mags.
 	tiling: semstg.CircularTiling, semstg.BoundaryTiling etc
 	mags  = (( FOV0, maxTiles0), (FOV1, maxTiles1),...) where FOVX in mm and maxTiles=0 is full set
-	overlap: extent of field overlap 
+	overlap: extent of field overlap
 	seed: random seed for when maxTiles < tiling.size()"""
 		global defaultPath
 		if terminated:
@@ -2954,14 +3007,14 @@ if connect:
 		finally:
 			tf.close()
 		print elapse.updateString(tileCx)
-			
-			
+
+
 	def collectTiledSIs(tiling, mags=((2.0, 0,), (0.5, 0,)), overlap=0.9, imgDim= 1024, imgDwell=9, seed=0xBADF00D):
 		"""collectTiledImage(tiling, sample, mags[=(( 2.0, 0, ),(0.5, 0, ))], overlap[=0.9], seed[=0xBADF00D])
 		Collect a set of images for the specified tiling on the named sample at the specified mags.
 	tiling: semstg.CircularTiling, semstg.BoundaryTiling etc
 	mags  = (( FOV0, maxTiles0), (FOV1, maxTiles1),...) where FOVX in mm and maxTiles=0 is full set
-	overlap: extent of field overlap 
+	overlap: extent of field overlap
 	seed: random seed for when maxTiles < tiling.size()"""
 		global defaultPath
 		tileCx = 0
@@ -3014,24 +3067,24 @@ if connect:
 		finally:
 			tf.close()
 		print elapse.updateString(tileCx)
-			
+
 
 
 def startIn(seconds, proc):
 	"""startIn(seconds, proc)
 	Execute the function 'proc' after a 'seconds' delay.  Timing is approximate (slightly more then specified)"""
-	print "Starting in %d:%02d:%02d" % (seconds / 3600, (seconds / 60) % 60, seconds % 60) 
+	print "Starting in %d:%02d:%02d" % (seconds / 3600, (seconds / 60) % 60, seconds % 60)
 	for i in xrange(seconds, 0, -1):
-		 time.sleep(1.0)
-		 if (seconds < 60) or ((seconds < 3600)and(i % 60 == 0)) or (i % 600 == 0):
-		 	print "%d:%02d:%02d" % (i / 3600, (i / 60) % 60, i % 60) 
-		 if terminated:
-		 	return
+		time.sleep(1.0)
+		if (seconds < 60) or ((seconds < 3600)and(i % 60 == 0)) or (i % 600 == 0):
+			print "%d:%02d:%02d" % (i / 3600, (i / 60) % 60, i % 60)
+		if terminated:
+			return
 	proc()
 
 def replicates(name, dur=1.0, reps=100, fov=0.010):
 	"""replicates(name, [dur=1.0], [reps=100], [fov=0.005])
-	Collect reps replicate spectra for dur liveTime from field-of-view fov (in mm).  This is useful for determining whether a sample changes during acqusition."""
+	Collect reps replicate spectra for dur liveTime from field-of-view fov (in mm).	 This is useful for determining whether a sample changes during acqusition."""
 	res = []
 	global defLED
 	oldDef = defLED
@@ -3078,7 +3131,7 @@ def repliQuant(specss, e0, stds, refs={}, preferred=(), elmByDiff=None, elmBySto
 		for elm, std in stds.iteritems():
 			detstds[elm] = std[deti]
 		mq = multiQuant(pt_det[deti], e0, detstds, refs, preferred, elmByDiff, elmByStoic, assumedStoic)
-		tmp = []		
+		tmp = []
 		for specs in specs:
 			spec = specs[deti]
 			mq.compute(spec)
@@ -3119,7 +3172,7 @@ def select(specs):
 	Select and display the specified spectra ."""
 	DataManager.clearSelections()
 	DataManager.select(specs, True)
-	
+
 def toLine(pt0, pt1, nPts):
 	"""toLine(pt0, pt1, nPts):
 	Takes two stage points (pt0 and pt1) and creates a line of 'nPts' stage points forming a dotted line between them."""
@@ -3212,18 +3265,18 @@ def dump(comps, prop=epq.SpectrumProperties.MicroanalyticalComposition):
 		for elm in elms:
 			ss="%s\t%g" % (ss, 100.0*comp.weightPercent(elm, False))
 		print ss
-		
+
 UNDERFILL = semstg.BaseTiling.Mode.Underfill
 CENTERINSIDE = semstg.BaseTiling.Mode.CenterInside
-COVERS = semstg.BaseTiling.Mode.Covers		
-		
+COVERS = semstg.BaseTiling.Mode.Covers
+
 def circularTiling(pts, mode=UNDERFILL, serpentine=False, fov = 0.5):
 	""""circularTiling(pts, mode=UNDERFILL, serpentine=False, fov = 0.5 )
 	Creates a tiling from a list of three StageCoordinate points from around the perimeter of the circle."""
 	res = semstg.CircularTiling(pts, mode, serpentine)
 	res.setTileDimension([fov,fov])
 	return res
-	
+
 def rectangularTiling(pts, mode=UNDERFILL, serpentine=False, fov = 0.5 ):
 	""""rectangularTiling(pts, mode=UNDERFILL, serpentine=False, fov = 0.5 )
 	Creates a tiling from a list of two StageCoordinate points at outer extremeties of a rectangle aligned with the stage axes."""
@@ -3237,21 +3290,21 @@ def boundaryTiling(pts, mode=UNDERFILL, serpentine=False, fov = 0.5 ):
 	res = semstg.BoundaryTiling(pts, mode, serpentine)
 	res.setTileDimension([fov,fov])
 	return res
-	
+
 def linearTiling(pts, overlap=0.0, fov = 0.5):
 	""""linearTiling(pts, overlap=0.0, fov = 0.5)
-	Creates a tiling from a list of StageCoordinate points.  The tiles are constructed by drawing lines between the points and placing tiles at the appropriate spacing along the lines."""
+	Creates a tiling from a list of StageCoordinate points.	 The tiles are constructed by drawing lines between the points and placing tiles at the appropriate spacing along the lines."""
 	res = semstg.LinearTiling(pts, overlap)
 	res.setTileDimension([fov,fov])
 	return res
-	
+
 def polygonalTiling(pts, mode=UNDERFILL, serpentine=False, fov = 0.5):
 	""""polygonalTiling(pts, mode=UNDERFILL, serpentine=False )
 	Creates a tiling from a list of StageCoordinate points from around the perimeter of an object. The points are reordered to maximize the area inside."""
 	res = semstg.PolygonalTiling(pts, mode, serpentine)
 	res.setTileDimension([fov,fov])
 	return res
-	
+
 def randomSubSetOfATiling(tiling, maxFields, seed=None):
 	"""randomSubSetTiling(tiling, maxFields):
 	Adapts a tiling to analyze at most maxFields chosen in an order that attempts to minimize stage travel distance.  Use this to analyze a pre-established number of tiles chosen at random."""
@@ -3264,7 +3317,7 @@ def randomSubSetOfATiling(tiling, maxFields, seed=None):
 
 def randomizedTiling(tiling, seed=None):
 	"""randomizedTiling(tiling, seed=None):
-	Adapts a tiling to select the tiles in a random order.  Use this to select an unspecified number of tiles until some other criterion is met (such as number of particles or time)."""
+	Adapts a tiling to select the tiles in a random order.	Use this to select an unspecified number of tiles until some other criterion is met (such as number of particles or time)."""
 	if not seed:
 		seed = int(jl.System.currentTimeMillis()%0xFFFFFFF)
 	return semstg.RandomizeOrder(tiling, seed)
@@ -3277,17 +3330,17 @@ def displayTiling(tiling, dim=2048, fov=None):
 		return semstg.DisplayTiling(tiling, dim, fov)
 	else:
 		return semstg.DisplayTiling(tiling, dim)
-	
+
 def everyNthTile(tiling, n, start=0, end=100000):
 	"""everyNthTile(tiling, n, start=0, end=100000)
 	Adapts a tiling to analyze only every n-th tile from start to end."""
 	return semstg.AdapterTiling(tiling, start, end, n)
-	
+
 def multiTiling( tilings ):
 	"""multiTiling( tilings )
 	Creates a single tiling from a collection of multiple region tilings."""
 	return semstg.MultiRegion(tilings)
-	
+
 def dumpTiling(tiling, filename, fov=None, path = None):
 	"""dumpTiling(tiling, filename, fov=None, path = None)
 	Creates a 2048 pixel image showing the layout of the tiles in the specified tiling."""
@@ -3295,40 +3348,40 @@ def dumpTiling(tiling, filename, fov=None, path = None):
 	dt=displayTiling(tiling, dim=2048, fov=fov)
 	path = (path if path else defaultPath)
 	write(dt.getImage(),filename, path)
-	
-	
+
+
 def areaCriterion(min, max=4.0e4, diag=False):
 	"""areaCriterion(min, max=4.0e4, diag=False)
 	Creates a morphology rule based on particle area."""
 	res = semtr.RcaTranslator.AreaCriterion(min, max)
 	return (res if not diag else semtr.RcaTranslator.Diagnostic(res, StdOut))
-		
-	
+
+
 def lengthCriterion(min, max=1.0e3, diag=False):
 	"""lengthCriterion(min, max=4.0e4, diag=False)
 	Creates a morphology rule based on average diameter."""
 	res = semtr.RcaTranslator.DAverageCriterion(min, max)
 	return (res if not diag else semtr.RcaTranslator.Diagnostic(res, StdOut))
-	
+
 def maxCriterion(min, max=1.0e3, diag=False):
 	"""maxCriterion(min, max=1.0e3, diag=False)
 	Creates a morphology rule based on maximum diameter."""
 	res = semtr.RcaTranslator.DMaxCriterion(min, max)
 	return (res if not diag else semtr.RcaTranslator.Diagnostic(res, StdOut))
-	
+
 def aspectCriterion(min, max=4.0e4, diag=False):
 	"""aspectCriterion(min, max=4.0e4, diag=False)
 	Creates a morphology rule based on aspect ratio (dMax/dPerp)."""
 	res = semtr.RcaTranslator.AspectCriterion(min, max)
 	return (res if not diag else semtr.RcaTranslator.Diagnostic(res, StdOut))
-	
+
 def abbrevName(name, maxLen=80, filler="--"):
 	if len(name)>maxLen:
 		fr = 2*maxLen/3 - 2
 		return name[0:fr]+"--"+name[fr+len(filler)-maxLen:len(name)]
 	else:
 		return name
-	
+
 def mapTiling(tiling, hdim=1024):
 	"""mapTiling(tiling, hdim=1024):
 	Draws an image containing a map of the tiles in the specified tiling."""
@@ -3362,8 +3415,8 @@ If p is a point on the plane then dot(n,p)=d. Knowing any two coordinates we can
 
 def meshZ(point, points):
 	"""meshZ(point, points)
-	Computes the z-height for 'point' from a list of x,y,z stage positions called 'points'.  The x,z,z stage positions form a mesh.  
-	The closes three 'points' to 'point' are used to define a plane that is used to interpolate the x-y position in 'point' into a z-height.  
+	Computes the z-height for 'point' from a list of x,y,z stage positions called 'points'.	 The x,z,z stage positions form a mesh.
+	The closes three 'points' to 'point' are used to define a plane that is used to interpolate the x-y position in 'point' into a z-height.
 	meshZ returns a float, the z-height at x-y coordinates in 'point'."""
 	def cmpDist(x,y):
 		if x[0]<y[0]:
@@ -3397,15 +3450,16 @@ def meshZ(point, points):
 	if n:
 		#print n, d
 		res = computeZ(n, d, (point.get(X_AXIS), point.get(Y_AXIS)))
-	if res<minZ:
-		print "Truncating Z = %f to %f - minZ" % (res, minZ)
-		return minZ
-	elif res>maxZ:
-		print "Truncating Z = %f to %f - maxZ" % (res, maxZ)
-		return maxZ
+	dz=(maxZ-minZ)/2
+	if res<minZ-dz:
+		print "Truncating Z = %f to %f - minZ" % (res, minZ-dz)
+		return minZ-dz
+	elif res>maxZ+dz:
+		print "Truncating Z = %f to %f - maxZ" % (res, maxZ+dz)
+		return maxZ+dz
 	else:
 		return res
-		
+
 def compareSpecs(specs):
 	"""compareSpecs(s1, s2)
 	Generates a number which measures how similar two spectra are which should be approximately 1.0 for spectra that differ only in count statistics and then sorts the spectra according to similarity."""
@@ -3444,7 +3498,7 @@ def compareSpecs(specs):
 	res.sort(cmp)
 	return res
 
-	
+
 # Import pyRules to help reclassify data sets
 import dtsa2.pyRules as pr
 
@@ -3477,7 +3531,7 @@ def backup(src, dest, verbose = False):
 		except:
 			target_ts = 0
 		return src_stat.st_size if (src_stat.st_mtime-target_ts > 1) else False
-		
+
 	def sync_file(source, target, verbose):
 		size = size_if_newer(source, target)
 		if size:
@@ -3527,4 +3581,19 @@ def archive(project, dest = defaultArchivePath):
 	else:
 		backup(rootPath+"\\Projects\\"+project, dest+"\\"+project, False)
 
+def checkpts(pts):
+	"""checkpts(pts)
+	Validate the stage points in the point list by driving to each one and asking whether the point is ok.  If the point is not ok /
+then you can select to delete the point or to replace the point."""
+	newPts = []
+	for i, sp in enumerate(pts):
+		print "%d\t%f\t%f\t%f" % (i + 1, sp.get(X_AXIS), sp.get(Y_AXIS), sp.get(Z_AXIS))
+		_stg.moveTo(sp)
+		res = jop.showConfirmDialog(MainFrame, "Update this point?", "Stage point validation", jop.YES_NO_OPTION)
+		if res == jop.YES_OPTION:
+			newPts.append(position())
+		else:
+			newPts.append(sp)
+	return newPts
+		
 reportMemory()

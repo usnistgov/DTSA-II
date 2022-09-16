@@ -533,7 +533,7 @@ public class MakeStandardDialog extends JWizardDialog {
 		double e0 = Double.MAX_VALUE;
 		for (ISpectrumData s : mSpectra)
 			e0 = Math.min(e0, SpectrumUtils.getBeamEnergy(s));
-		for (Element elm : mMaterial.getElementSet())
+		for (Element elm : mStandardPanel.jPanel_Element.getSelected())
 			rois.add(new XRayTransitionSet(elm, ToSI.eV(50.0), ToSI.eV(e0)));
 		return rois;
 	}
@@ -542,7 +542,7 @@ public class MakeStandardDialog extends JWizardDialog {
 		ArrayList<ISpectrumData> cspecs = new ArrayList<>(specs);
 		cspecs.remove(spec);
 		try {
-			return Math.sqrt(SpectrumUtils.measureDissimilarity(spec, cspecs, rois));
+			return SpectrumUtils.measureDissimilarity(spec, cspecs, rois);
 		} catch (EPQException e) {
 			return Double.NaN;
 		}

@@ -29,6 +29,7 @@ Example:
 > xtraParams.update(configureVariablePressure(pathLen, gas))
 > xtraParams.configureVRML(nElectrons = 40)
 The default output path for all files created is the same as 'reportPath()'.  You can specify an alternative location using 'configureOutput(...)'. """
+from compiler.pycodegen import TRY_FINALLY
     
 # Example:
 # 1> xp = { "Transitions" : [transition("Fe K-L3"), transition("Fe K-M3"), transition("Fe L3-M5"), transition("O K-L3")], "Emission Images":5.0e-6, "Characteristic Accumulator":True, "Char Fluor Accumulator":True, "Brem Fluor Accumulator":True, "PhiRhoZ":5.0e-6, "Output" : "Z:/nritchie/Desktop/tmp" }
@@ -186,9 +187,13 @@ def suggestTransitions(mat, e0=20.0):
     res = []
     for elm in mat.getElementSet():
         for xrt in xrts:
-            tr = dtsa2.transition(xrt % elm.toAbbrev())
-            if tr.exists() and (tr.getEnergy() < 0.95 * epq.ToSI.keV(e0)) and (tr.getEnergy() > epq.ToSI.keV(0.2)):
-                res.append(tr)
+            try:
+                tr = dtsa2.transition(xrt % elm.toAbbrev())
+                if tr.exists() and (tr.getEnergy() < 0.95 * epq.ToSI.keV(e0)) and (tr.getEnergy() > epq.ToSI.keV(0.2)):
+                    res.append(tr)
+            except:
+                pass
+                # print("%s does not exist" % xrt) # Ignore
     return res
 
 def configureBSEDDepth(zMin, zMax):

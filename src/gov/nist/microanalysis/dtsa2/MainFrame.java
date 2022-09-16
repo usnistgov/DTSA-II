@@ -1996,10 +1996,10 @@ public class MainFrame extends JFrame {
 	public ISpectrumData[] selectSpectraFromFiles() {
 		final SpectrumFileChooser sfc = new SpectrumFileChooser(this, "Open spectrum files...");
 		final File dir = new File(DTSA2.getSpectrumDirectory());
+        sfc.setMultiSelectionEnabled(true);
 		sfc.getFileChooser().setCurrentDirectory(dir);
 		sfc.setLocationRelativeTo(this);
-		final int res = sfc.showOpenDialog();
-		if (res == JFileChooser.APPROVE_OPTION) {
+		if(sfc.showOpenDialog() == JFileChooser.APPROVE_OPTION) {
 			DTSA2.updateSpectrumDirectory(sfc.getFileChooser().getCurrentDirectory());
 			return sfc.getSpectra();
 		}
