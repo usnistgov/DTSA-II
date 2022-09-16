@@ -5,7 +5,7 @@
 # Modified: 11-July-2022
 # Set the SITE to account for site specific hardware variations
 NIST, MCCRONE, PNNL, PAS, AEM, ORNL, SRNL, PLEASANTON, WARRENDALE = ( "NIST", "McCRONE", "PNNL", "PAS", "AEM", "ORNL", "SRNL", "PLEASANTON", "WARRENDALE" )
-SITE = MCCRONE
+SITE = SRNL
 
 if (SITE == NIST) and (jl.System.getProperty('sun.java.command') == u'gov.nist.microanalysis.dtsa2.DTSA2'):
 	print "JAR paths based on workspace."
@@ -84,7 +84,9 @@ elif SITE==ORNL:
 elif SITE==PLEASANTON:
 	rootPath = "C:\\Users\\Tescan\\Documents\\DTSA-II Reports\\Data" 
 elif SITE==WARRENDALE:
-	rootPath = "C:\\Users\\EdaxAdmin\\Documents\\DTSA-II Reports\\Data"
+	rootPath = "C:\\Users\\Tescan\\Documents\\DTSA-II Reports\\Data"
+elif SITE==SRNL:
+	rootPath = "C:\\Data"
 else:  # SITE==MCCRONE:
 	rootPath = "C:\\Data"
 
@@ -142,6 +144,8 @@ if (SITE==MCCRONE) or (SITE==ORNL) or (SITE==NIST):
 	availableDets = ( True, )*4 # False, False, False )
 elif (SITE==PLEASANTON) or (SITE==WARRENDALE):
 	availableDets = ( True, )
+elif SITE==SRNL:
+	availableDets = ( True, )*3
 else:
 	availableDets = ( True, )*2 # False, False, False )
 
@@ -235,7 +239,9 @@ if connect:
 		print "Unable to find a detector named: %s" % name
 		return None
 
-	if SITE==MCCRONE:
+	if SITE==SRNL:
+		_apaDet = findEDet("BSE")
+	elif SITE==MCCRONE:
 		_apaDet = findEDet("BSED")
 	elif SITE==WARRENDALE:
 		_apaDet = findEDet("LE BSE")
@@ -1061,7 +1067,7 @@ Get the spectrum associated with the specified row number"""
 			print "%s archived to %s" % (src, destF)
 			return
 
-	if connect and _ts.hasRCALicense():
+	if connect and (_ts.hasRCALicense() or SITE==SRNL): 
 		def updatePC(self):
 			"""z.updatePC()
 	Updates the probe current if necessary and then asks to recenter particle"""
@@ -1140,7 +1146,7 @@ Get the spectrum associated with the specified row number"""
 				self.getZ().setTranslation(res)
 
 
-if connect and _ts.hasRCALicense():
+if connect and (_ts.hasRCALicense() or SITE==SRNL):
 
 		POINT_MODE = "Point mode EDS"
 		FIXED_SPACING = "Fixed spacing EDS"
