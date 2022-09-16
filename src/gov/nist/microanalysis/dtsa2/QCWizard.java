@@ -752,7 +752,7 @@ public class QCWizard
          final Map<String, UncertainValue2> res = mFitThread.mResults;
          if(isFinished() && (mSpectrum != null) && (res != null))
             try {
-               mFitThread.mPerformQC.addToProject();
+               mFitThread.mPerformQC.addToProject(res);
                mHTMLResult.append(mFitThread.mPerformQC.toHTML());
             }
             catch(final Exception e) {

@@ -166,10 +166,10 @@ public class PerformQC {
       return mResidual;
    }
 
-   public QCEntry addToProject()
+   public QCEntry addToProject(Map<String, UncertainValue2> result)
          throws FileNotFoundException, SQLException, EPQException, IOException, AlreadyInDatabaseException, UtilException {
       if(mEntry == null)
-         mEntry = mQCProject.addMeasurement(mSpectrum, compute());
+         mEntry = mQCProject.addMeasurement(mSpectrum, result);
       return mEntry;
    }
 
