@@ -20,8 +20,8 @@
         <property name="info.appName" value="DTSA-II"/>
         <property name="info.url" value="http://www.cstl.nist.gov/div837/837.02/epq/dtsa2/index.html"/>
         <property name="info.company.name" value="NIST"/>
-        <property name="info.version" value="Microscopium"/>
-        <property name="info.release-date" value="2022-05-23"/>
+        <property name="info.version" value="Microscopium KR"/>
+        <property name="info.release-date" value="2022-09-16"/>
     </properties>
     <info>
         <appname>@{info.company.name} @{info.appName}</appname>
@@ -92,7 +92,7 @@
             
         </pack>
         <pack name="Java Runtime for Windows" preselected="yes" required="no">
-            <description>An integrated Java 15.0 JRE (run-time environment) for MS Windows only!!.</description>
+            <description>An integrated Java 18.0 JRE (run-time environment) for MS Windows only!!.</description>
             <fileset dir="$BUILDPATH/java-runtime" targetdir="${INSTALL_PATH}/java-runtime"/>
         </pack>
         <pack name="NIST DTSA-II Application" preselected="yes" required="no">
@@ -133,9 +133,9 @@
             <file override="update" src="$BUILDPATH/semantics.jar" targetdir="$INSTALL_PATH/"/>
             <file override="update" src="$BUILDPATH/graf.jar" targetdir="$INSTALL_PATH/"/>
             <file override="update" src="$BUILDPATH/Graf.exe" targetdir="$INSTALL_PATH/"/>
-            <file override="update" src="$BUILDPATH/startUp.py" targetdir="$INSTALL_PATH/"/>
-            <file override="update" src="$BUILDPATH/multiRCA.py" targetdir="$INSTALL_PATH/"/>
-            <file override="update" src="$BUILDPATH/bbb.py" targetdir="$INSTALL_PATH/"/>
+            <file override="update" src="$BUILDPATH/../../Lib/startUp.py" targetdir="$INSTALL_PATH/"/>
+            <file override="update" src="$BUILDPATH/../../Lib/multiRCA.py" targetdir="$INSTALL_PATH/"/>
+            <file override="update" src="$BUILDPATH/../../Lib/bbb.py" targetdir="$INSTALL_PATH/"/>
             <file override="update" src="$BUILDPATH/TESCAN_backdrop theme.themepack" targetdir="$INSTALL_PATH/"/>
         </pack>
     </packs>

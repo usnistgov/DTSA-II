@@ -251,26 +251,32 @@ public class DTSA2 {
 
    // Main method
    public static void main(String[] args) {
-      if(Integer.parseInt(System.getProperty("java.specification.version"))>16) {
-         ErrorDialog.createErrorMessage(
-            null,
-            "NIST DTSA-II Initialization Error", 
-            "NIST DTSA-II does not support Java Runtime Environments more recent than version 16.",
-            "JRE versions 17 and later remove functionality used by DTSA-II to record system data\n"+
-            "in XML format.  Until we can find an alternative, DTSA-II will only run on Java\n"+
-            "Runtime Environments between version 11 and version 16.\n"+
-            "You will also need to specify the `--illegal-access=permit` at the java command line.\n"+
-            "This flag entails some minor risks which would be unacceptable if we were running a\n"+
-            "web server but, in a desktop application like DTSA-II, we do not believe that they\n"+
-            "represent a significant risk.");
-          System.exit(1);
-      }
+	   // Due to additional security concerns, JRE versions after 16, require an "Add-Opens"
+	   // statement to instantiate objects from XML using XStream.  This can either be
+	   // the form of additional command line arguments:
+	   // > java --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED -jar dtsa2.jar
+	   // or included in the manifest using the ":Add-Opens" command.	
+	   // Add-Opens: java.base/java.lang=ALL-UNNAMED java.base/java.util=ALL-UNNAMED
       EPQXStream xst = EPQXStream.getInstance();
       try {
          xst.fromXML(xst.toXML(MaterialFactory.createCompound("Al2O3", 3.4)));
       }
       catch (Exception e3){
-         ErrorDialog.createErrorMessage(
+          System.err.println(e3.toString());
+          if(Integer.parseInt(System.getProperty("java.specification.version"))>16) {
+              ErrorDialog.createErrorMessage(
+                 null,
+                 "NIST DTSA-II Initialization Error", 
+                 "NIST DTSA-II does not support Java Runtime Environments with version numbers ≥17.",
+                 "JRE versions 17 and later remove functionality used by DTSA-II to record system data\n"+
+                 "in XML format.  Until we can find an alternative, DTSA-II will only run on Java\n"+
+                 "Runtime Environments between version 11 and version 16.\n"+
+                 "You will also need to specify the `--illegal-access=permit` at the java command line.\n"+
+                 "This flag entails some minor risks which would be unacceptable if we were running a\n"+
+                 "web server but, in a desktop application like DTSA-II, we do not believe that they\n"+
+                 "represent a significant risk.");
+               System.exit(1);
+           }         ErrorDialog.createErrorMessage(
             null,
             "NIST DTSA-II Initialization Error", 
             "Please specify the `--illegal-access=permit` java command line option when starting DTSA-II.",
@@ -278,11 +284,11 @@ public class DTSA2 {
             "   > java --illegal-access=permit -jar dtsa2.jar\n"+
             "This flag entails some risks which would be unacceptable in a web server but,\n"+
             "in a desktop application like DTSA-II, we do not believe that they represent\n"+
-            "a significant risk.  We have imposed limits on the types of objects that can"+
+            "a significant risk.  We have imposed limits on the types of objects that can\n"+
             "be read into the application.  We are also looking into alternatives but the\n"+
             "nature of the problem means that the alternatives we've identified suffer from\n"+
-            "the same issue.  Any code that introspectively reconstructs Java objects from\n"+
-            "disk has been made illegal.");
+            "the same issue.  Code that introspectively reconstructs Java objects from disk\n"+
+            "has been made illegal.");
          System.exit(1);
       }
       final String os = System.getProperty("os.name").toLowerCase();
@@ -295,20 +301,7 @@ public class DTSA2 {
       // java.nio.charset.UnsupportedCharsetException: cp0"
       System.setProperty("python.console.encoding", "UTF-8");
       try {
-         final String osName = System.getProperty("os.name");
-         // Windows 10 Creator's Update introduced a bug that causes the system
-         // look-and-feel to crash for JRE versions less than 1.8.0_144. Use
-         // Nimbus look-and-feel instead.
-         final int[] testVer = new int[] {
-            1,
-            8,
-            0,
-            144
-         };
-         if((osName.endsWith("10") && (!versionHigherThanOrEqualTo(getJavaVersion(), testVer))) || argExists(args, "-nimbus"))
-            UIManager.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
-         else
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+    	  UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
       }
       catch(final Exception e) {
          try {
