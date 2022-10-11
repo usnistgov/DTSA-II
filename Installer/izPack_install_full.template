@@ -1,0 +1,164 @@
+<izpack:installation version="5.0"
+    xmlns:izpack="http://izpack.org/schema/installation"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://izpack.org/schema/installation http://izpack.org/schema/5.0/izpack-installation-5.0.xsd">
+    <!-- The script doesn't work within Eclipse but can be build from the command line 
+    > c:
+    > cd C:\Users\nritchie\git\nist-dtsa-ii\Installer
+    >"C:\Program Files (x86)\IzPack\bin\compile.bat" -h ${IZPACK_HOME} izPack_install_full.xml -b . -o dtsa2_microscopium_full.jar -k standard 
+    -->
+    <variables>
+        <variable name="TargetPanel.dir.windows" value="$USER_HOME\AppData\Local\NIST\$APP_NAME $APP_VER"/>
+        <variable name="TargetPanel.dir.unix" value="/usr/local/NIST/$APP_NAME $APP_VER"/>
+        <variable name="TargetPanel.dir.linux" value="/usr/local/NIST/$APP_NAME $APP_VER"/>
+        <variable name="TargetPanel.dir.mac_osx" value="/Applications/$APP_NAME $APP_VER"/>
+        <variable name ="ORGANIZATION" value="NIST"/>
+        <variable name="JARPATH" value="../../../.m2/repository"/>
+        <variable name="BUILDPATH" value="/DTSA-II Build"/>
+    </variables>    
+    <properties>
+        <property name="info.appName" value="DTSA-II"/>
+        <property name="info.url" value="http://www.cstl.nist.gov/div837/837.02/epq/dtsa2/index.html"/>
+        <property name="info.company.name" value="NIST"/>
+        <property name="info.version" value="Microscopium"/>
+        <property name="info.release-date" value="DATE_VERSION"/>
+    </properties>
+    <info>
+        <appname>@{info.company.name} @{info.appName}</appname>
+        <appversion>@{info.version} @{info.release-date}</appversion>
+        <authors>
+            <author email="nicholas.ritchie@nist.gov" name="Nicholas Ritchie"/>
+        </authors>
+        <url>@{info.url}</url>
+        <uninstaller name="Uninstaller.jar" write="yes"/>
+        <requiresjdk>no</requiresjdk>
+        <writeinstallationinformation>yes</writeinstallationinformation>
+        <summarylogfilepath>$INSTALL_PATH/installlog/index.html</summarylogfilepath>
+    </info>
+    <guiprefs height="480" resizable="False" width="640">
+        <modifier key="useFlags" value="yes"/>
+        <modifier key="langDisplayType" value="iso3"/>
+    </guiprefs>
+    <locale>
+        <langpack iso3="eng"/>
+    </locale>
+    <resources>
+        <res id="LicencePanel.licence" parse="no" src="..\LicenseFile.txt"/>
+        <res id="Win_shortcutSpec.xml" src="izPack_install_shortcutSpec.xml"/>
+        <res id="Unix_shortcutSpec.xml" src="izPack_install_Unix_shortcutSpec.xml"/>
+        <!--
+        <res src="RegistrySpec.xml" id="RegistrySpec.xml"/>
+        <res id="packsLang.xml" src="packsLang.xml"/>
+        <res id="packsLang.xml_eng" src="packsLang.xml_eng"/>
+        <res id="packsLang.xml_fra" src="packsLang.xml_fra"/>
+        <res id="packsLang.xml_deu" src="packsLang.xml_deu"/>
+        -->
+    </resources>
+    <panels>
+        <panel classname="HelloPanel"/>
+        <panel classname="LicencePanel" id="panel.license">
+            <configuration>
+                <param name="console-text-paging" value="true" />
+                <param name="console-text-wordwrap" value="false" />
+            </configuration>
+        </panel>
+        <panel classname="TargetPanel"/>
+        <panel classname="PacksPanel"/>
+        <panel classname="InstallPanel"/>
+        <panel classname="ShortcutPanel"/>        
+        <panel classname="FinishPanel"/>
+    </panels>
+    <packs>
+        <pack name="Core Libraries" preselected="yes" required="yes">
+            <description>The core libraries required for all installations.</description>
+            <file override="update" src="$JARPATH/org/apache/derby/derby/10.14.1.0/derby-10.14.1.0.jar" targetdir="$INSTALL_PATH/"/>
+            <file override="update" src="$JARPATH/org/apache/derby/derbynet/10.14.1.0/derbynet-10.14.1.0.jar" targetdir="$INSTALL_PATH/"/>
+            <file override="update" src="$JARPATH/org/apache/derby/derbyclient/10.14.1.0/derbyclient-10.14.1.0.jar" targetdir="$INSTALL_PATH/"/>
+            <file override="update" src="$JARPATH/junit/junit/4.13/junit-4.13.jar" targetdir="$INSTALL_PATH/"/>
+            <file override="update" src="$JARPATH/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar" targetdir="$INSTALL_PATH/"/>
+            <file override="update" src="$JARPATH/com/thoughtworks/xstream/xstream/1.4.19/xstream-1.4.19.jar" targetdir="$INSTALL_PATH/"/>
+            <file override="update" src="$JARPATH/xmlpull/xmlpull/1.1.3.1/xmlpull-1.1.3.1.jar" targetdir="$INSTALL_PATH/"/>
+            <file override="update" src="$JARPATH/xpp3/xpp3_min/1.1.4c/xpp3_min-1.1.4c.jar" targetdir="$INSTALL_PATH/"/>
+            <file override="update" src="$JARPATH/gov/nist/math/jama/1.0.3/jama-1.0.3.jar" targetdir="$INSTALL_PATH/"/>
+            <file override="update" src="$JARPATH/com/jgoodies/jgoodies-forms/1.8.0/jgoodies-forms-1.8.0.jar" targetdir="$INSTALL_PATH/"/>
+            <file override="update" src="$JARPATH/com/jgoodies/jgoodies-common/1.8.0/jgoodies-common-1.8.0.jar" targetdir="$INSTALL_PATH/"/>
+            <file override="update" src="$JARPATH/com/sun/jna/jna/3.0.9/jna-3.0.9.jar" targetdir="$INSTALL_PATH/"/>
+            <file override="update" src="$JARPATH/com/github/jai-imageio/jai-imageio-core/1.4.0/jai-imageio-core-1.4.0.jar" targetdir="$INSTALL_PATH/"/>
+            <file override="update" src="$JARPATH/com/toedter/jcalendar/1.4/jcalendar-1.4.jar" targetdir="$INSTALL_PATH/"/>
+            <file override="update" src="$JARPATH/org/python/jython-standalone/2.7.2/jython-standalone-2.7.2.jar" targetdir="$INSTALL_PATH/"/>
+            <file override="update" src="$BUILDPATH/epq.jar" targetdir="$INSTALL_PATH/"/>
+            <fileset dir="$BUILDPATH/../../Lib/dtsa2" targetdir="${INSTALL_PATH}/Lib/dtsa2" excludes="*/.class"/>
+            <file override="update" src="$BUILDPATH/../../Lib/to10dash1.py" targetdir="${INSTALL_PATH}/Lib/dtsa2"/>
+            
+        </pack>
+        <pack name="Java Runtime for Windows" preselected="yes" required="no">
+            <description>An integrated Java 18.0 JRE (run-time environment) for MS Windows only!!.</description>
+            <fileset dir="$BUILDPATH/java-runtime" targetdir="${INSTALL_PATH}/java-runtime"/>
+        </pack>
+        <pack name="NIST DTSA-II Application" preselected="yes" required="no">
+            <description>Power tools for x-ray microanalysis.</description>
+            <file override="update" src="$BUILDPATH/dtsa2.jar" targetdir="$INSTALL_PATH/"/>
+            <file override="update" src="$BUILDPATH/fastQuant.jar" targetdir="$INSTALL_PATH/"/>
+            <file override="update" src="$BUILDPATH/DTSA-II.exe" targetdir="$INSTALL_PATH/"/>
+            <file override="update" src="$BUILDPATH/Basic scripting in DTSA-II.pdf" targetdir="$INSTALL_PATH/doc/"/>
+            <file override="update" src="$BUILDPATH/Introduction to DTSA-II.pdf" targetdir="$INSTALL_PATH/doc/"/>
+            <file override="update" src="$BUILDPATH/MT1_GettingStartedWithNIST_DTSA_II.pdf" targetdir="$INSTALL_PATH/doc/"/>
+            <file override="update" src="$BUILDPATH/MT2_ManipulatingSpectraUsingDTSA_II.pdf" targetdir="$INSTALL_PATH/doc/"/>
+            <file override="update" src="$BUILDPATH/MT3_Standards_based_Quantication_Part1.pdf" targetdir="$INSTALL_PATH/doc/"/>
+            <file override="update" src="$BUILDPATH/MT4_Standards_based_Quantication_Part2.pdf" targetdir="$INSTALL_PATH/doc/"/>
+            <file override="update" src="$BUILDPATH/Newbury2014_Limits_of_Quantitative_EDS.pdf" targetdir="$INSTALL_PATH/doc/"/>
+            <file override="update" src="$BUILDPATH/Standard Bundles.pdf" targetdir="$INSTALL_PATH/doc/"/>
+        </pack>
+        <pack name="NIST Relocation Application" preselected="no" required="no">
+            <description>Coordinate translation application for relocating features on translated, scaled and rotated coordinate systems.  A useful utility to help to relocate a feature on a sample based on pre-recorded and relocated fiducial points.</description>
+            <file override="update" src="$BUILDPATH/relocate.jar" targetdir="$INSTALL_PATH/"/>
+            <file override="update" src="$BUILDPATH/Relocate.exe" targetdir="$INSTALL_PATH/"/>
+        </pack>
+        <pack name="NIST Glass Database" preselected="no" required="no">
+            <description>An applications for searching the NIST Glass database. Most non-NIST people don't have access to these glasses so the program is of little use to them.</description>
+            <file override="update" src="$BUILDPATH/NISTGlassDB.jar" targetdir="$INSTALL_PATH/"/>
+            <file override="update" src="$BUILDPATH/GlassDatabase.exe" targetdir="$INSTALL_PATH/"/>
+        </pack>
+        <pack name="NIST Graf Application" preselected="yes" required="no">
+            <description>Data analysis for RJ Lee Group / ASPEX automated particle analysis data files.  DON'T INSTALL THIS UNLESS YOU KNOW YOU NEED IT!</description>
+            <file override="update" src="$BUILDPATH/graf.jar" targetdir="$INSTALL_PATH/"/>
+            <file override="update" src="$BUILDPATH/Graf.exe" targetdir="$INSTALL_PATH/"/>
+            <file override="update" src="$JARPATH/org/apache/poi/poi/3.17/poi-3.17.jar" targetdir="$INSTALL_PATH/"/>
+            <file override="update" src="$JARPATH/commons-codec\commons-codec\1.10\commons-codec-1.10.jar" targetdir="$INSTALL_PATH/"/>
+            <file override="update" src="$JARPATH/org/apache/commons/commons-collections4/4.1/commons-collections4-4.1.jar" targetdir="$INSTALL_PATH/"/>
+            <file override="update" src="$JARPATH/org/apache/commons/commons-math3/3.6.1/commons-math3-3.6.1.jar" targetdir="$INSTALL_PATH/"/>
+        </pack> 
+        <pack name="SEMantics" preselected="yes" required="no">
+            <description>An application for automating a TESCAN SEM through DTSA-II.</description>
+            <file override="update" src="$BUILDPATH/semantics.jar" targetdir="$INSTALL_PATH/"/>
+            <file override="update" src="$BUILDPATH/graf.jar" targetdir="$INSTALL_PATH/"/>
+            <file override="update" src="$BUILDPATH/Graf.exe" targetdir="$INSTALL_PATH/"/>
+            <file override="update" src="$BUILDPATH/../../Lib/startUp.py" targetdir="$INSTALL_PATH/"/>
+            <file override="update" src="$BUILDPATH/../../Lib/multiRCA.py" targetdir="$INSTALL_PATH/"/>
+            <file override="update" src="$BUILDPATH/../../Lib/bbb.py" targetdir="$INSTALL_PATH/"/>
+            <file override="update" src="$BUILDPATH/TESCAN_backdrop theme.themepack" targetdir="$INSTALL_PATH/"/>
+        </pack>
+    </packs>
+    <listeners>
+        <listener classname="RegistryInstallerListener" stage="install" >
+            <os family="windows"/>
+        </listener>
+        <listener classname="RegistryUninstallerListener" stage="uninstall" >
+            <os family="windows"/>
+        </listener>
+    </listeners>
+    <natives>
+        <native type="izpack" name="ShellLink.dll">
+            <os family="windows"/>
+        </native>
+        <native type="izpack" name="ShellLink_x64.dll">
+            <os family="windows"/>
+        </native>
+        <native type="3rdparty" name="COIOSHelper.dll" stage="both">
+            <os family="windows"/>
+        </native>
+        <native type="3rdparty" name="COIOSHelper_x64.dll" stage="both">
+            <os family="windows"/>
+        </native>        
+    </natives>
+</izpack:installation>

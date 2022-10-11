@@ -4,8 +4,9 @@
 #	TESCAN SEM and provides a mechanism to control the SEM, collect data and process SEM data.
 # Modified: 11-July-2022
 # Set the SITE to account for site specific hardware variations
+from gov.nist.microanalysis.EPQLibrary import SpectrumProperties
 NIST, MCCRONE, PNNL, PAS, AEM, ORNL, SRNL, PLEASANTON, WARRENDALE = ( "NIST", "McCRONE", "PNNL", "PAS", "AEM", "ORNL", "SRNL", "PLEASANTON", "WARRENDALE" )
-SITE = SRNL
+SITE = NIST
 
 if (SITE == NIST) and (jl.System.getProperty('sun.java.command') == u'gov.nist.microanalysis.dtsa2.DTSA2'):
 	print "JAR paths based on workspace."
@@ -86,13 +87,13 @@ elif SITE==PLEASANTON:
 elif SITE==WARRENDALE:
 	rootPath = "C:\\Users\\Tescan\\Documents\\DTSA-II Reports\\Data"
 elif SITE==SRNL:
-	rootPath = "C:\\Data"
+	rootPath = "C:\\Users\\TESCAN\\SEMantics Data"
 else:  # SITE==MCCRONE:
 	rootPath = "C:\\Data"
 
 
 BLANKER_INDEX = 0
-if SITE == WARRENDALE:
+if SITE == WARRENDALE or SITE == SRNL:
 	BLANKER_INDEX = 1
 
 # Configure this to determine which field images to save.
@@ -110,6 +111,8 @@ if SITE==PLEASANTON:
 	DEF_IMAGE_MASK = 0x2F
 elif SITE==WARRENDALE:
 	DEF_IMAGE_MASK = 0x9 # 0x2F
+elif SITE==SRNL:
+	DEF_IMAGE_MASK = 0x2F
 else:
 	DEF_IMAGE_MASK = 0x3
 # Mask to use for other functions that save images
@@ -128,7 +131,7 @@ if SITE<>PNNL:
 else:
 	setDefaultPath("%s\\Daily\\%s" % (rootPath, jtext.SimpleDateFormat("dd-MMM-yyyy").format(ju.Date())))
 	defaultRulePath = "%s\\Standards\\Rule" % rootPath
-	defaultVecPath = "%s\\Standards\\Combined\\25 keV" % rootPath
+	defaultVecPath = "%s\\Standards\\Combined\\% keV" % ( rootPath, DEFAULT_E0 )
 	nullImagePath = "%s\\NullImages" % base
 	keyPath = nullImagePath
 
@@ -148,7 +151,6 @@ elif SITE==SRNL:
 	availableDets = ( True, )*3
 else:
 	availableDets = ( True, )*2 # False, False, False )
-
 defaultDetCount = len(availableDets)
 defaultDetMask = 0
 for i in range(0, defaultDetCount):
@@ -159,9 +161,13 @@ _edsResolution="Medium"
 defLED = True
 
 pt_det = []
+if SITE==SRNL:
+	det_off=0
+else:
+	det_off=1
 for i in range(0, defaultDetCount):
 	if availableDets[i]:
-		pt_det.append(findDetector("EDAX Det %d" % (i+1, )))
+		pt_det.append(findDetector("EDAX Det %d" % (i+det_off, )))
 pt_det_all = findDetector("EDAX All")
 
 _saverize = semantics.Saverize()
@@ -263,7 +269,7 @@ if connect:
 
 	def setResolution(res, mask=defaultDetMask):
 		"""setResolution(res, mask=defaultDetMask)
-		Set the EDS detector resolution to one of 'Best', 'Medium', 'Fast', 'VeryFast', 'Adaptive'"""
+		Set the EDS detector resolution to one of 'Best', 'Medium', 'Fast', 'VeryFast', 'Adaptive', 'LowEnergy'"""
 		if _pt:
 			_pt.setResolutionMode(_pt.ResolutionMode.valueOf(res), mask)
 			_edsResolution = res
@@ -568,6 +574,8 @@ fov: An optional field of view width to which to set the SEM imaging while colle
 			sp.setTimestampProperty(epq.SpectrumProperties.AcquisitionTime, start_ts)
 			sp.setObjectProperty(epq.SpectrumProperties.StagePosition, stg_pos)
 			sp.setNumericProperty(epq.SpectrumProperties.WorkingDistance, _opt.getWorkingDistance())
+			sp.setDetector(pt_det_all)
+			sp.setTextProperty(sp.DetectorMode, "%s" % _pt.getResolutionMode(0))
 			if isinstance(comp, str):
 				comp = material(comp)
 			if isinstance(comp, epq.Composition):
@@ -664,6 +672,8 @@ fov: An optional field of view width to which to set the SEM imaging while colle
 			sp.setTimestampProperty(epq.SpectrumProperties.AcquisitionTime, start_ts)
 			sp.setObjectProperty(epq.SpectrumProperties.StagePosition, stg_pos)
 			sp.setNumericProperty(epq.SpectrumProperties.WorkingDistance, _opt.getWorkingDistance())
+			sp.setDetector(pt_det_all)
+			sp.setTextProperty(sp.DetectorMode, "%s" % _pt.getResolutionMode(0))
 			if isinstance(comp, str):
 				comp = material(comp)
 			if isinstance(comp, epq.Composition):
@@ -747,6 +757,8 @@ fov: An optional field of view width to which to set the SEM imaging while colle
 					if availableDets[det]:
 						tmp = _eds.getSpectrum(det)
 						epq.SpectrumUtils.rename(tmp, "%s[%d]" % (name, det))
+						sp.setDetector(pt_det[det])
+						sp.setTextProperty(sp.DetectorMode, "%s" % _pt.getResolutionMode(det))
 						if pc and fb:
 							sp = tmp.getProperties()
 							sp.setNumericProperty(sp.FaradayBegin, fb.average())
@@ -2678,7 +2690,9 @@ results are written to the defaultDir."""
 							for sp in specs[1:]:
 								sum.add(sp,1.0)
 							epq.SpectrumUtils.rename(sum, "%s[all]" % (name))
-							sum.getProperties().setDetector(pt_det_all)
+							sps = sum.getProperties()
+							sps.setDetector(pt_det_all)
+							sp.setTextProperty(sp.DetectorMode, "%s" % _pt.getResolutionMode(0))
 							specs=list(specs)
 							specs.append(sum)
 						clear()
