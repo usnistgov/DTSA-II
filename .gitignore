@@ -1,2 +1,8 @@
 /target/
 /derby.log
+
+Installer/izPack_install.xml
+
+Installer/izPack_install_full.xml
+
+Installer/izPack_install_nojre.xml

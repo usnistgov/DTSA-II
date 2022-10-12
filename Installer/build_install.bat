@@ -1,5 +1,5 @@
 cd C:\Users\nritchie\git
-set "D2V=2022-10-11"
+set "D2V=2022-10-12"
 echo Microscopium %D2V% > "nist-dtsa-ii\src\gov\nist\microanalysis\dtsa2\revision"
 echo Microscopium %D2V% > "epq\src\gov\nist\microanalysis\EPQLibrary\revision"
 
