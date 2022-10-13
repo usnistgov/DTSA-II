@@ -3138,6 +3138,7 @@ public class MainFrame extends JFrame {
 
 	public void processFitBackground() {
 		final BremsstrahlungAnalytic ba = new BremsstrahlungAnalytic.Lifshin1974Model();
+		//final BremsstrahlungAnalytic ba = new BremsstrahlungAnalytic.Castellano2004aBremsstrahlung();
 		final HTMLList list = new HTMLList();
 		list.setHeader("Bremsstrahlung fit");
 		for (final ISpectrumData sd : getSelectedSpectra())

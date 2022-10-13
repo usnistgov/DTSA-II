@@ -1,4 +1,5 @@
 eclipse.preferences.version=1
+encoding//Installer/build_install.bat=UTF-8
 encoding//Installer/izPack_install.template=UTF-8
 encoding//Lib/bbb.py=utf-8
 encoding//Lib/dtsa2/__init__.py=utf-8

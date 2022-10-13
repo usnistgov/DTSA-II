@@ -2,6 +2,7 @@ package gov.nist.microanalysis.dtsa2;
 
 import java.awt.AWTEvent;
 import java.awt.Desktop;
+import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.SystemColor;
 import java.awt.event.ActionEvent;

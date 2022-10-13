@@ -4,7 +4,7 @@
     xsi:schemaLocation="http://izpack.org/schema/installation http://izpack.org/schema/5.0/izpack-installation-5.0.xsd">
     <!-- The script doesn't work within Eclipse but can be build from the command line 
     > cd  C:\Users\nritchie\git\nist-dtsa-ii\Installer
-    > "C:\Program Files (x86)\IzPack\bin\compile.bat" -h ${IZPACK_HOME} izPack_install.xml -b . -o dtsa2_microscopium.jar -k standard 
+    > "C:\Program Files (x86)\IzPack\bin\compile.bat" -h ${IZPACK_HOME} izPack_install.xml -b . -o dtsa2_neptune.jar -k standard 
     -->
     <variables>
         <variable name="TargetPanel.dir.windows" value="$USER_HOME\AppData\Local\NIST\$APP_NAME $APP_VER"/>
@@ -19,7 +19,7 @@
         <property name="info.appName" value="DTSA-II"/>
         <property name="info.url" value="http://www.cstl.nist.gov/div837/837.02/epq/dtsa2/index.html"/>
         <property name="info.company.name" value="NIST"/>
-        <property name="info.version" value="Microscopium"/>
+        <property name="info.version" value="Neptune"/>
         <property name="info.release-date" value="DATE_VERSION"/>
     </properties>
     <info>

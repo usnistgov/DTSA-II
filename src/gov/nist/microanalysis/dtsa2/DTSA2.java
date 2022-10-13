@@ -198,7 +198,7 @@ public class DTSA2 {
 
    public static String getRevision(Class<?> cls) {
       String res = "???";
-      try (final BufferedReader isr = new BufferedReader(new InputStreamReader(cls.getResourceAsStream("revision"), "US-ASCII"))) {
+      try (final BufferedReader isr = new BufferedReader(new InputStreamReader(cls.getResourceAsStream("revision"), "UTF-8"))) {
          res = isr.readLine();
       }
       catch(final Exception e) {
