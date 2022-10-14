@@ -1,7 +1,8 @@
 cd C:\Users\nritchie\git
-set "D2V=2022-10-13"
+set "D2V=2022-10-14"
+set "NUM_VER=14.0.0.0"
 echo Neptune %D2V% > "nist-dtsa-ii\src\gov\nist\microanalysis\dtsa2\revision"
-echo Neptune %D2V% > "epq\revision"
+echo Neptune %D2V% > "epq\src\gov\nist\microanalysis\EPQLibrary\revision"
 echo Neptune %D2V% > "graf\src\gov\nist\microanalysis\Graf\revision"
 
 cd C:\Users\nritchie\git\nist-dtsa-ii
@@ -16,6 +17,14 @@ call "C:\Users\nritchie\git\nist-dtsa-ii\Installer\DTSA-II Build\buildjre.bat"
 "C:\Program Files (x86)\GnuWin32\bin\sed.exe" "s/DATE_VERSION/%D2V%/" "C:\Users\nritchie\git\nist-dtsa-ii\Installer\izPack_install.template" > "C:\Users\nritchie\git\nist-dtsa-ii\Installer\izPack_install.xml"
 "C:\Program Files (x86)\GnuWin32\bin\sed.exe" "s/DATE_VERSION/%D2V%/" "C:\Users\nritchie\git\nist-dtsa-ii\Installer\izPack_install_full.template" > "C:\Users\nritchie\git\nist-dtsa-ii\Installer\izPack_install_full.xml"
 "C:\Program Files (x86)\GnuWin32\bin\sed.exe" "s/DATE_VERSION/%D2V%/" "C:\Users\nritchie\git\nist-dtsa-ii\Installer\izPack_install_nojre.template" > "C:\Users\nritchie\git\nist-dtsa-ii\Installer\izPack_install_nojre.xml"
+
+"C:\Program Files (x86)\GnuWin32\bin\sed.exe" -e "s/NUMBER_VERSION/%NUM_VER%/" -e "s/DATE_VERSION/%D2V%/" "C:\Users\nritchie\git\nist-dtsa-ii\Installer\Launch4j_config.template" > "C:\Users\nritchie\git\nist-dtsa-ii\Installer\Launch4j_config.xml"
+"C:\Program Files (x86)\GnuWin32\bin\sed.exe" -e "s/NUMBER_VERSION/%NUM_VER%/" -e "s/DATE_VERSION/%D2V%/" "C:\Users\nritchie\git\nist-dtsa-ii\Installer\Launch4j_relocate.template" > "C:\Users\nritchie\git\nist-dtsa-ii\Installer\Launch4j_relocate.xml"
+"C:\Program Files (x86)\GnuWin32\bin\sed.exe" -e "s/NUMBER_VERSION/%NUM_VER%/" -e "s/DATE_VERSION/%D2V%/" "C:\Users\nritchie\git\graf\Launch4j config.template" > "C:\Users\nritchie\git\graf\Launch4j config.xml"
+
+call "C:\Program Files (x86)\Launch4j\launch4j_2.bat" "C:\Users\nritchie\git\nist-dtsa-ii\Installer\Launch4j_config.xml"
+call "C:\Program Files (x86)\Launch4j\launch4j_2.bat" "C:\Users\nritchie\git\nist-dtsa-ii\Installer\Launch4j_relocate.xml"
+call "C:\Program Files (x86)\Launch4j\launch4j_2.bat" "C:\Users\nritchie\git\graf\Launch4j config.xml"
 
 cd C:\Users\nritchie\git\nist-dtsa-ii\Installer
 call "C:\Program Files (x86)\IzPack\bin\compile.bat" -h ${IZPACK_HOME} izPack_install.xml -b . -o dtsa2_neptune.jar -k standard
