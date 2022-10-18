@@ -1,6 +1,6 @@
 cd C:\Users\nritchie\git
-set "D2V=2022-10-14"
-set "NUM_VER=14.0.0.0"
+set "D2V=2022-10-18"
+set "NUM_VER=14.0.0.2"
 echo Neptune %D2V% > "nist-dtsa-ii\src\gov\nist\microanalysis\dtsa2\revision"
 echo Neptune %D2V% > "epq\src\gov\nist\microanalysis\EPQLibrary\revision"
 echo Neptune %D2V% > "graf\src\gov\nist\microanalysis\Graf\revision"
