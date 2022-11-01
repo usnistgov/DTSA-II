@@ -86,6 +86,7 @@
             <file override="update" src="$JARPATH/com/github/jai-imageio/jai-imageio-core/1.4.0/jai-imageio-core-1.4.0.jar" targetdir="$INSTALL_PATH/"/>
             <file override="update" src="$JARPATH/com/toedter/jcalendar/1.4/jcalendar-1.4.jar" targetdir="$INSTALL_PATH/"/>
             <file override="update" src="$JARPATH/org/python/jython-standalone/2.7.2/jython-standalone-2.7.2.jar" targetdir="$INSTALL_PATH/"/>
+            <file override="update" src="$JARPATH/com/formdev/flatlaf/2.6/flatlaf-2.6.jar" targetdir="$INSTALL_PATH/"/>
             <file override="update" src="$BUILDPATH/epq.jar" targetdir="$INSTALL_PATH/"/>
             <fileset dir="$BUILDPATH/../../Lib/dtsa2" targetdir="${INSTALL_PATH}/Lib/dtsa2" excludes="*/.class"/>
             <file override="update" src="$BUILDPATH/../../Lib/to10dash1.py" targetdir="${INSTALL_PATH}/Lib/dtsa2"/>

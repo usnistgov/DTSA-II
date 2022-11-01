@@ -156,7 +156,7 @@ defaultDetMask = 0
 for i in range(0, defaultDetCount):
 	if availableDets[i]:
 		defaultDetMask = defaultDetMask + (1 << i)
-_edsResolution="Medium"
+_edsResolution="MediumLE"
 
 defLED = True
 
@@ -179,6 +179,8 @@ connect = (jop.showConfirmDialog(MainFrame, "Connect to the TESCAN?", "Start-up 
 # Location of the Image Magick executables 'convert' and 'montage'
 if SITE==ORNL:
 	IMAGE_MAGICK = "C:\\Program Files\\ImageMagick-6.9.9-Q16"
+elif SITE==NIST:
+	IMAGE_MAGICK = "C:\\Program Files\\ImageMagick-6.9.12-31"    
 else:
 	IMAGE_MAGICK = "C:\\Program Files\\ImageMagick-6.9.6-Q16"
 
@@ -269,7 +271,8 @@ if connect:
 
 	def setResolution(res, mask=defaultDetMask):
 		"""setResolution(res, mask=defaultDetMask)
-		Set the EDS detector resolution to one of 'Best', 'Medium', 'Fast', 'VeryFast', 'Adaptive', 'LowEnergy'"""
+		Set the EDS detector resolution to one of 'Best', 'Medium', 'Fast', 'VeryFast', 'Adaptive', 'MediumLE', 'BestLE', 'LowEnergy'"""
+		global _edsResolution
 		if _pt:
 			_pt.setResolutionMode(_pt.ResolutionMode.valueOf(res), mask)
 			_edsResolution = res
@@ -757,6 +760,7 @@ fov: An optional field of view width to which to set the SEM imaging while colle
 					if availableDets[det]:
 						tmp = _eds.getSpectrum(det)
 						epq.SpectrumUtils.rename(tmp, "%s[%d]" % (name, det))
+						sp = tmp.getProperties()
 						sp.setDetector(pt_det[det])
 						sp.setTextProperty(sp.DetectorMode, "%s" % _pt.getResolutionMode(det))
 						if pc and fb:
@@ -2692,7 +2696,7 @@ results are written to the defaultDir."""
 							epq.SpectrumUtils.rename(sum, "%s[all]" % (name))
 							sps = sum.getProperties()
 							sps.setDetector(pt_det_all)
-							sp.setTextProperty(sp.DetectorMode, "%s" % _pt.getResolutionMode(0))
+							sps.setTextProperty(sps.DetectorMode, "%s" % _pt.getResolutionMode(0))
 							specs=list(specs)
 							specs.append(sum)
 						clear()

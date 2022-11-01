@@ -59,6 +59,7 @@ import java.util.regex.Pattern;
 
 import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -996,6 +997,7 @@ public class MainFrame extends JFrame {
 
 	// Component initialization
 	private void initialize() throws Exception {
+		this.setFont(new Font(Font.DIALOG, Font.PLAIN, 12));
 
 		jMenuItem_HelpSite.setMnemonic(KeyEvent.VK_W);
 		jMenuItem_HelpSite.setText(DTSA2.APP_NAME + " web site...");
@@ -1547,7 +1549,7 @@ public class MainFrame extends JFrame {
 			bbb.add(jButton_SpecDelete, CC.xy(8, 1));
 			specList.add(bbb.getPanel(), CC.xy(1, 3));
 		}
-		specList.setBorder(DTSA2.createTitledBorder("Spectrum list"));
+		specList.setBorder(DTSA2.createTitledBorder("Spectra"));
 		pb1.add(defDet, CC.xy(1, 1));
 		pb1.add(specList, CC.xy(1, 3));
 
@@ -1655,7 +1657,7 @@ public class MainFrame extends JFrame {
 		}
 
 		jStatusBar_Main.setText(DTSA2.APP_NAME + " - based on the Electron Probe Quant algorithm library");
-		jStatusBar_Main.setForeground(SystemColor.controlText);
+		//jStatusBar_Main.setForeground(SystemColor.controlText);
 
 		ToolTipManager.sharedInstance().setDismissDelay(10000);
 		jTable_SpecProperties.setForeground(FOREGROUND_COLOR);
@@ -1825,8 +1827,8 @@ public class MainFrame extends JFrame {
 		addUtilityTab("Report", tab, "An HTML summary of this DTSA-II session");
 		{
 			final ImageIcon ii = new ImageIcon(MainFrame.class.getResource("python.png"));
-			jTabbedPane_Utility.addTab("Command", ii, jPanel_Command,
-					"A command line for controlling DTSA-II in Python");
+			jTabbedPane_Utility.addTab("Script", ii, jPanel_Command,
+					"A command line for scripting DTSA-II in Python");
 		}
 		/*
 		 * if(System.getProperty("user.name").equalsIgnoreCase("nritchie")) {
@@ -1929,6 +1931,8 @@ public class MainFrame extends JFrame {
 		jSplitPane_MainVert.setResizeWeight(0.5);
 
 		final JPanel contentPane = (JPanel) this.getContentPane();
+		final int bw = 4;
+		contentPane.setBorder(BorderFactory.createEmptyBorder(bw, bw, bw, bw));
 		contentPane.setLayout(new BorderLayout());
 		contentPane.add(jStatusBar_Main, BorderLayout.SOUTH);
 		contentPane.add(jSplitPane_MainVert, BorderLayout.CENTER);

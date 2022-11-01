@@ -1,5 +1,8 @@
 package gov.nist.microanalysis.dtsa2;
 
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.SystemColor;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -10,14 +13,19 @@ import java.net.URL;
 import java.sql.SQLException;
 import java.util.prefs.Preferences;
 
+import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
-import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.WindowConstants;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
+
+import com.formdev.flatlaf.FlatDarculaLaf;
+import com.formdev.flatlaf.FlatDarkLaf;
+import com.formdev.flatlaf.FlatLightLaf;
+import com.jgoodies.forms.layout.FormLayout;
 
 import gov.nist.microanalysis.EPQDatabase.ReferenceDatabase;
 import gov.nist.microanalysis.EPQDatabase.Session;
@@ -269,24 +277,19 @@ public class DTSA2 {
 		if ((os.indexOf("mac") >= 0) || (os.indexOf("os x") >= 0)) {
 			System.setProperty("apple.laf.useScreenMenuBar", "true");
 			System.setProperty("apple.laf.smallTabs", "true");
+			System.setProperty("com.apple.mrj.application.apple.menu.about.name", "NIST DTSA-II");
 		}
 		// This eliminates an exception in Jython 2.7.0
 		// "console: Failed to install '':
 		// java.nio.charset.UnsupportedCharsetException: cp0"
 		System.setProperty("python.console.encoding", "UTF-8");
 		try {
-			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+			if(System.getProperty("os.name").startsWith("Windows"))
+				UIManager.setLookAndFeel(AppPreferences.getInstance().getAppearance());
+			else
+				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch (final Exception e) {
-			try {
-				for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
-					if ("Nimbus".equals(info.getName())) {
-						UIManager.setLookAndFeel(info.getClassName());
-						break;
-					}
-				}
-			} catch (Exception ee) {
-				ee.printStackTrace();
-			}
+			e.printStackTrace();
 		}
 		JFrame.setDefaultLookAndFeelDecorated(false);
 		AppPreferences.getInstance();
