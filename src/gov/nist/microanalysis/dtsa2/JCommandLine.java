@@ -271,6 +271,7 @@ public class JCommandLine extends JTextPane {
 	@SuppressWarnings("unchecked")
 	public JCommandLine() throws HeadlessException {
 		super();
+		setBackground(Color.white);
 		mJythonWorker = new JythonWorker();
 		boolean assertsEnabled = false;
 		assert assertsEnabled = true; // Intentional side effect!!!
@@ -290,10 +291,14 @@ public class JCommandLine extends JTextPane {
 		StyleConstants.setForeground(err, Color.RED);
 		mErrorStyle = addStyle("__ERROR__", getStyle("default"));
 		StyleConstants.setForeground(mErrorStyle, Color.RED);
+		StyleConstants.setBackground(mErrorStyle, getBackground());
 		mOutputStyle = addStyle("__OUTPUT__", getStyle("default"));
 		StyleConstants.setForeground(mOutputStyle, Color.BLACK);
+		StyleConstants.setBackground(mOutputStyle, getBackground());
 		mStatusStyle = addStyle("__STATUS__", getStyle("default"));
 		StyleConstants.setForeground(mStatusStyle, Color.BLUE);
+		StyleConstants.setBackground(mStatusStyle, getBackground());
+		
 		setTabs(10);
 
 		addKeyListener(new java.awt.event.KeyAdapter() {

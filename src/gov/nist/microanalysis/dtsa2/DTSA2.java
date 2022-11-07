@@ -285,7 +285,7 @@ public class DTSA2 {
 		System.setProperty("python.console.encoding", "UTF-8");
 		try {
 			if(System.getProperty("os.name").startsWith("Windows"))
-				UIManager.setLookAndFeel(AppPreferences.getInstance().getAppearance());
+				AppPreferences.getInstance().applyAppearance();
 			else
 				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch (final Exception e) {

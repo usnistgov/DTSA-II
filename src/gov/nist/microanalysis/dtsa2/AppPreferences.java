@@ -32,6 +32,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
+import javax.swing.LookAndFeel;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
@@ -186,10 +187,9 @@ public class AppPreferences {
 			pb.add(jButton_EPQDocPath, cc.xy(6, 19));
 			pb.add(jButton_EPQDocDefault, cc.xy(8, 19));
 			pb.addSeparator("Look-and-Feel", cc.xyw(1, 21, fl.getColumnCount()));
-			pb.addLabel("Appearance", cc.xy(2, 23));
+			pb.addLabel("Appearance (requires restart)", cc.xy(2, 23));
 			for (Appearance laf : Appearance.values())
 				jCombo_LaF.addItem(laf);
-
 			pb.add(jCombo_LaF, cc.xy(4, 23));
 
 			jButton_ReportPath.addActionListener(new ActionListener() {
@@ -265,7 +265,7 @@ public class AppPreferences {
 			jTextField_PostScript.setText(getShutdownScript().equals("") ? CLEAR : getShutdownScript());
 			jTextField_EPQDoc.setText(getEPQJavaDoc());
 			final Preferences userPref = Preferences.userNodeForPackage(AppPreferences.class);
-			Appearance appear=Appearance.valueOf(userPref.get("LookAndFeel", Appearance.FlatLight.toString()));
+			Appearance appear = Appearance.valueOf(userPref.get("LookAndFeel", Appearance.FlatLight.toString()));
 			jCombo_LaF.setSelectedItem(appear);
 		}
 
@@ -1815,22 +1815,26 @@ public class AppPreferences {
 		userPref.put("LookAndFeel", laf.toString());
 	}
 
-	public javax.swing.LookAndFeel getAppearance() throws UnsupportedLookAndFeelException{
-	   final Preferences userPref = Preferences.userNodeForPackage(getClass());
-	   String pref=userPref.get("LookAndFeel", Appearance.FlatLight.toString());
-	   Appearance laf = Appearance.valueOf(pref);
-	   switch(laf) {
-			case Darcula:
-				return new FlatDarculaLaf();
-			case FlatLight:
-				return new FlatLightLaf();
-			case Ugly:
-				return UIManager.createLookAndFeel("Metal");
-			case System:
-			default:
-				return UIManager.createLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-	   }
-   }
+	public void applyAppearance() throws ClassNotFoundException, InstantiationException, IllegalAccessException,
+			UnsupportedLookAndFeelException {
+		final Preferences userPref = Preferences.userNodeForPackage(getClass());
+		Appearance laf = Appearance.valueOf(userPref.get("LookAndFeel", Appearance.FlatLight.toString()));
+		switch (laf) {
+		case Darcula:
+			UIManager.setLookAndFeel(new FlatDarculaLaf());
+			break;
+		case FlatLight:
+			UIManager.setLookAndFeel(new FlatLightLaf());
+			break;
+		case Ugly:
+			UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
+			break;
+		case System:
+		default:
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+			break;
+		}
+	}
 
 	public void openEPQJavaDoc() {
 		try {
