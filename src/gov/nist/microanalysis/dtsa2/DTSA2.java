@@ -1,8 +1,5 @@
 package gov.nist.microanalysis.dtsa2;
 
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.SystemColor;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -13,7 +10,6 @@ import java.net.URL;
 import java.sql.SQLException;
 import java.util.prefs.Preferences;
 
-import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.SwingWorker;
@@ -21,11 +17,6 @@ import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
-
-import com.formdev.flatlaf.FlatDarculaLaf;
-import com.formdev.flatlaf.FlatDarkLaf;
-import com.formdev.flatlaf.FlatLightLaf;
-import com.jgoodies.forms.layout.FormLayout;
 
 import gov.nist.microanalysis.EPQDatabase.ReferenceDatabase;
 import gov.nist.microanalysis.EPQDatabase.Session;
