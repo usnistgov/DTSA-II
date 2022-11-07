@@ -603,7 +603,7 @@ fov: An optional field of view width to which to set the SEM imaging while colle
 			_ts.scSetSpeed(oldSp)
 		logSpectrum((path if path else defaultPath), acqTime, name, mode)
 		if imageFOV>0.0:
-			imgs=collectImages(name, imageFOV, (256,256), 4, rotation=0.0, markCenter)
+			imgs=collectImages(name, imageFOV, (256,256), 4, rotation=0.0, markCenter=True)
 		if isinstance(comp, epq.Composition):
 			report("<p>Collected spectrum <i>%s</i> from %s for %0.1f s %s at %0.1f keV</p>" % (name, comp, acqTime, mode, hv))
 		else:
@@ -810,7 +810,7 @@ fov: An optional field of view width to which to set the SEM imaging while colle
 			_ts.scSetSpeed(oldSp)
 		logSpectrum((path if path else defaultPath), acqTime, name, mode)
 		if imageFOV>0.0:
-			imgs=collectImages(name, imageFOV, (256,256), 4, rotation=0.0, markCenter)
+			imgs=collectImages(name, imageFOV, (256,256), 4, rotation=0.0, markCenter=True)
 		if isinstance(comp, epq.Composition):
 			report("<p>Collected %d spectra <i>%s</i> from %s for %0.1f s %s at %0.1f keV</p>" % (len(specs), name, comp, acqTime, mode, hv))
 		else:
@@ -1316,7 +1316,7 @@ if connect and (_ts.hasRCALicense() or SITE==SRNL):
 			def configSI(self,	collectSIFunc, dwell=10, dim=64):
 				"""configSI(collectSIFunc, dwell=10, dims=64)
 	Configure the optional acquisition of a x-ray spectrum image. /
-	If the function collectSIFunc(tvm) evaluates true then a spectrum image with the specified dwell and max dimensions (dim) /
+	If the function collectSIFunc(tvm) evaluates True then a spectrum image with the specified dwell and max dimensions (dim) /
 	will be collected following the end-of-frame."""
 				self._collectSI = collectSIFunc
 				self._SIDwell = dwell
@@ -2180,7 +2180,7 @@ def checkTiling(tiling, bounds=defaultBounds):
 
 def moveToTile(tile, xyOnly=False, bounds=defaultBounds):
 	"""moveToTile(tile, bounds=(-40.0, -30.0, 40.0, 30.0)):
-	Moves the stage to this tile and returns true if it is in bounds.  Returns false if the tile is out of bounds."""
+	Moves the stage to this tile and returns True if it is in bounds.  Returns false if the tile is out of bounds."""
 	c = tile.getCenter()
 	x, y = c.get(X_AXIS), c.get(Y_AXIS)
 	b = not ((x < bounds[0]) or (x > bounds[2]) or (y < bounds[1]) or (y > bounds[3]))
