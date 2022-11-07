@@ -87,7 +87,7 @@ elif SITE==PLEASANTON:
 elif SITE==WARRENDALE:
 	rootPath = "C:\\Users\\Tescan\\Documents\\DTSA-II Reports\\Data"
 elif SITE==SRNL:
-	rootPath = "C:\\Users\\TESCAN\\SEMantics Data"
+	rootPath = "C:\\Users\\Tescan\\SEMantics Data"
 else:  # SITE==MCCRONE:
 	rootPath = "C:\\Data"
 
@@ -104,19 +104,6 @@ elif (SITE==AEM) or (SITE==PAS):
 	SAVE_FIELD_MASK = 0x0
 else:
 	SAVE_FIELD_MASK = 0x3
-
-# Default images to save using collectImages(...)
-
-if SITE==PLEASANTON:
-	DEF_IMAGE_MASK = 0x2F
-elif SITE==WARRENDALE:
-	DEF_IMAGE_MASK = 0x9 # 0x2F
-elif SITE==SRNL:
-	DEF_IMAGE_MASK = 0x2F
-else:
-	DEF_IMAGE_MASK = 0x3
-# Mask to use for other functions that save images
-SAVE_IMAGE_MASK = 0x3
 
 DEFAULT_E0 = 25
 if (SITE == NIST) or (SITE==WARRENDALE):
@@ -157,6 +144,8 @@ for i in range(0, defaultDetCount):
 	if availableDets[i]:
 		defaultDetMask = defaultDetMask + (1 << i)
 _edsResolution="MediumLE"
+
+imageFOV = 0.050
 
 defLED = True
 
@@ -247,6 +236,21 @@ if connect:
 		print "Unable to find a detector named: %s" % name
 		return None
 
+	# Default images to save using collectImages(...)
+	if SITE==PLEASANTON:
+		DEF_IMAGE_MASK = 0x2F
+	elif SITE==WARRENDALE:
+		DEF_IMAGE_MASK = 0x9 # 0x2F
+	elif SITE==SRNL:
+		DEF_IMAGE_MASK = (1 << findEDet("BSE").getIndex())+(1 << findEDet("SE").getIndex()) # 0x300 - All detectors is 0x328
+	else:
+		DEF_IMAGE_MASK = 0x3
+
+	# Mask to use for other functions that save images
+	SAVE_IMAGE_MASK = (1 << findEDet("BSE").getIndex())+(1 << findEDet("SE").getIndex())
+
+	# Mask to use for other functions that save images
+	SAVE_IMAGE_MASK = 0x300
 	if SITE==SRNL:
 		_apaDet = findEDet("BSE")
 	elif SITE==MCCRONE:
@@ -257,6 +261,11 @@ if connect:
 		_apaDet = findEDet("BSE Q4")
 	else:
 		_apaDet = findEDet("BSE")
+
+	if SITE==SRNL:
+		_apaWrite = ( (epq.SpectrumProperties.MicroImage, 3), (epq.SpectrumProperties.MicroImage2, 2) )
+	else:
+		_apaWrite = ( (epq.SpectrumProperties.MicroImage, 1), (epq.SpectrumProperties.MicroImage2, 0) )
 
 	# Initialize the PulseTor detectors
 
@@ -498,7 +507,7 @@ is moved to the StagePosition associated with the spectrum."""
 			time.sleep(0.01)
 		return _stg.getPosition()
 
-	def collect2(acqTime=60, name=None, pc=True, mode='L', disp=True, forcePC=False, comp=None, path=None, fov=None):
+	def collect2(acqTime=60, name=None, pc=True, mode='L', disp=True, forcePC=False, comp=None, path=None, fov=None, imageFOV=imageFOV):
 		"""collect2(acqTime=60, name=None, pc=True, mode='L', disp=True, forcePC=False, comp=None, path=None)
 	Collect a single combined EDS spectrum for the specified live time or real time.  Name the spectrum as specified and display.
 pc = True to collect the probe current from the stage position "faraday"
@@ -593,6 +602,8 @@ fov: An optional field of view width to which to set the SEM imaging while colle
 			_ts.setViewField(oldVf)
 			_ts.scSetSpeed(oldSp)
 		logSpectrum((path if path else defaultPath), acqTime, name, mode)
+		if imageFOV>0.0:
+			imgs=collectImages(name, imageFOV, (256,256), 4, rotation=0.0, markCenter)
 		if isinstance(comp, epq.Composition):
 			report("<p>Collected spectrum <i>%s</i> from %s for %0.1f s %s at %0.1f keV</p>" % (name, comp, acqTime, mode, hv))
 		else:
@@ -704,7 +715,7 @@ fov: An optional field of view width to which to set the SEM imaging while colle
 			report("<p>Collected %d time series spectra <i>%s</i> for %0.1f s %s at %0.1f keV</p>" % (len(specs), name, acqTime, mode, hv))
 		return tuple(specs)
 
-	def collect(acqTime=60, name=None, pc=True, mode='L', disp=True, forcePC=False, comp=None, path=None, fov=None):
+	def collect(acqTime=60, name=None, pc=True, mode='L', disp=True, forcePC=False, comp=None, path=None, fov=None, imageFOV=imageFOV):
 		"""collect(acqTime=60, name=None, pc=True, mode="L", disp=True, forcePC=False, comp=None, path=None)
 	Simultaneously collect an EDS spectrum from each detector for the specified live time or real time.	 Name the spectra as specified and display.
 pc = True to collect the probe current from the stage position "faraday"
@@ -798,6 +809,8 @@ fov: An optional field of view width to which to set the SEM imaging while colle
 			_ts.setViewField(oldVf)
 			_ts.scSetSpeed(oldSp)
 		logSpectrum((path if path else defaultPath), acqTime, name, mode)
+		if imageFOV>0.0:
+			imgs=collectImages(name, imageFOV, (256,256), 4, rotation=0.0, markCenter)
 		if isinstance(comp, epq.Composition):
 			report("<p>Collected %d spectra <i>%s</i> from %s for %0.1f s %s at %0.1f keV</p>" % (len(specs), name, comp, acqTime, mode, hv))
 		else:
@@ -1103,10 +1116,8 @@ Get the spectrum associated with the specified row number"""
 			spec=collect2(liveTime, name=fn, fov=edsFov)
 			if spec:
 				props = spec.getProperties()
-				if len(imgs) > 0:
-					props.setImageProperty(props.MicroImage, imgs[1])
-				if len(imgs) > 1:
-					props.setImageProperty(props.MicroImage2, imgs[0])
+				for prop, idx in _apaWrite:
+					props.setImageProperty(prop, imgs[idx])
 			write(spec, fn, rel )	# msa
 			write(spec, fn, rel, fmt="tif")
 
@@ -1221,6 +1232,10 @@ if connect and (_ts.hasRCALicense() or SITE==SRNL):
 				self._ParticleCount = 0
 				self._debugPw = None
 				self._stageZ = None
+				self._pImgDwell = 4
+
+			def setParticleImageDwell(self, dwell):
+				self._pImgDwell = dwell
 
 			def setSearchThreshold(self, low, high=255, dwell=4000, maxPart=100000, maxPartPerField = 10000):
 				"""SetSearchThreshold(low,[high],[dwell],[maxPart])
@@ -1592,7 +1607,7 @@ areaCriterion(...), maxCriterion(...) build common criteria."""
 					if self._collectImages:
 						ra = self._transform.rcaToSubraster(r, self._imgDim)
 						imgs = collectImages("%04d" % (fieldNumber, ), self._rcaFov, dims=ra.getImageDimensions(), dwell=3, path="%s/FIELDS" % self._path, subRaster=ra.getSubRaster(), rotation=0.0, writeMask = SAVE_FIELD_MASK)
-						ii = imgs[1]
+						ii = imgs[_apaWrite[0][1]]
 						mg.drawImage(ii, r.x, r.y, r.x + r.width, r.y + r.height, 0, 0, ii.getWidth(), ii.getHeight(), None)
 						_afafb.updateFieldImage(map)
 					_ts.rcaInit(rca)
@@ -1666,15 +1681,15 @@ areaCriterion(...), maxCriterion(...) build common criteria."""
 					self.debug("CollectField 06")
 					for pNum, rcaFov, pixDim, sr, spec in self._pImgStack:
 						self.debug("CollectField 07: Particle %d - dim = %s, sr = %s" % ( pNum, pixDim, sr ))
-						imgs = collectImages(None, fov=rcaFov, dims=pixDim, dwell=4, subRaster=sr, path="%s/mag0" % (self._path,))
+						imgs = collectImages(None, fov=rcaFov, dims=pixDim, dwell=self._pImgDwell, subRaster=sr, path="%s/mag0" % (self._path,), writeMask=0x0)
 						if imgs:
 							self.debug("CollectField 08: P%i imgs" % (pNum, ))
-							_afafb.updateParticleImage(imgs[0])
+							_afafb.updateParticleImage(imgs[_apaWrite[0][1]])
 							if spec:
 								props = spec.getProperties()
 								if len(imgs) > 1:
-									props.setImageProperty(props.MicroImage, imgs[1]) # BSED
-									props.setImageProperty(props.MicroImage2, imgs[0]) # SED
+									for prop, idx in _apaWrite:
+										props.setImageProperty(prop, imgs[idx])
 								else:
 									props.setImageProperty(props.MicroImage,imgs[0])
 								self._zep.writeSpectrum(spec, pNum)
