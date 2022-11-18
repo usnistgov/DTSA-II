@@ -597,13 +597,15 @@ fov: An optional field of view width to which to set the SEM imaging while colle
 					sp.setNumericProperty(sp.FaradayBegin, fb.average())
 				if fe:
 					sp.setNumericProperty(sp.FaradayEnd, fe.average())
+			if (imageFOV!=None) and (imageFOV>0.0):
+				imgs=collectImages(name, imageFOV, (256,256), 4, rotation=0.0, markCenter=True, writeMask=0)
+				for p, i in _apaWrite:
+					sp.setObjectProperty(p, imgs[i])
 		_ts.chamberLed(defLED)
 		if fov:
 			_ts.setViewField(oldVf)
 			_ts.scSetSpeed(oldSp)
 		logSpectrum((path if path else defaultPath), acqTime, name, mode)
-		if imageFOV>0.0:
-			imgs=collectImages(name, imageFOV, (256,256), 4, rotation=0.0, markCenter=True)
 		if isinstance(comp, epq.Composition):
 			report("<p>Collected spectrum <i>%s</i> from %s for %0.1f s %s at %0.1f keV</p>" % (name, comp, acqTime, mode, hv))
 		else:
@@ -724,7 +726,8 @@ disp=True to display the spectrum as it is acquired
 forcePC = True to force the probe current to be measured with each spectrum rather than once every 5 minutes
 comp: If defined as a epq.Composition object then this composition is assigned to the "StandardMaterial" property of the spectrum.
 path: An alternative path into which to save the spectrum context data
-fov: An optional field of view width to which to set the SEM imaging while collecting the spectrum."""
+fov: An optional field of view width to which to set the SEM imaging while collecting the spectrum.
+imageFOV: Determines whether and the dimensions of an image collected after acquiring the spectrum (default=imageFOV)"""
 		global terminated
 		if terminated:
 			return ()
@@ -804,13 +807,16 @@ fov: An optional field of view width to which to set the SEM imaging while colle
 					sp.setNumericProperty(sp.FaradayBegin, fb.average())
 				if fe:
 					sp.setNumericProperty(sp.FaradayEnd, fe.average())
+		if (imageFOV!=None) and (imageFOV>0.0):
+			imgs=collectImages(name, imageFOV, (256,256), 4, rotation=0.0, markCenter=True, writeMask=0)
+			for spec in specs:
+				for p, i in _apaWrite:
+					spec.getProperties().setObjectProperty(p, imgs[i])
 		_ts.chamberLed(defLED)
 		if fov:
 			_ts.setViewField(oldVf)
 			_ts.scSetSpeed(oldSp)
 		logSpectrum((path if path else defaultPath), acqTime, name, mode)
-		if imageFOV>0.0:
-			imgs=collectImages(name, imageFOV, (256,256), 4, rotation=0.0, markCenter=True)
 		if isinstance(comp, epq.Composition):
 			report("<p>Collected %d spectra <i>%s</i> from %s for %0.1f s %s at %0.1f keV</p>" % (len(specs), name, comp, acqTime, mode, hv))
 		else:
@@ -833,7 +839,7 @@ fov: An optional field of view width to which to set the SEM imaging while colle
 			for i, pnt in enumerate(pts):
 				_ts.scSetBeamPosition(pnt[0],pnt[1])
 				time.sleep(0.1)
-				spec=collect2(acqTime, "%s[Pt %i](%0.3g,%0.3g)" % (baseName, i, pnt[0],pnt[1]), mode='L', pc=False, disp=disp, path=path, fov=None)
+				spec=collect2(acqTime, "%s[Pt %i](%0.3g,%0.3g)" % (baseName, i, pnt[0],pnt[1]), mode='L', pc=False, disp=disp, path=path, fov=None, imageFOV=0.0)
 				if pc and spec:
 					sp = spec.getProperties()
 					sp.setNumericProperty(sp.FaradayBegin, pcb.average())
@@ -1113,7 +1119,7 @@ Get the spectrum associated with the specified row number"""
 			fn = "%0.5d" % (partNum , )
 			self.updatePC()
 			imgs=collectImages(fn, fov=fov, dims=dims, dwell=dwell, path=rel, writeMask=SAVE_IMAGE_MASK)
-			spec=collect2(liveTime, name=fn, fov=edsFov)
+			spec=collect2(liveTime, name=fn, fov=edsFov, imageFOV=0.0)
 			if spec:
 				props = spec.getProperties()
 				for prop, idx in _apaWrite:
@@ -1127,7 +1133,7 @@ Get the spectrum associated with the specified row number"""
 			rel = self.getRelocated()
 			fn = "%0.5d%s" % (partNum , ("" if not postFix else " - "+postFix), )
 			self.updatePC()
-			spec=collect2(liveTime, name=fn, fov=fov)
+			spec=collect2(liveTime, name=fn, fov=fov, imageFOV=0.0)
 			write(spec, fn, rel.getAbsolutePath() )
 
 		def collectSI(self, partNum, fov, dwell=9, dims=(1024,1024), rotation=0.0, postFix=None):
@@ -2666,7 +2672,7 @@ results are written to the defaultDir."""
 			name = "%s Auto%d.msa" % (sample, i)
 			collectImages(name, 0.256, (1024, 1024), writeMask=SAVE_IMAGE_MASK)
 			_ts.setViewField(fov)
-			write(collect(liveTime, name), name, fmt="msa")
+			write(collect(liveTime, name, imageFOV=5*fov), name, fmt="msa")
 
 	def collectStandards(sample, pts, liveTime=60.0, fov=0.005, disp = True, combine=True, offenze=True):
 		"""collectStandards(sample, pts, liveTime=60.0, fov=0.005, combine=True, offenze)
@@ -2703,7 +2709,7 @@ results are written to the defaultDir."""
 						newPt.set(R_AXIS, pnt.get(R_AXIS))
 						_stg.moveTo(newPt)
 						collectImages(name, 0.256, (512, 512), writeMask=SAVE_IMAGE_MASK)
-						specs = collect(liveTime, name=name, pc=True, mode='L', disp=disp, forcePC=False, fov=fov)
+						specs = collect(liveTime, name=name, pc=True, mode='L', disp=disp, forcePC=False, fov=fov, imageFOV=0.0)
 						if combine and len(specs)>1:
 							sum=epq.SpectrumMath(specs[0])
 							for sp in specs[1:]:
@@ -2915,7 +2921,7 @@ if connect:
 			return
 		print "Collecting %0.1f live time second spectra.\n   Please wait..." % lt
 		clear()
-		specs = collect(lt, std)
+		specs = collect(lt, std, imageFOV=0.0)
 		if terminated:
 			return
 		cals=readCalibrations()
@@ -3140,7 +3146,7 @@ def replicates(name, dur=1.0, reps=100, fov=0.010):
 			if terminated:
 				break
 			_ts.setViewField(fov)
-			tmp = collect(dur, name="%s[T%d]" % (name, i), pc=(i == 0), disp=False, forcePC=False)
+			tmp = collect(dur, name="%s[T%d]" % (name, i), pc=(i == 0), disp=False, forcePC=False, imageFOV=0.0)
 			res.append(tmp)
 			for j in range(0, len(tmp)):
 				if len(sumSpecs) <= j:
@@ -3189,10 +3195,10 @@ def collectMe(pts, lt=300, name="Spectrum", volatile=False, fov=0.2):
 		time.sleep(1.0)
 		collectImages("%s%d" % (name, i), fov, writeMask=SAVE_IMAGE_MASK)
 		if volatile:
-			res.append(collect(10.0, "%s%d_before" % (name, i), fov=0.005, forcePC=True))
-		res.append(collect(lt, "%s%d" % (name, i), fov=0.005, forcePC=(not volatile)))
+			res.append(collect(10.0, "%s%d_before" % (name, i), fov=0.005, forcePC=True, imageFOV=0.0))
+		res.append(collect(lt, "%s%d" % (name, i), fov=0.005, forcePC=(not volatile), imageFOV=0.0))
 		if volatile:
-			res.append(collect(10.0, "%s%d_after" % (name, i), fov=0.005))
+			res.append(collect(10.0, "%s%d_after" % (name, i), fov=0.005, imageFOV=0.0))
 		if terminated:
 			break
 	return tuple(res)
