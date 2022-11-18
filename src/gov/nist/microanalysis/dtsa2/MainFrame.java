@@ -1765,6 +1765,7 @@ public class MainFrame extends JFrame {
 			jPanel_Spectrum.add(jPanel_Composition, CC.xy(3, 1));
 		}
 		jPanel_Command = new JPanel(new BorderLayout());
+		jPanel_Command.setBorder(BorderFactory.createEmptyBorder(4,4,4,4));
 
 		jButton_OpenPy.setText("Open");
 		jButton_OpenPy.setToolTipText("Open and run a Python script file.");
@@ -1824,6 +1825,7 @@ public class MainFrame extends JFrame {
 
 		addUtilityTab("Spectrum", jPanel_Spectrum, "Windows for interacting with spectra");
 		final JScrollPane tab = new JScrollPane(getTextPane_Log());
+		tab.setBorder(BorderFactory.createEmptyBorder(4,4,4,4));
 		addUtilityTab("Report", tab, "An HTML summary of this DTSA-II session");
 		{
 			final ImageIcon ii = new ImageIcon(MainFrame.class.getResource("python.png"));
@@ -3006,7 +3008,7 @@ public class MainFrame extends JFrame {
 			file.renameTo(new File(replaceExtension(filename, " - "+formatDate(mod)+".msa")));
 		}
 		try (final FileOutputStream os = new FileOutputStream(file)) {
-			WriteSpectrumAsEMSA1_0.write(sd, os, WriteSpectrumAsEMSA1_0.Mode.COMPATIBLE);
+			WriteSpectrumAsEMSA1_0.write(sd, os, WriteSpectrumAsEMSA1_0.Mode.COMPATIBLE, file);
 		}
 		return file.getName();
 	}
@@ -3036,7 +3038,7 @@ public class MainFrame extends JFrame {
 			file.renameTo(new File(replaceExtension(filename, " - "+formatDate(mod)+".msa")));
 		}
 		try (final FileOutputStream os = new FileOutputStream(file)) {
-			WriteSpectrumAsEMSA1_0.write(sd, os, WriteSpectrumAsEMSA1_0.Mode.FOR_TIA);
+			WriteSpectrumAsEMSA1_0.write(sd, os, WriteSpectrumAsEMSA1_0.Mode.FOR_TIA, file);
 		}
 		return file.getName();
 	}
