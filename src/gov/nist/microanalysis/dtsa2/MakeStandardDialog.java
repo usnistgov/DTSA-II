@@ -83,6 +83,7 @@ import gov.nist.microanalysis.EPQTools.SelectElements;
 import gov.nist.microanalysis.EPQTools.SpectrumFileChooser;
 import gov.nist.microanalysis.EPQTools.SpectrumPropertyPanel;
 import gov.nist.microanalysis.Utility.HalfUpFormat;
+import gov.nist.microanalysis.Utility.Interval;
 import gov.nist.microanalysis.Utility.Math2;
 
 /**
@@ -145,8 +146,7 @@ public class MakeStandardDialog extends JWizardDialog {
 						MakeStandardDialog.this.setErrorText("Please specify a positive number.");
 					}
 					for (PropertyId pid : new PropertyId[] { //
-							SpectrumProperties.FaradayBegin,
-							SpectrumProperties.FaradayEnd }) {
+							SpectrumProperties.FaradayBegin, SpectrumProperties.FaradayEnd }) {
 						for (int sel : sels)
 							if (val > 0.0)
 								mSpectra.get(sel).getProperties().setNumericProperty(pid, val);
@@ -1186,6 +1186,24 @@ public class MakeStandardDialog extends JWizardDialog {
 				sp.setNumericProperty(SpectrumProperties.FaradayEnd, pd / lt);
 				sp.setNumericProperty(SpectrumProperties.LiveTime, lt);
 				sp.setNumericProperty(SpectrumProperties.RealTime, rt);
+				// Add a metric which indicates how much the sum spectrum differs from the count statistic limit
+				try {
+					ArrayList<ISpectrumData> specs = new ArrayList<>();
+					for (int i = 0; i < mSpectra.size(); ++i)
+						if (mSelected.get(i))
+							specs.add(mSpectra.get(i));
+					double msm = 0.0;
+					RegionOfInterestSet rois = computeROIS();
+					for (ISpectrumData spec : specs) {
+						ArrayList<ISpectrumData> others = new ArrayList<>(specs);
+						others.remove(spec);
+						msm += SpectrumUtils.measureDissimilarity(spec, others, rois);
+					}
+					sp.setNumericProperty(SpectrumProperties.MultiSpectrumMetric,
+							msm / specs.size());
+				} catch (EPQException e) {
+					// Just don't add it...
+				}
 				if (mThinFilmStandard && (!Double.isNaN(mThickness))) {
 					final ThinFilm tf = new ThinFilm(Math2.MINUS_Z_AXIS, mThickness);
 					sp.setSampleShape(SpectrumProperties.SampleShape, tf);
