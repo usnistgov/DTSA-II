@@ -83,7 +83,6 @@ import gov.nist.microanalysis.EPQTools.SelectElements;
 import gov.nist.microanalysis.EPQTools.SpectrumFileChooser;
 import gov.nist.microanalysis.EPQTools.SpectrumPropertyPanel;
 import gov.nist.microanalysis.Utility.HalfUpFormat;
-import gov.nist.microanalysis.Utility.Interval;
 import gov.nist.microanalysis.Utility.Math2;
 
 /**

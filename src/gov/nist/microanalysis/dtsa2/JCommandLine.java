@@ -64,8 +64,7 @@ public class JCommandLine extends JTextPane {
 
 	private int mLastChar = 10;
 	private String mCurrentCommand = null;
-	private final ArrayList<String> mCmdBuffer = new ArrayList<String>();
-	private int mBufferIndex = -1;
+	private final CommandBuffer mCmdBuffer;
 	private int mCmdIndex = 1;
 	private int mNextTemp = 1;
 	private final boolean mMoreInput = false;
@@ -298,7 +297,7 @@ public class JCommandLine extends JTextPane {
 		mStatusStyle = addStyle("__STATUS__", getStyle("default"));
 		StyleConstants.setForeground(mStatusStyle, Color.BLUE);
 		StyleConstants.setBackground(mStatusStyle, getBackground());
-		
+
 		setTabs(10);
 
 		addKeyListener(new java.awt.event.KeyAdapter() {
@@ -381,16 +380,12 @@ public class JCommandLine extends JTextPane {
 				case KeyEvent.VK_UP: {
 					if (e.isControlDown() || e.isAltDown()) {
 						e.consume();
-						if (mBufferIndex > 0) {
-							final Document doc = getDocument();
-							try {
-								doc.remove(mCmdOffset, doc.getLength() - mCmdOffset);
-								--mBufferIndex;
-								if (mBufferIndex < mCmdBuffer.size())
-									doc.insertString(mCmdOffset, mCmdBuffer.get(mBufferIndex), getStyle(COMMAND));
-								setCaretPosition(doc.getLength());
-							} catch (final BadLocationException ex1) {
-							}
+						final Document doc = getDocument();
+						try {
+							doc.remove(mCmdOffset, doc.getLength() - mCmdOffset);
+							doc.insertString(mCmdOffset, mCmdBuffer.previous(), getStyle(COMMAND));
+							setCaretPosition(doc.getLength());
+						} catch (final BadLocationException ex1) {
 						}
 					}
 					break;
@@ -398,15 +393,12 @@ public class JCommandLine extends JTextPane {
 				case KeyEvent.VK_DOWN: {
 					if (e.isControlDown() || e.isAltDown()) {
 						e.consume();
-						if (mBufferIndex + 1 < mCmdBuffer.size()) {
-							final Document doc = getDocument();
-							try {
-								doc.remove(mCmdOffset, doc.getLength() - mCmdOffset);
-								++mBufferIndex;
-								doc.insertString(mCmdOffset, mCmdBuffer.get(mBufferIndex), getStyle(COMMAND));
-								setCaretPosition(doc.getLength());
-							} catch (final BadLocationException ex1) {
-							}
+						final Document doc = getDocument();
+						try {
+							doc.remove(mCmdOffset, doc.getLength() - mCmdOffset);
+							doc.insertString(mCmdOffset, mCmdBuffer.next(), getStyle(COMMAND));
+							setCaretPosition(doc.getLength());
+						} catch (final BadLocationException ex1) {
 						}
 					}
 					break;
@@ -484,25 +476,8 @@ public class JCommandLine extends JTextPane {
 		setFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS, Collections.EMPTY_SET);
 		setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, Collections.EMPTY_SET);
 		writeOutput(InteractiveConsole.getDefaultBanner() + "\n");
-
-		File f = new File(HTMLReport.getBasePath(), "history.txt");
-		if (f.isFile()) {
-			try {
-				BufferedReader fr = new BufferedReader(new FileReader(f, java.nio.charset.Charset.forName("UTF8")));
-				try {
-					while (fr.ready()) {
-						String line = fr.readLine();
-						if (line.length() > 0)
-							mCmdBuffer.add(line);
-					}
-				} finally {
-					fr.close();
-				}
-			} catch (IOException e1) {
-				System.err.print("Unable to open command history");
-			}
-		}
-		mBufferIndex = mCmdBuffer.size();
+		
+		mCmdBuffer = new CommandBuffer(new File(HTMLReport.getBasePath(), "history.txt"), 20);
 	}
 
 	public JythonWorker getJythonWorker() {
@@ -588,27 +563,11 @@ public class JCommandLine extends JTextPane {
 		}
 		mCurrentCommand = (mCurrentCommand == null ? cmd : mCurrentCommand + "\n" + cmd);
 		if (!mMoreInput) {
-			mCmdBuffer.remove(mCurrentCommand);
 			mCmdBuffer.add(mCurrentCommand);
-			mBufferIndex = mCmdBuffer.size();
 			mCurrentCommand = null;
-			File f = new File(HTMLReport.getBasePath(), "history.txt");
 			try {
-				FileWriter fw = new FileWriter(f, java.nio.charset.Charset.forName("UTF8"));
-				try {
-					int i = 0;
-					for (String str : mCmdBuffer) {
-						fw.write(str);
-						fw.write("\n");
-						if ((++i) == 20)
-							break;
-					}
-					fw.flush();
-				} finally {
-					fw.close();
-				}
+				mCmdBuffer.write();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 
