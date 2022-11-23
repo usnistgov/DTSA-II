@@ -1,5 +1,5 @@
-set "D2V=2022-11-22"
-set "NUM_VER=14.0.5.0"
+set "D2V=2022-11-23"
+set "NUM_VER=14.0.6.0"
 set "BPATH=C:\Users\nritchie\git"
 cd %BPATH% 
 
