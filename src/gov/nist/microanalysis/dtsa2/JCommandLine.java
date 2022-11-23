@@ -12,13 +12,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.BlockingDeque;
@@ -53,7 +49,7 @@ import gov.nist.microanalysis.EPQLibrary.ISpectrumData;
  * <p>
  * Company: Duck-and-Cover
  * </p>
- * 
+ *
  * @author Nicholas W. M. Ritchie
  * @version 1.0
  */
@@ -83,7 +79,7 @@ public class JCommandLine extends JTextPane {
 	/**
 	 * Specify a writer to use to save an archival version of the information output
 	 * to this pane.
-	 * 
+	 *
 	 * @param wr
 	 */
 	public void setArchivalWriter(Writer wr) {
@@ -264,7 +260,7 @@ public class JCommandLine extends JTextPane {
 
 	/**
 	 * JCommandLine - The default constructor for JCommandLine
-	 * 
+	 *
 	 * @throws HeadlessException
 	 */
 	@SuppressWarnings("unchecked")
@@ -377,6 +373,22 @@ public class JCommandLine extends JTextPane {
 					}
 					break;
 				}
+				case KeyEvent.VK_SPACE: {
+					if(e.isControlDown()) {
+						final Document doc = getDocument();
+						try {
+							final int cp=getCaretPosition();
+							String curr=doc.getText(mCmdOffset, cp - mCmdOffset);
+							doc.remove(mCmdOffset, doc.getLength() - mCmdOffset);
+							doc.insertString(mCmdOffset, mCmdBuffer.search(curr), getStyle(COMMAND));
+							setCaretPosition(cp);
+						} catch (BadLocationException e1) {
+							e1.printStackTrace();
+						}
+					}
+
+					break;
+				}
 				case KeyEvent.VK_UP: {
 					if (e.isControlDown() || e.isAltDown()) {
 						e.consume();
@@ -476,7 +488,7 @@ public class JCommandLine extends JTextPane {
 		setFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS, Collections.EMPTY_SET);
 		setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, Collections.EMPTY_SET);
 		writeOutput(InteractiveConsole.getDefaultBanner() + "\n");
-		
+
 		mCmdBuffer = new CommandBuffer(new File(HTMLReport.getBasePath(), "history.txt"), 20);
 	}
 
@@ -510,7 +522,7 @@ public class JCommandLine extends JTextPane {
 
 	/**
 	 * addBanner - Add a banner string to the top of the JCommandLine panel.
-	 * 
+	 *
 	 * @param banner String
 	 */
 	void addBanner(String banner) {
@@ -576,7 +588,7 @@ public class JCommandLine extends JTextPane {
 
 	enum Mode {
 		StdOut, StdErr, NewCommand
-	};
+	}
 
 	class JythonWorkerOutput {
 
@@ -708,10 +720,10 @@ public class JCommandLine extends JTextPane {
 		}
 
 		/**
-		 * 
+		 *
 		 */
 		public JythonWorker() {
-			mCommands = new LinkedBlockingDeque<String>();
+			mCommands = new LinkedBlockingDeque<>();
 			mConsole = new InteractiveConsole();
 			mStdErr = new OutputWriter(Mode.StdErr);
 			mConsole.setErr(mStdErr);
@@ -725,7 +737,7 @@ public class JCommandLine extends JTextPane {
 
 		/*
 		 * (non-Javadoc)
-		 * 
+		 *
 		 * @see javax.swing.SwingWorker#doInBackground()
 		 */
 		@Override

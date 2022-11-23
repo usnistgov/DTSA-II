@@ -45,25 +45,44 @@ public class CommandBuffer {
 	}
 
 	public void add(String cmd) {
-		mBuffer.remove(cmd);
+		if ((mIndex >= 0) && (mIndex < mBuffer.size()) && (cmd == mBuffer.get(mIndex)))
+			return;
 		mBuffer.add(cmd);
 		mIndex = mBuffer.size();
 	}
 
 	public String previous() {
 		mIndex = Math.max(-1, mIndex - 1);
+		return current();
+	}
+
+	public String next() {
+		mIndex = Math.min(mBuffer.size(), mIndex + 1);
+		return current();
+	}
+
+	public String current() {
 		if ((mIndex >= 0) && (mIndex < mBuffer.size()))
 			return mBuffer.get(mIndex);
 		else
 			return "";
 	}
 
-	public String next() {
-		mIndex = Math.min(mBuffer.size(), mIndex + 1);
-		if ((mIndex >= 0) && (mIndex < mBuffer.size()))
-			return mBuffer.get(mIndex);
-		else
-			return "";
+	public String search(String cmd) {
+		int st = Math.min(mIndex-1, mBuffer.size()-1);
+		for (int i = st; i >= 0; --i) {
+			if (mBuffer.get(i).startsWith(cmd)) {
+				mIndex = i;
+				return mBuffer.get(mIndex);
+			}
+		}
+		for (int i = mBuffer.size() - 1; i > st; --i) {
+			if (mBuffer.get(i).startsWith(cmd)) {
+				mIndex = i;
+				return mBuffer.get(mIndex);
+			}
+		}
+		return cmd;
 	}
 
 	public void write() throws IOException {
