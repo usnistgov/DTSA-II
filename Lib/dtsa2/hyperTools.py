@@ -18,7 +18,7 @@ through the spectra."""
    sp = epq.SpectrumProperties()
    sp.setDetector(det)
    sp.setNumericProperty(epq.SpectrumProperties.BeamEnergy, e0)
-   sp.setNumericProperty(epq.SpectrumProperties.FaradayBegin, i0)
+   sp.setNumericProperty(epq.SpectrumProperties.ProbeCurrent, i0)
    sp.setNumericProperty(epq.SpectrumProperties.LiveTime, liveTime)
    return ept.RippleSpectrum(rpl, sp)
 

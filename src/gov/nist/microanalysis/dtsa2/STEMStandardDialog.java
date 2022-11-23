@@ -118,8 +118,7 @@ public class STEMStandardDialog extends JDialog {
          // Live time in seconds
          props.setNumericProperty(SpectrumProperties.LiveTime, jTextField_LiveTime.getValue());
          // Current in pA
-         props.setNumericProperty(SpectrumProperties.FaradayBegin, jTextField_Current.getValue() / 1000.0);
-         props.setNumericProperty(SpectrumProperties.FaradayEnd, jTextField_Current.getValue() / 1000.0);
+         props.setNumericProperty(SpectrumProperties.ProbeCurrent, jTextField_Current.getValue() / 1000.0);
          // Density in g/cm3
          mat.setDensity(ToSI.gPerCC(jTextField_Density.getValue()));
          // Thickness in meters

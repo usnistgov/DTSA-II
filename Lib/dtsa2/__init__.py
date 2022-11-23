@@ -280,9 +280,7 @@ class ScriptableSpectrum(epq.BaseSpectrum):
         """s.setProbeCurrent(0.5)
     Sets the probe current to the specified value in nA."""
         p = self.wrapped.getProperties()
-        p.setNumericProperty(epq.SpectrumProperties.FaradayBegin, pc)
-        if p.isDefined(epq.SpectrumProperties.FaradayEnd):
-            p.setNumericProperty(epq.SpectrumProperties.FaradayEnd, pc)
+        p.setNumericProperty(epq.SpectrumProperties.ProbeCurrent, pc)
             
     def beamEnergy(self):
         """s.beamEnergy()
@@ -1119,7 +1117,7 @@ Composition object'''
     sp = epq.SpectrumProperties()
     sp.setDetector(det)
     sp.setNumericProperty(epq.SpectrumProperties.BeamEnergy, keV)
-    sp.setNumericProperty(epq.SpectrumProperties.FaradayBegin, 1.0)
+    sp.setNumericProperty(epq.SpectrumProperties.ProbeCurrent, 1.0)
     sp.setNumericProperty(epq.SpectrumProperties.LiveTime, dose)
     sp.setDetector(det)
     res = wrap(epq.SpectrumSimulator.Basic.generateSpectrum(mat, sp, True))
@@ -1794,7 +1792,7 @@ additional decimal digits of precision. [massFrac->False for atomic fraction.] [
    return result
 
 
-def tabulateProperties(specs, props=(epq.SpectrumProperties.BeamEnergy, epq.SpectrumProperties.LiveTime, epq.SpectrumProperties.RealTime, epq.SpectrumProperties.FaradayBegin, epq.SpectrumProperties.FaradayEnd,)):
+def tabulateProperties(specs, props=(epq.SpectrumProperties.BeamEnergy, epq.SpectrumProperties.LiveTime, epq.SpectrumProperties.RealTime, epq.SpectrumProperties.ProbeCurrent, )):
     tmp = "Spectrum"
     for prop in props:
         tmp = "%s\t%s" % (tmp, str(prop))

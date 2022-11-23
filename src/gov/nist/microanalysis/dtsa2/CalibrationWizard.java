@@ -318,8 +318,7 @@ public class CalibrationWizard
          final SpectrumPropertyPanel.PropertyDialog dlg = new SpectrumPropertyPanel.PropertyDialog(CalibrationWizard.this, ses);
          final SpectrumProperties.PropertyId[] required = new SpectrumProperties.PropertyId[] {
             SpectrumProperties.BeamEnergy,
-            SpectrumProperties.FaradayBegin,
-            SpectrumProperties.FaradayEnd,
+            SpectrumProperties.ProbeCurrent,
             SpectrumProperties.LiveTime
          };
          dlg.setRequiredProperties(Arrays.asList(required));

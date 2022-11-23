@@ -47,7 +47,7 @@ for r in [0.1e-6, 0.2e-6, 0.4e-6, 0.8e-6, 1.6e-6]:
    props.setTextProperty(epq.SpectrumProperties.SpectrumDisplayName, 
                      "%g micron sphere with 10 nm Gold coating on C substrate" % (r/1.0e-6))
    props.setNumericProperty(epq.SpectrumProperties.LiveTime, dose)
-   props.setNumericProperty(epq.SpectrumProperties.FaradayBegin,1.0)
+   props.setNumericProperty(epq.SpectrumProperties.ProbeCurrent,1.0)
    props.setNumericProperty(epq.SpectrumProperties.BeamEnergy,e0)
    # Write the spectrum to disk and display
    fos = jio.FileOutputStream("%s/R = %g um.msa" % (DefaultOutput, r/1.0e-6))

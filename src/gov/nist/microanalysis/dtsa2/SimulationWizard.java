@@ -633,7 +633,7 @@ public class SimulationWizard extends JWizardDialog {
 			ISpectrumData spec = null, rawSpec = null;
 			final SpectrumProperties props = new SpectrumProperties();
 			props.setNumericProperty(SpectrumProperties.BeamEnergy, FromSI.keV(mBeamEnergy));
-			props.setNumericProperty(SpectrumProperties.FaradayBegin, 1.0);
+			props.setNumericProperty(SpectrumProperties.ProbeCurrent, 1.0);
 			props.setNumericProperty(SpectrumProperties.LiveTime, mProbeDose * FromSI.NANO);
 			props.setDetector(mDetector);
 			double[] sNorm;

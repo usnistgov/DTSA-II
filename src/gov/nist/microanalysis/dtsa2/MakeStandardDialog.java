@@ -144,14 +144,11 @@ public class MakeStandardDialog extends JWizardDialog {
 					} catch (NumberFormatException nfe) {
 						MakeStandardDialog.this.setErrorText("Please specify a positive number.");
 					}
-					for (PropertyId pid : new PropertyId[] { //
-							SpectrumProperties.FaradayBegin, SpectrumProperties.FaradayEnd }) {
-						for (int sel : sels)
-							if (val > 0.0)
-								mSpectra.get(sel).getProperties().setNumericProperty(pid, val);
-							else
-								mSpectra.get(sel).getProperties().clear(pid);
-					}
+					for (int sel : sels)
+						if (val > 0.0)
+							mSpectra.get(sel).getProperties().setNumericProperty(SpectrumProperties.ProbeCurrent, val);
+						else
+							mSpectra.get(sel).getProperties().clear(SpectrumProperties.ProbeCurrent);
 					update();
 				}
 			});
@@ -196,8 +193,8 @@ public class MakeStandardDialog extends JWizardDialog {
 			DefaultTableModel model = new DefaultTableModel(new Object[] { "Spectrum", "Probe Current", "Live Time" },
 					0);
 			for (ISpectrumData spec : mSpectra) {
-				model.addRow(new Object[] { spec,
-						spec.getProperties().getTextWithDefault(SpectrumProperties.FaradayBegin, "missing"),
+				final String faraday = spec.getProperties().getTextWithDefault(SpectrumProperties.ProbeCurrent, "missing");
+				model.addRow(new Object[] { spec, faraday,
 						spec.getProperties().getTextWithDefault(SpectrumProperties.LiveTime, "missing") });
 			}
 			jTable_Dose.setModel(model);
@@ -207,10 +204,9 @@ public class MakeStandardDialog extends JWizardDialog {
 	public static boolean checkDoses(Collection<ISpectrumData> specs) {
 		for (ISpectrumData spec : specs) {
 			SpectrumProperties sp = spec.getProperties();
-			final double fb = sp.getNumericWithDefault(SpectrumProperties.FaradayBegin, -1.0);
-			final double fe = sp.getNumericWithDefault(SpectrumProperties.FaradayEnd, fb);
+			final double f = sp.getNumericWithDefault(SpectrumProperties.ProbeCurrent, -1.0);
 			final double lt = sp.getNumericWithDefault(SpectrumProperties.LiveTime, -1.0);
-			if ((fe < 0.0) || (lt < 0.0))
+			if ((f < 0.0) || (lt < 0.0))
 				return false;
 		}
 		return true;
@@ -409,8 +405,7 @@ public class MakeStandardDialog extends JWizardDialog {
 			final SpectrumPropertyPanel.PropertyDialog dlg = new SpectrumPropertyPanel.PropertyDialog(
 					MakeStandardDialog.this, mSession);
 			final SpectrumProperties.PropertyId[] required = new SpectrumProperties.PropertyId[] {
-					SpectrumProperties.BeamEnergy, SpectrumProperties.FaradayBegin, SpectrumProperties.FaradayEnd,
-					SpectrumProperties.LiveTime };
+					SpectrumProperties.BeamEnergy, SpectrumProperties.ProbeCurrent, SpectrumProperties.LiveTime };
 			dlg.setRequiredProperties(Arrays.asList(required));
 			dlg.addSpectrumProperties(sp);
 			dlg.setLocationRelativeTo(this);
@@ -1181,11 +1176,11 @@ public class MakeStandardDialog extends JWizardDialog {
 				sp.setNumericProperty(SpectrumProperties.BeamEnergy, mBeamEnergy);
 				sp.setCompositionProperty(SpectrumProperties.StandardComposition, mMaterial);
 				final double pd = getProbeDose();
-				sp.setNumericProperty(SpectrumProperties.FaradayBegin, pd / lt);
-				sp.setNumericProperty(SpectrumProperties.FaradayEnd, pd / lt);
+				sp.setNumericProperty(SpectrumProperties.ProbeCurrent, pd / lt);
 				sp.setNumericProperty(SpectrumProperties.LiveTime, lt);
 				sp.setNumericProperty(SpectrumProperties.RealTime, rt);
-				// Add a metric which indicates how much the sum spectrum differs from the count statistic limit
+				// Add a metric which indicates how much the sum spectrum differs from the count
+				// statistic limit
 				try {
 					ArrayList<ISpectrumData> specs = new ArrayList<>();
 					for (int i = 0; i < mSpectra.size(); ++i)
@@ -1198,8 +1193,7 @@ public class MakeStandardDialog extends JWizardDialog {
 						others.remove(spec);
 						msm += SpectrumUtils.measureDissimilarity(spec, others, rois);
 					}
-					sp.setNumericProperty(SpectrumProperties.MultiSpectrumMetric,
-							msm / specs.size());
+					sp.setNumericProperty(SpectrumProperties.MultiSpectrumMetric, msm / specs.size());
 				} catch (EPQException e) {
 					// Just don't add it...
 				}

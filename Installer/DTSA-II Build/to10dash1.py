@@ -46,7 +46,7 @@ assumed to come from the same material.  The "_error" columns reflect the standa
 	elms = ju.TreeSet()
 	props = specs[0].getProperties()
 	e0 = props.getNumericProperty(epq.SpectrumProperties.BeamEnergy)
-	beam_current = "%0.3f" % ( props.getNumericProperty(epq.SpectrumProperties.FaradayBegin), )
+	beam_current = "%0.3f" % ( props.getNumericProperty(epq.SpectrumProperties.ProbeCurrent), )
 	for spec in specs:
 		mat = spec.getProperties().getObjectProperty(epq.SpectrumProperties.MicroanalyticalComposition)
 		elms.addAll(mat.getElementSet())

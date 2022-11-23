@@ -1056,7 +1056,7 @@ public class OptimizationWizard
          final SpectrumProperties sp = new SpectrumProperties();
          sp.setNumericProperty(SpectrumProperties.BeamEnergy, FromSI.keV(mOptimizer.getBeamEnergy()));
          sp.setDetector(mOptimizer.getDetector());
-         sp.setNumericProperty(SpectrumProperties.FaradayBegin, 1.0);
+         sp.setNumericProperty(SpectrumProperties.ProbeCurrent, 1.0);
          sp.setNumericProperty(SpectrumProperties.LiveTime, 60.0);
          for(final Composition comp : mOptimizer.getAllMaterials())
             try {

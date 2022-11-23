@@ -322,14 +322,13 @@ public class QuantificationWizard
    private boolean validateRequiredProperties(ISpectrumData spec) {
       final SpectrumProperties sp = spec.getProperties();
       boolean ok = sp.isDefined(SpectrumProperties.LiveTime)
-            && (sp.isDefined(SpectrumProperties.FaradayBegin) || sp.isDefined(SpectrumProperties.FaradayEnd))
+            && sp.isDefined(SpectrumProperties.ProbeCurrent)
             && sp.isDefined(SpectrumProperties.BeamEnergy);
       if(!ok) {
          final SpectrumPropertyPanel.PropertyDialog dlg = new SpectrumPropertyPanel.PropertyDialog(this, mSession);
          final SpectrumProperties.PropertyId[] required = new SpectrumProperties.PropertyId[] {
             SpectrumProperties.BeamEnergy,
-            SpectrumProperties.FaradayBegin,
-            SpectrumProperties.FaradayEnd,
+            SpectrumProperties.ProbeCurrent,
             SpectrumProperties.LiveTime
          };
          dlg.setRequiredProperties(Arrays.asList(required));
@@ -2414,7 +2413,7 @@ public class QuantificationWizard
                   // Actual beam current or live time is not important for
                   // references but it must be defined for the filter
                   final SpectrumProperties sp = spec.getProperties();
-                  sp.setNumericProperty(SpectrumProperties.FaradayBegin, sp.getNumericWithDefault(SpectrumProperties.FaradayBegin, 1.0));
+                  sp.setNumericProperty(SpectrumProperties.ProbeCurrent, sp.getNumericWithDefault(SpectrumProperties.ProbeCurrent, 1.0));
                   sp.setNumericProperty(SpectrumProperties.LiveTime, sp.getNumericWithDefault(SpectrumProperties.LiveTime, 60.0));
                   final StringBuffer warning = new StringBuffer("<HTML>");
                   boolean ok = true;
