@@ -49,6 +49,7 @@ import com.jgoodies.forms.layout.FormLayout;
 import gov.nist.microanalysis.EPQDatabase.Session;
 import gov.nist.microanalysis.EPQLibrary.Composition;
 import gov.nist.microanalysis.EPQLibrary.ConductiveCoating;
+import gov.nist.microanalysis.EPQLibrary.DuaneHuntLimit;
 import gov.nist.microanalysis.EPQLibrary.EPQException;
 import gov.nist.microanalysis.EPQLibrary.EditableSpectrum;
 import gov.nist.microanalysis.EPQLibrary.Element;
@@ -193,7 +194,8 @@ public class MakeStandardDialog extends JWizardDialog {
 			DefaultTableModel model = new DefaultTableModel(new Object[] { "Spectrum", "Probe Current", "Live Time" },
 					0);
 			for (ISpectrumData spec : mSpectra) {
-				final String faraday = spec.getProperties().getTextWithDefault(SpectrumProperties.ProbeCurrent, "missing");
+				final String faraday = spec.getProperties().getTextWithDefault(SpectrumProperties.ProbeCurrent,
+						"missing");
 				model.addRow(new Object[] { spec, faraday,
 						spec.getProperties().getTextWithDefault(SpectrumProperties.LiveTime, "missing") });
 			}
@@ -474,7 +476,8 @@ public class MakeStandardDialog extends JWizardDialog {
 		private void updateSelected() {
 			DecimalFormat nf = new DecimalFormat("#.##");
 			RegionOfInterestSet rois = computeROIS();
-			DefaultTableModel model = new DefaultTableModel(new Object[] { "Spectrum", "Score", "Included" }, 0);
+			DefaultTableModel model = new DefaultTableModel(
+					new Object[] { "Spectrum", "Score", "Duane-Hunt", "Included" }, 0);
 			ArrayList<ISpectrumData> sel = new ArrayList<>();
 			for (int i = 0; i < mSpectra.size(); ++i)
 				if (mSelected.get(i))
@@ -500,11 +503,29 @@ public class MakeStandardDialog extends JWizardDialog {
 				} else
 					html[i] = "N/A";
 			}
+			double e0 = mSpectra.get(0).getProperties().getNumericWithDefault(SpectrumProperties.BeamEnergy,
+					Double.NaN);
+			assert !Double.isNaN(e0);
+			final String[] dhunt = new String[scores.length];
+			for (int i = 0; i < scores.length; ++i) {
+				double dh = FromSI.keV(DuaneHuntLimit.DefaultDuaneHunt.compute(mSpectra.get(i)));
+				if (!Double.isNaN(dh)) {
+					final double de0 = ((e0 - dh) / e0);
+					final double sc = scores[i] / ((ss - scores[i]) / (selCount - 1));
+					if (de0 < 0.01)
+						dhunt[i] = "<html><font color=\"black\">" + nf.format(dh) + " keV</font>";
+					else if (sc < 0.025)
+						dhunt[i] = "<html><font color=\"orange\">" + nf.format(dh) + " keV</font>";
+					else
+						dhunt[i] = "<html><font color=\"red\">" + nf.format(dh) + " keV</font>";
+				} else
+					dhunt[i] = "<html><font color=\"red\">Unknown keV</font>";
+			}
 			for (int i = 0; i < mSpectra.size(); ++i)
 				model.addRow(new Object[] { //
 						mSpectra.get(i).toString(), //
 						html[i], //
-						mSelected.get(i).toString() //
+						dhunt[i], mSelected.get(i).toString() //
 				});
 			jFilterTable.setModel(model);
 		}
