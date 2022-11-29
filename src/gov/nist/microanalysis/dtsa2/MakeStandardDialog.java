@@ -479,19 +479,20 @@ public class MakeStandardDialog extends JWizardDialog {
 			DefaultTableModel model = new DefaultTableModel(
 					new Object[] { "Spectrum", "Score", "Duane-Hunt", "Included" }, 0);
 			ArrayList<ISpectrumData> sel = new ArrayList<>();
-			for (int i = 0; i < mSpectra.size(); ++i)
+			final int spSize = mSpectra.size();
+			for (int i = 0; i < spSize; ++i)
 				if (mSelected.get(i))
 					sel.add(mSpectra.get(i));
-			double[] scores = new double[mSpectra.size()];
+			double[] scores = new double[spSize];
 			int selCount = 0;
-			for (int i = 0; i < mSpectra.size(); ++i)
+			for (int i = 0; i < spSize; ++i)
 				if (mSelected.get(i)) {
 					++selCount;
 					scores[i] = score(mSpectra.get(i), sel, rois);
 				}
-			final String[] html = new String[scores.length];
+			final String[] html = new String[spSize];
 			final double ss = Math2.sum(scores);
-			for (int i = 0; i < scores.length; ++i) {
+			for (int i = 0; i < spSize; ++i) {
 				if (scores[i] > 0.0) {
 					final double sc = scores[i] / ((ss - scores[i]) / (selCount - 1));
 					if (sc < 2.0)
@@ -506,22 +507,21 @@ public class MakeStandardDialog extends JWizardDialog {
 			double e0 = mSpectra.get(0).getProperties().getNumericWithDefault(SpectrumProperties.BeamEnergy,
 					Double.NaN);
 			assert !Double.isNaN(e0);
-			final String[] dhunt = new String[scores.length];
-			for (int i = 0; i < scores.length; ++i) {
+			final String[] dhunt = new String[spSize];
+			for (int i = 0; i < spSize; ++i) {
 				double dh = FromSI.keV(DuaneHuntLimit.DefaultDuaneHunt.compute(mSpectra.get(i)));
 				if (!Double.isNaN(dh)) {
 					final double de0 = ((e0 - dh) / e0);
-					final double sc = scores[i] / ((ss - scores[i]) / (selCount - 1));
-					if (de0 < 0.01)
+					if (de0 < 0.025) // less than 2.5% less than the beam energy
 						dhunt[i] = "<html><font color=\"black\">" + nf.format(dh) + " keV</font>";
-					else if (sc < 0.025)
+					else if (de0 < 0.05) // less than 5% less
 						dhunt[i] = "<html><font color=\"orange\">" + nf.format(dh) + " keV</font>";
-					else
+					else // more than 5% less than the beam energy 
 						dhunt[i] = "<html><font color=\"red\">" + nf.format(dh) + " keV</font>";
 				} else
 					dhunt[i] = "<html><font color=\"red\">Unknown keV</font>";
 			}
-			for (int i = 0; i < mSpectra.size(); ++i)
+			for (int i = 0; i < spSize; ++i)
 				model.addRow(new Object[] { //
 						mSpectra.get(i).toString(), //
 						html[i], //

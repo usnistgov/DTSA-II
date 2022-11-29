@@ -659,8 +659,6 @@ public class MainFrame extends JFrame {
 						userPref.put(PREVIOUS_TRIXY_VERSION, DTSA2.getRevision(DTSA2.class));
 						userPref.put(PREVIOUS_EPQ_VERSION, DTSA2.getRevision(EPQException.class));
 					}
-					if (DTSA2.INCLUDE_USER_GROUP)
-						JoinUserGroupDialog.doSignUp(MainFrame.this);
 					mSessionStarted = null;
 				}
 				final String mark = "<A NAME=\"ITEM_" + Long.toHexString(++mLastMark) + "\" />\n";
@@ -1057,16 +1055,6 @@ public class MainFrame extends JFrame {
 			}
 		});
 
-		if (DTSA2.INCLUDE_USER_GROUP) {
-			jMenuItem_HelpUserGroup.setMnemonic(KeyEvent.VK_U);
-			jMenuItem_HelpUserGroup.setText("User Group Signup...");
-			jMenuItem_HelpUserGroup.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent arg0) {
-					JoinUserGroupDialog.launchSignUp(MainFrame.this);
-				}
-			});
-		}
 		jMenuItem_HelpAbout.setMnemonic(KeyEvent.VK_A);
 		jMenuItem_HelpAbout.setText("About " + DTSA2.APP_NAME + "...");
 		jMenuItem_HelpAbout.addActionListener(new ActionListener() {
@@ -1083,8 +1071,6 @@ public class MainFrame extends JFrame {
 		jMenu_Help.add(jMenuItem_HelpJython);
 		jMenu_Help.add(jMenuItem_HelpPython);
 		jMenu_Help.add(jMenuItem_ProbeUserGroup);
-		if (DTSA2.INCLUDE_USER_GROUP)
-			jMenu_Help.add(jMenuItem_HelpUserGroup);
 
 		jMenuItem_EditSpectrumProperties.setMnemonic(KeyEvent.VK_E);
 		jMenuItem_EditSpectrumProperties.setText("Edit spectrum properties");

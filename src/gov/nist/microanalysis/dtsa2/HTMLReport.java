@@ -88,8 +88,6 @@ public class HTMLReport {
                pw.println("   <tr><th align=\"right\">System User</th><td>" + System.getProperty("user.name") + "</td></tr>");
                pw.println("   <tr><th align=\"right\">Date</th><td>" + date + "</td></tr>");
                pw.println("   <tr><th align=\"right\">Time</th><td>" + time + "</td></tr>");
-               if(DTSA2.INCLUDE_USER_GROUP)
-                  pw.println("   <tr><th align=\"right\">Google Group</th><td><a href= https://groups.google.com/d/forum/dtsa-ii-user-group?hl=en>DTSA-II User Group</a></td></tr>");
                pw.println("  </table>");
                pw.println("  <br>");
                pw.println(" </body>");

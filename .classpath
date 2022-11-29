@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry including="**/*.java|Splash.png|gov/nist/microanalysis/dtsa2/*.css|gov/nist/microanalysis/dtsa2/*.csv|gov/nist/microanalysis/dtsa2/*.html|gov/nist/microanalysis/dtsa2/*.png|gov/nist/microanalysis/dtsa2/*.py|gov/nist/microanalysis/dtsa2/revision|gov/nist/microanalysis/dtsa2/standards.sd2.xml" kind="src" output="target/classes" path="src">
+	<classpathentry including="**/*.java" kind="src" output="target/classes" path="src">
 		<attributes>
 			<attribute name="optional" value="true"/>
 			<attribute name="maven.pomderived" value="true"/>
@@ -16,6 +16,7 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER">
 		<attributes>
 			<attribute name="module" value="true"/>
+			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="output" path="target/classes"/>

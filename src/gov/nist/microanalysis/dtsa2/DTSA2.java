@@ -73,7 +73,6 @@ public class DTSA2 {
 	}
 
 	static public final String APP_NAME = "NIST DTSA-II";
-	static public final boolean INCLUDE_USER_GROUP = false;
 	static private final String SPECTRUM_DIR = "Default spectrum directory";
 	static private DTSA2 mApplication;
 	private final MainFrame mFrame;
