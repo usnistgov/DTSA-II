@@ -32,7 +32,7 @@ import javax.swing.event.ListSelectionListener;
  * <p>
  * Company: National Institute of Standards and Technology
  * </p>
- * 
+ *
  * @author Nicholas W. M. Ritchie
  * @version 1.0
  */
@@ -212,7 +212,7 @@ public class JCheckList
 
    /**
     * isChecked - Is the check box at this index selected?
-    * 
+    *
     * @param index int
     * @return boolean
     */

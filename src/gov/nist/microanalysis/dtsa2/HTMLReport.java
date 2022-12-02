@@ -37,7 +37,7 @@ import gov.nist.microanalysis.EPQTools.ErrorDialog;
  * <p>
  * Institution: National Institute of Standards and Technology
  * </p>
- * 
+ *
  * @author nritchie
  * @version 1.0
  */
@@ -47,7 +47,7 @@ public class HTMLReport {
    private final String mReportName;
    private File mFile;
 
-   static private Map<String, HTMLReport> mInstances = new TreeMap<String, HTMLReport>();
+   static private Map<String, HTMLReport> mInstances = new TreeMap<>();
 
    private HTMLReport(String reportName) {
       mReportName = reportName;

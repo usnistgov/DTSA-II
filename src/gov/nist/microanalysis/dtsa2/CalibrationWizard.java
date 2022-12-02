@@ -82,7 +82,7 @@ import gov.nist.microanalysis.Utility.UtilException;
  * <p>
  * Institution: National Institute of Standards and Technology
  * </p>
- * 
+ *
  * @author nicholas
  * @version 1.0
  */
@@ -218,8 +218,8 @@ public class CalibrationWizard
 
       private static final long serialVersionUID = 2996757631404932405L;
 
-      private final JComboBox<ElectronProbe> jComboBox_Instrument = new JComboBox<ElectronProbe>();
-      private final JComboBox<EDSDetector> jComboBox_Detector = new JComboBox<EDSDetector>();
+      private final JComboBox<ElectronProbe> jComboBox_Instrument = new JComboBox<>();
+      private final JComboBox<EDSDetector> jComboBox_Detector = new JComboBox<>();
 
       private EDSDetector mDetector = null;
       private DetectorProperties mDefaultDetector = null;
@@ -235,7 +235,7 @@ public class CalibrationWizard
          pb.addSeparator("Instrument and Detector", cc.xyw(1, 1, 3));
          pb.addLabel("Instrument", cc.xy(1, 3));
          pb.add(jComboBox_Instrument, cc.xy(3, 3));
-         final DefaultComboBoxModel<ElectronProbe> dcbm = new DefaultComboBoxModel<ElectronProbe>(getSession().getCurrentProbes().toArray(new ElectronProbe[0]));
+         final DefaultComboBoxModel<ElectronProbe> dcbm = new DefaultComboBoxModel<>(getSession().getCurrentProbes().toArray(new ElectronProbe[0]));
          jComboBox_Instrument.setModel(dcbm);
          jComboBox_Instrument.addActionListener(new ActionListener() {
             @Override
@@ -256,7 +256,7 @@ public class CalibrationWizard
          final Object obj = jComboBox_Instrument.getSelectedItem();
          if(obj instanceof ElectronProbe) {
             final EDSDetector[] dets = getSession().getCurrentEDSDetectors((ElectronProbe) obj).toArray(new EDSDetector[0]);
-            final DefaultComboBoxModel<EDSDetector> dcbm = new DefaultComboBoxModel<EDSDetector>(dets);
+            final DefaultComboBoxModel<EDSDetector> dcbm = new DefaultComboBoxModel<>(dets);
             jComboBox_Detector.setModel(dcbm);
             if(dp != null)
                for(final EDSDetector det : dets)
@@ -335,7 +335,7 @@ public class CalibrationWizard
 
       private void initialize() {
          final Session ses = getSession();
-         final Vector<Object> standards = new Vector<Object>();
+         final Vector<Object> standards = new Vector<>();
          for(final String std : STANDARDS)
             try {
                final Composition c = ses.findStandard(std);
@@ -346,7 +346,7 @@ public class CalibrationWizard
                // Ignore it...
             }
          standards.add("New material");
-         jComboBox_Material = new JComboBox<Object>(standards);
+         jComboBox_Material = new JComboBox<>(standards);
          jComboBox_Material.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -364,9 +364,9 @@ public class CalibrationWizard
          jTextField_Spectrum = new JTextField();
          jTextField_Spectrum.setEditable(false);
          {
-            jComboBox_FitOrder = new JComboBox<String>();
+            jComboBox_FitOrder = new JComboBox<>();
             final String def = "Linear (default)";
-            final ComboBoxModel<String> model = new DefaultComboBoxModel<String>(new String[] {
+            final ComboBoxModel<String> model = new DefaultComboBoxModel<>(new String[] {
                def,
                "Quadratic",
                "Cubic",
@@ -579,7 +579,7 @@ public class CalibrationWizard
          }
 
       }
-   };
+   }
 
    public class FitProgressPanel
       extends
@@ -591,7 +591,7 @@ public class CalibrationWizard
 
       /**
        * Constructs a FitProgressPanel
-       * 
+       *
        * @param wiz
        */
       public FitProgressPanel(JWizardDialog wiz) {
@@ -638,7 +638,7 @@ public class CalibrationWizard
 
       /**
        * Constructs a FitResultPanel
-       * 
+       *
        * @param wiz
        */
       public FitResultPanel(JWizardDialog wiz) {
@@ -896,10 +896,10 @@ public class CalibrationWizard
       extends
       JWizardPanel {
 
-      private final JComboBox<Element> jComboBox_KLine = new JComboBox<Element>();
-      private final JComboBox<Element> jComboBox_LLine = new JComboBox<Element>();
-      private final JComboBox<Element> jComboBox_MLine = new JComboBox<Element>();
-      private final JComboBox<Element> jComboBox_NLine = new JComboBox<Element>();
+      private final JComboBox<Element> jComboBox_KLine = new JComboBox<>();
+      private final JComboBox<Element> jComboBox_LLine = new JComboBox<>();
+      private final JComboBox<Element> jComboBox_MLine = new JComboBox<>();
+      private final JComboBox<Element> jComboBox_NLine = new JComboBox<>();
 
       private static final long serialVersionUID = -8281440631161048625L;
 
@@ -925,22 +925,22 @@ public class CalibrationWizard
             final EDSCalibration cal = mResultCalibration;
             final SiLiCalibration sili = (SiLiCalibration) cal;
             {
-               final DefaultComboBoxModel<Element> dcbm = new DefaultComboBoxModel<Element>(Element.range(Element.Li, Element.Si));
+               final DefaultComboBoxModel<Element> dcbm = new DefaultComboBoxModel<>(Element.range(Element.Li, Element.Si));
                dcbm.setSelectedItem(sili.getFirstVisible(AtomicShell.KFamily));
                jComboBox_KLine.setModel(dcbm);
             }
             {
-               final DefaultComboBoxModel<Element> dcbm = new DefaultComboBoxModel<Element>(Element.range(Element.S, Element.Mo));
+               final DefaultComboBoxModel<Element> dcbm = new DefaultComboBoxModel<>(Element.range(Element.S, Element.Mo));
                dcbm.setSelectedItem(sili.getFirstVisible(AtomicShell.LFamily));
                jComboBox_LLine.setModel(dcbm);
             }
             {
-               final DefaultComboBoxModel<Element> dcbm = new DefaultComboBoxModel<Element>(Element.range(Element.Br, Element.Uub));
+               final DefaultComboBoxModel<Element> dcbm = new DefaultComboBoxModel<>(Element.range(Element.Br, Element.Uub));
                dcbm.setSelectedItem(sili.getFirstVisible(AtomicShell.MFamily));
                jComboBox_MLine.setModel(dcbm);
             }
             {
-               final DefaultComboBoxModel<Element> dcbm = new DefaultComboBoxModel<Element>(Element.range(Element.Pb, Element.Uub));
+               final DefaultComboBoxModel<Element> dcbm = new DefaultComboBoxModel<>(Element.range(Element.Pb, Element.Uub));
                dcbm.setSelectedItem(sili.getFirstVisible(AtomicShell.NFamily));
                jComboBox_NLine.setModel(dcbm);
             }
@@ -1001,7 +1001,7 @@ public class CalibrationWizard
             }
          }
       }
-   };
+   }
 
    private SpectrumFitter8 mFit;
    private String mHTMLResult;

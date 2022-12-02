@@ -151,14 +151,14 @@ public class QuantificationWizard
 
    private static final long serialVersionUID = -6603251642619377671L;
 
-   private final LazyEvaluate<IntroPanel> jWizardPanel_Intro = new LazyEvaluate<IntroPanel>() {
+   private final LazyEvaluate<IntroPanel> jWizardPanel_Intro = new LazyEvaluate<>() {
       @Override
       protected IntroPanel compute() {
          return new IntroPanel(QuantificationWizard.this);
       }
    };
 
-   private final LazyEvaluate<KConditionsPanel> jWizardPanel_Conditions = new LazyEvaluate<KConditionsPanel>() {
+   private final LazyEvaluate<KConditionsPanel> jWizardPanel_Conditions = new LazyEvaluate<>() {
 
       @Override
       protected KConditionsPanel compute() {
@@ -166,7 +166,7 @@ public class QuantificationWizard
       }
    };
 
-   private final LazyEvaluate<KRatioPanel> jWizardPanel_KRatio = new LazyEvaluate<KRatioPanel>() {
+   private final LazyEvaluate<KRatioPanel> jWizardPanel_KRatio = new LazyEvaluate<>() {
 
       @Override
       protected KRatioPanel compute() {
@@ -174,49 +174,49 @@ public class QuantificationWizard
       }
    };
 
-   private final LazyEvaluate<KResultsPanel> jWizardPanel_Results = new LazyEvaluate<KResultsPanel>() {
+   private final LazyEvaluate<KResultsPanel> jWizardPanel_Results = new LazyEvaluate<>() {
 
       @Override
       protected KResultsPanel compute() {
          return new KResultsPanel(QuantificationWizard.this);
       }
    };
-   private final LazyEvaluate<KStandardPanel> jWizardPanel_Standard = new LazyEvaluate<KStandardPanel>() {
+   private final LazyEvaluate<KStandardPanel> jWizardPanel_Standard = new LazyEvaluate<>() {
 
       @Override
       protected KStandardPanel compute() {
          return new KStandardPanel(QuantificationWizard.this);
       }
    };
-   private final LazyEvaluate<LLSQStandardPanel> jWizardPanel_LLSQStandard = new LazyEvaluate<LLSQStandardPanel>() {
+   private final LazyEvaluate<LLSQStandardPanel> jWizardPanel_LLSQStandard = new LazyEvaluate<>() {
 
       @Override
       protected LLSQStandardPanel compute() {
          return new LLSQStandardPanel(QuantificationWizard.this);
       }
    };
-   private final LazyEvaluate<LLSQInstrumentPanel> jWizardPanel_LLSQInstrument = new LazyEvaluate<LLSQInstrumentPanel>() {
+   private final LazyEvaluate<LLSQInstrumentPanel> jWizardPanel_LLSQInstrument = new LazyEvaluate<>() {
 
       @Override
       protected LLSQInstrumentPanel compute() {
          return new LLSQInstrumentPanel(QuantificationWizard.this);
       }
    };
-   private final LazyEvaluate<LLSQReferencePanel> jWizardPanel_LLSQReference = new LazyEvaluate<LLSQReferencePanel>() {
+   private final LazyEvaluate<LLSQReferencePanel> jWizardPanel_LLSQReference = new LazyEvaluate<>() {
 
       @Override
       protected LLSQReferencePanel compute() {
          return new LLSQReferencePanel(QuantificationWizard.this);
       }
    };
-   private final LazyEvaluate<LLSQQuantLine> jWizardPanel_LLSQQuantLine = new LazyEvaluate<LLSQQuantLine>() {
+   private final LazyEvaluate<LLSQQuantLine> jWizardPanel_LLSQQuantLine = new LazyEvaluate<>() {
 
       @Override
       protected LLSQQuantLine compute() {
          return new LLSQQuantLine(QuantificationWizard.this);
       }
    };
-   private final LazyEvaluate<LLSQOtherElement> jWizardPanel_LLSQOther = new LazyEvaluate<LLSQOtherElement>() {
+   private final LazyEvaluate<LLSQOtherElement> jWizardPanel_LLSQOther = new LazyEvaluate<>() {
 
       @Override
       protected LLSQOtherElement compute() {
@@ -224,14 +224,14 @@ public class QuantificationWizard
       }
    };
 
-   private final LazyEvaluate<LLSQUnknownPanel> jWizardPanel_LLSQUnknown = new LazyEvaluate<LLSQUnknownPanel>() {
+   private final LazyEvaluate<LLSQUnknownPanel> jWizardPanel_LLSQUnknown = new LazyEvaluate<>() {
 
       @Override
       protected LLSQUnknownPanel compute() {
          return new LLSQUnknownPanel(QuantificationWizard.this);
       }
    };
-   private final LazyEvaluate<LLSQResults> jWizardPanel_LLSQResults = new LazyEvaluate<LLSQResults>() {
+   private final LazyEvaluate<LLSQResults> jWizardPanel_LLSQResults = new LazyEvaluate<>() {
 
       @Override
       protected LLSQResults compute() {
@@ -239,35 +239,35 @@ public class QuantificationWizard
       }
    };
 
-   private final LazyEvaluate<STEMInstrumentPanel> jWizardPanel_STEMInstrument = new LazyEvaluate<STEMInstrumentPanel>() {
+   private final LazyEvaluate<STEMInstrumentPanel> jWizardPanel_STEMInstrument = new LazyEvaluate<>() {
 
       @Override
       protected STEMInstrumentPanel compute() {
          return new STEMInstrumentPanel(QuantificationWizard.this);
       }
    };
-   private final LazyEvaluate<STEMStandardsPanel> jWizardPanel_STEMStandards = new LazyEvaluate<STEMStandardsPanel>() {
+   private final LazyEvaluate<STEMStandardsPanel> jWizardPanel_STEMStandards = new LazyEvaluate<>() {
 
       @Override
       protected STEMStandardsPanel compute() {
          return new STEMStandardsPanel(QuantificationWizard.this);
       }
    };
-   private final LazyEvaluate<STEMStripPanel> jWizardPanel_STEMStrip = new LazyEvaluate<STEMStripPanel>() {
+   private final LazyEvaluate<STEMStripPanel> jWizardPanel_STEMStrip = new LazyEvaluate<>() {
 
       @Override
       protected STEMStripPanel compute() {
          return new STEMStripPanel(QuantificationWizard.this);
       }
    };
-   private final LazyEvaluate<STEMUnknownsPanel> jWizardPanel_STEMUnknowns = new LazyEvaluate<STEMUnknownsPanel>() {
+   private final LazyEvaluate<STEMUnknownsPanel> jWizardPanel_STEMUnknowns = new LazyEvaluate<>() {
 
       @Override
       protected STEMUnknownsPanel compute() {
          return new STEMUnknownsPanel(QuantificationWizard.this);
       }
    };
-   private final LazyEvaluate<STEMResultsPanel> jWizardPanel_STEMResults = new LazyEvaluate<STEMResultsPanel>() {
+   private final LazyEvaluate<STEMResultsPanel> jWizardPanel_STEMResults = new LazyEvaluate<>() {
 
       @Override
       protected STEMResultsPanel compute() {
@@ -292,7 +292,7 @@ public class QuantificationWizard
    private Session mSession;
 
    // Result data items
-   private final ArrayList<ISpectrumData> mResultSpectra = new ArrayList<ISpectrumData>();
+   private final ArrayList<ISpectrumData> mResultSpectra = new ArrayList<>();
 
    private final Preferences mUserPref = Preferences.userNodeForPackage(QuantificationWizard.class);
 
@@ -818,7 +818,7 @@ public class QuantificationWizard
          });
          final int r = jTableModel_Standard.getRowCount() - 1;
          {
-            final JComboBox<Element> ecb = new JComboBox<Element>();
+            final JComboBox<Element> ecb = new JComboBox<>();
             ecb.setModel(new ElementComboBoxModel(unused));
             ecb.addActionListener(new EditCellAction());
             jEachRowEditor_ElementEditor.setEditorAt(r, new DefaultCellEditor(ecb));
@@ -834,7 +834,7 @@ public class QuantificationWizard
       }
 
       private TreeSet<Element> unusedElements() {
-         final TreeSet<Element> elms = new TreeSet<Element>(Element.allElements());
+         final TreeSet<Element> elms = new TreeSet<>(Element.allElements());
          for(int r = 0; r < jTableModel_Standard.getRowCount(); ++r)
             elms.remove(getElementCell(r));
          return elms;
@@ -844,12 +844,12 @@ public class QuantificationWizard
          if(r >= 0) {
             final Element el = getElementCell(r);
             {
-               final JComboBox<Composition> cb = new JComboBox<Composition>();
+               final JComboBox<Composition> cb = new JComboBox<>();
                cb.addActionListener(new UpdateMaterialListAction());
                if(el != Element.None) {
-                  final Vector<Composition> comps = new Vector<Composition>(MaterialFactory.getCommonStandards(el));
+                  final Vector<Composition> comps = new Vector<>(MaterialFactory.getCommonStandards(el));
                   comps.add(NEW_MATERIAL);
-                  cb.setModel(new DefaultComboBoxModel<Composition>(comps));
+                  cb.setModel(new DefaultComboBoxModel<>(comps));
                   jTable_Standards.getModel().setValueAt(comps.get(0), r, COMPOSITION_COL);
                }
                jEachRowEditor_CompositionEditor.setEditorAt(r, new DefaultCellEditor(cb));
@@ -923,13 +923,13 @@ public class QuantificationWizard
 
       @Override
       public boolean permitNext() {
-         mMaterialMap = new TreeMap<Element, Composition>();
-         mCurrentMap = new TreeMap<Element, Number>();
+         mMaterialMap = new TreeMap<>();
+         mCurrentMap = new TreeMap<>();
          try {
             final TableCellEditor tce = jTable_Standards.getCellEditor();
             if(tce != null)
                tce.stopCellEditing();
-            assert jTable_Standards.isEditing() == false;
+            assert !jTable_Standards.isEditing();
             for(int r = 0; r < jTable_Standards.getRowCount(); ++r) {
                final Element el = (Element) jTable_Standards.getValueAt(r, ELEMENT_COL);
                final Composition comp = (Composition) jTable_Standards.getValueAt(r, COMPOSITION_COL);
@@ -963,7 +963,7 @@ public class QuantificationWizard
       public Map<Element, Number> getProbeCurrents() {
          return Collections.unmodifiableMap(mCurrentMap);
       }
-   };
+   }
 
    protected class KRatioPanel
       extends
@@ -1005,8 +1005,8 @@ public class QuantificationWizard
             "1.0"
          });
          final ArrayList<String> c = XRayTransitionSet.getBasicFamilies(el, 0.95 * jWizardPanel_Conditions.get().getEnergy());
-         final DefaultComboBoxModel<String> dcmb = new DefaultComboBoxModel<String>(c.toArray(new String[0]));
-         final JComboBox<String> jcb = new JComboBox<String>(dcmb);
+         final DefaultComboBoxModel<String> dcmb = new DefaultComboBoxModel<>(c.toArray(new String[0]));
+         final JComboBox<String> jcb = new JComboBox<>(dcmb);
          final int row = jTableModel_KRatio.getRowCount() - 1;
          jEachRowEditor_TransitionEditor.setEditorAt(row, new DefaultCellEditor(jcb));
          if(!c.isEmpty())
@@ -1079,7 +1079,7 @@ public class QuantificationWizard
       @Override
       public void onShow() {
          // Add any elements that are not currently displayed
-         final ArrayList<Element> elms = new ArrayList<Element>(jWizardPanel_Standard.get().getReferences().keySet());
+         final ArrayList<Element> elms = new ArrayList<>(jWizardPanel_Standard.get().getReferences().keySet());
          for(int i = mTable.getRowCount() - 1; i >= 0; --i) {
             final Element el = (Element) mTable.getValueAt(i, ELEMENT_COL);
             if(elms.contains(el))
@@ -1105,14 +1105,14 @@ public class QuantificationWizard
       @Override
       public boolean permitNext() {
          final NumberFormat nf = NumberFormat.getInstance();
-         mTransitionMap = new TreeMap<Element, XRayTransitionSet>();
-         mKRatioMap = new TreeMap<Element, Number>();
-         mCurrentMap = new TreeMap<Element, Number>();
+         mTransitionMap = new TreeMap<>();
+         mKRatioMap = new TreeMap<>();
+         mCurrentMap = new TreeMap<>();
          // Cancel table editing when active...
          final TableCellEditor tce = mTable.getCellEditor();
          if(tce != null)
             tce.stopCellEditing();
-         assert mTable.isEditing() == false;
+         assert !mTable.isEditing();
          try {
             // double kRsum = 0.0;
             for(int i = mTable.getRowCount() - 1; i >= 0; --i) {
@@ -1500,9 +1500,9 @@ public class QuantificationWizard
          }
       }
 
-      private final JComboBox<ElectronProbe> jComboBox_Instrument = new JComboBox<ElectronProbe>();
-      private final JComboBox<DetectorProperties> jComboBox_Detector = new JComboBox<DetectorProperties>();
-      private final JComboBox<EDSCalibration> jComboBox_Calibration = new JComboBox<EDSCalibration>();
+      private final JComboBox<ElectronProbe> jComboBox_Instrument = new JComboBox<>();
+      private final JComboBox<DetectorProperties> jComboBox_Detector = new JComboBox<>();
+      private final JComboBox<EDSCalibration> jComboBox_Calibration = new JComboBox<>();
       private final JTextFieldDouble jTextField_BeamEnergy = new JTextFieldDouble(1.0, 1.0, 512.0);
 
       private static final long serialVersionUID = -6481374858932055638L;
@@ -1585,7 +1585,7 @@ public class QuantificationWizard
             }
             {
                final Set<ElectronProbe> eps = mSession.getCurrentProbes();
-               final DefaultComboBoxModel<ElectronProbe> dcmb = new DefaultComboBoxModel<ElectronProbe>();
+               final DefaultComboBoxModel<ElectronProbe> dcmb = new DefaultComboBoxModel<>();
                for(final ElectronProbe pr : eps)
                   dcmb.addElement(pr);
                dcmb.setSelectedItem(defProps != null ? defProps.getOwner() : eps.iterator().next());
@@ -1607,7 +1607,7 @@ public class QuantificationWizard
 
       private void updateDetectors(DetectorProperties defDp) {
          final ElectronProbe newProbe = (ElectronProbe) jComboBox_Instrument.getSelectedItem();
-         final DefaultComboBoxModel<DetectorProperties> dcmb = new DefaultComboBoxModel<DetectorProperties>();
+         final DefaultComboBoxModel<DetectorProperties> dcmb = new DefaultComboBoxModel<>();
          if((newProbe != null) && (newProbe != getProbe())) {
             for(final DetectorProperties dp : mSession.getDetectors(newProbe))
                dcmb.addElement(dp);
@@ -1619,7 +1619,7 @@ public class QuantificationWizard
 
       private void updateCalibrations(DetectorCalibration defCal) {
          final DetectorProperties newDet = (DetectorProperties) jComboBox_Detector.getSelectedItem();
-         final DefaultComboBoxModel<EDSCalibration> dcmb = new DefaultComboBoxModel<EDSCalibration>();
+         final DefaultComboBoxModel<EDSCalibration> dcmb = new DefaultComboBoxModel<>();
          if((newDet != null) && ((getDetector() == null) || (newDet != getDetector().getDetectorProperties()))) {
             for(final DetectorCalibration dc : mSession.getCalibrations(newDet))
                if(dc instanceof EDSCalibration)
@@ -1786,7 +1786,7 @@ public class QuantificationWizard
       }
 
       class ElementSet {
-         Set<Element> mElements = new TreeSet<Element>();
+         Set<Element> mElements = new TreeSet<>();
 
          ElementSet(Collection<Element> elms) {
             mElements.addAll(elms);
@@ -1831,7 +1831,7 @@ public class QuantificationWizard
       private final JTable jTable_Standards = new JTable(jTableModel_Standards);
       private EachRowEditor jEachRowEditor_Composition = new EachRowEditor(jTable_Standards);
       private JButton jButton_AddDatabase;
-      private final Map<RegionOfInterest, ISpectrumData> mReferencePool = new TreeMap<RegionOfInterest, ISpectrumData>();
+      private final Map<RegionOfInterest, ISpectrumData> mReferencePool = new TreeMap<>();
 
       private ISpectrumData getSpectrum(int r) {
          return (ISpectrumData) jTableModel_Standards.getValueAt(r, SPECTRUM_COL);
@@ -1846,7 +1846,7 @@ public class QuantificationWizard
       }
 
       private Set<Element> usedElements() {
-         final Set<Element> elms = new HashSet<Element>();
+         final Set<Element> elms = new HashSet<>();
          for(int r = 0; r < jTableModel_Standards.getRowCount(); ++r)
             elms.add(getElement(r));
          return elms;
@@ -1899,7 +1899,7 @@ public class QuantificationWizard
       }
 
       private double score(RegionOfInterest roi1, RegionOfInterest roi2) {
-         final Set<XRayTransition> xrts1 = new TreeSet<XRayTransition>(roi1.getAllTransitions().getTransitions());
+         final Set<XRayTransition> xrts1 = new TreeSet<>(roi1.getAllTransitions().getTransitions());
          final XRayTransitionSet xrts2 = roi2.getAllTransitions();
          double sum = 0.0, all = 0.0;
          for(XRayTransition xrt : xrts2.getTransitions()) {
@@ -1981,14 +1981,14 @@ public class QuantificationWizard
          Set<Element> elms = null;
          if(!comp.equals(Material.Null)) {
             final Set<Element> used = usedElements();
-            final Set<Element> avail = new TreeSet<Element>(comp.getElementSet());
+            final Set<Element> avail = new TreeSet<>(comp.getElementSet());
             avail.removeAll(used);
             if(avail.size() == 0) {
                JOptionPane.showMessageDialog(getWizard(), "The spectrum " + sp.toString()
                      + " can not act as standard for any unused elements.", "Standard redundancy", JOptionPane.INFORMATION_MESSAGE);
                return;
             } else if(avail.size() == 1) {
-               elms = new TreeSet<Element>();
+               elms = new TreeSet<>();
                elms.addAll(avail);
             } else {
                se.enableAll(false);
@@ -2028,13 +2028,13 @@ public class QuantificationWizard
             "<html><font color=" + (duaneHuntThreshold(dh, e0) ? "black>" : "red>") + nf3.format(dh) + "</font>"
          });
          final int row = jTableModel_Standards.getRowCount() - 1;
-         final JComboBox<Composition> cb = new JComboBox<Composition>();
+         final JComboBox<Composition> cb = new JComboBox<>();
          Composition first = null;
          if(!comp.equals(Material.Null)) {
             cb.addItem(comp);
             first = comp;
          }
-         final ArrayList<Composition> refs = new ArrayList<Composition>(MaterialFactory.getCommonStandards(elm));
+         final ArrayList<Composition> refs = new ArrayList<>(MaterialFactory.getCommonStandards(elm));
          if((refs.size() == 0) && (first == null)) {
             final Composition mat = MaterialsCreator.createMaterial(getWizard(), DTSA2.getSession(), false);
             if((mat != null) && (!mat.equals(Material.Null)))
@@ -2219,8 +2219,8 @@ public class QuantificationWizard
          // Clear and reenter all data in this panel...
          jTableModel_Standards.setRowCount(0);
          final Map<Element, ISpectrumData> stds = mQuantUsingStandards.getStandardSpectra();
-         for(final ISpectrumData std : new TreeSet<ISpectrumData>(stds.values())) {
-            final Set<Element> elms = new TreeSet<Element>();
+         for(final ISpectrumData std : new TreeSet<>(stds.values())) {
+            final Set<Element> elms = new TreeSet<>();
             for(final Map.Entry<Element, ISpectrumData> me : stds.entrySet())
                if(me.getValue() == std)
                   elms.add(me.getKey());
@@ -2383,7 +2383,7 @@ public class QuantificationWizard
       }
 
       private void specifyReferenceFile() {
-         final TreeMap<Integer, RegionOfInterestSet.RegionOfInterest> rois = new TreeMap<Integer, RegionOfInterestSet.RegionOfInterest>();
+         final TreeMap<Integer, RegionOfInterestSet.RegionOfInterest> rois = new TreeMap<>();
          for(int r = jTable_Reference.getRowCount() - 1; r >= 0; --r)
             if(jTable_Reference.isRowSelected(r))
                rois.put(Integer.valueOf(r), (RegionOfInterestSet.RegionOfInterest) jTable_Reference.getValueAt(r, ROI_COL));
@@ -2454,12 +2454,12 @@ public class QuantificationWizard
 
       private void specifyReferenceFromDatabase() {
          assert mSession != null;
-         final TreeMap<Integer, RegionOfInterestSet.RegionOfInterest> rois = new TreeMap<Integer, RegionOfInterestSet.RegionOfInterest>();
+         final TreeMap<Integer, RegionOfInterestSet.RegionOfInterest> rois = new TreeMap<>();
          for(int r = jTable_Reference.getRowCount() - 1; r >= 0; --r)
             if(jTable_Reference.isRowSelected(r))
                rois.put(Integer.valueOf(r), (RegionOfInterestSet.RegionOfInterest) jTable_Reference.getValueAt(r, ROI_COL));
          if(rois.size() > 0) {
-            final TreeSet<Element> elms = new TreeSet<Element>();
+            final TreeSet<Element> elms = new TreeSet<>();
             for(final RegionOfInterestSet.RegionOfInterest roi : rois.values())
                elms.addAll(roi.getElementSet());
             try {
@@ -2622,7 +2622,7 @@ public class QuantificationWizard
 
       private static final long serialVersionUID = 6343402510332633956L;
 
-      private final JComboBox<Element> jComboBox_ByDifference = new JComboBox<Element>();
+      private final JComboBox<Element> jComboBox_ByDifference = new JComboBox<>();
       private JRadioButton jRadioButton_None;
       private JRadioButton jRadioButton_ByStoichiometry;
       private JRadioButton jRadioButton_WatersOfCrystallization;
@@ -2731,7 +2731,7 @@ public class QuantificationWizard
                : Element.None;
       }
 
-   };
+   }
 
    /**
     * Allows the user to specify which line family to use to quantify a
@@ -2819,7 +2819,7 @@ public class QuantificationWizard
                   elm,
                   AUTO
                });
-               final JComboBox<Object> cb = new JComboBox<Object>();
+               final JComboBox<Object> cb = new JComboBox<>();
                cb.addItem(AUTO);
                for(final RegionOfInterest roi : rois)
                   cb.addItem(roi);
@@ -2909,7 +2909,7 @@ public class QuantificationWizard
          @Override
          public void actionPerformed(ActionEvent arg0) {
             final int[] rows = jTable_Unknown.getSelectedRows();
-            final ArrayList<ISpectrumData> specs = new ArrayList<ISpectrumData>();
+            final ArrayList<ISpectrumData> specs = new ArrayList<>();
             final SpectrumPropertyPanel.PropertyDialog pd = new SpectrumPropertyPanel.PropertyDialog(QuantificationWizard.this, mSession);
             pd.setLocationRelativeTo(QuantificationWizard.this);
             for(final int row : rows) {
@@ -2974,7 +2974,7 @@ public class QuantificationWizard
                assert files.length > 0;
                mUserPref.put(UNKNOWN_DIR, files[0].getParent());
                final NumberFormat nf = new HalfUpFormat("##.0");
-               final ArrayList<String> errs = new ArrayList<String>();
+               final ArrayList<String> errs = new ArrayList<>();
                for(final File file : files)
                   if(file.canRead())
                      try {
@@ -3062,7 +3062,7 @@ public class QuantificationWizard
       }
 
       private JTable jTable_Unknown;
-      private final Set<ISpectrumData> mSpectra = new TreeSet<ISpectrumData>();
+      private final Set<ISpectrumData> mSpectra = new TreeSet<>();
       private boolean mFirstShow = true;
       private final double[] COL_WIDTHS = new double[] {
          0.3,
@@ -3145,7 +3145,7 @@ public class QuantificationWizard
          if(!res)
             getWizard().setErrorText("Specify at least one spectrum to analyze");
          else {
-            final ArrayList<String> errs = new ArrayList<String>();
+            final ArrayList<String> errs = new ArrayList<>();
             final EDSDetector det = jWizardPanel_LLSQInstrument.get().getDetector();
             assert det != null : "The detector can not be null.";
             for(final ISpectrumData spec : mSpectra)
@@ -3234,7 +3234,7 @@ public class QuantificationWizard
 
    public enum ResultMode {
       WEIGHT_PERCENT, NORM_WEIGHT_PERCENT, ATOMIC_PERCENT
-   };
+   }
 
    private class LLSQResults
       extends
@@ -3294,9 +3294,9 @@ public class QuantificationWizard
          extends
          AbstractTableModel {
          private static final long serialVersionUID = 0L;
-         private final ArrayList<ISpectrumData> mResults = new ArrayList<ISpectrumData>();
-         private final ArrayList<Composition> mCompositions = new ArrayList<Composition>();
-         private final ArrayList<Element> mElements = new ArrayList<Element>();
+         private final ArrayList<ISpectrumData> mResults = new ArrayList<>();
+         private final ArrayList<Composition> mCompositions = new ArrayList<>();
+         private final ArrayList<Element> mElements = new ArrayList<>();
          private ResultMode mMode = ResultMode.WEIGHT_PERCENT;
          private final NumberFormat mFormat = new HalfUpFormat("0.0000");
 
@@ -3405,7 +3405,7 @@ public class QuantificationWizard
                   pw.print("\tSum");
                pw.print("\n");
                // Result rows
-               final Map<Element, DescriptiveStatistics> stats = new TreeMap<Element, DescriptiveStatistics>();
+               final Map<Element, DescriptiveStatistics> stats = new TreeMap<>();
                for(final Element elm : mElements)
                   stats.put(elm, new DescriptiveStatistics());
                for(int row = 0; row < mResults.size(); ++row) {
@@ -3571,7 +3571,7 @@ public class QuantificationWizard
          final Composition comp = spec.getProperties().getCompositionWithDefault(SpectrumProperties.MicroanalyticalComposition, Material.Null);
          mModel.add(spec, comp);
       }
-   };
+   }
 
    /**
     * Initializes a QuantifySpectra object and collects the unknowns in
@@ -3588,12 +3588,12 @@ public class QuantificationWizard
       PerformLLSQQuant(QuantifyUsingStandards quant, Collection<ISpectrumData> unknowns) {
          super();
          mQuant = quant;
-         mUnknowns = new ArrayList<ISpectrumData>(unknowns);
+         mUnknowns = new ArrayList<>(unknowns);
       }
 
       @Override
       public ArrayList<String> doInBackground() {
-         final ArrayList<String> errors = new ArrayList<String>();
+         final ArrayList<String> errors = new ArrayList<>();
          for(final ISpectrumData unk : mUnknowns)
             try {
                final QuantifyUsingStandards.Result results = mQuant.compute(unk);
@@ -3712,7 +3712,7 @@ public class QuantificationWizard
       protected ElectronProbe getProbe() {
          return mQuantUsingZetaFactors != null ? mQuantUsingZetaFactors.getDetector().getOwner() : null;
       }
-   };
+   }
 
    private class STEMStandardsPanel
       extends
@@ -3771,7 +3771,7 @@ public class QuantificationWizard
          @Override
          public void actionPerformed(ActionEvent arg0) {
             final int[] rows = jTable_Standards.getSelectedRows();
-            final List<ISpectrumData> selected = new ArrayList<ISpectrumData>();
+            final List<ISpectrumData> selected = new ArrayList<>();
             for(final int row : rows)
                selected.add(mStandards.get(row));
             mStandards.removeAll(selected);
@@ -3827,7 +3827,7 @@ public class QuantificationWizard
 
          StandardTableModel(Collection<ISpectrumData> specs) {
             super(COLUMN_NAMES, specs.size());
-            mSpectra = new ArrayList<ISpectrumData>(specs);
+            mSpectra = new ArrayList<>(specs);
          }
 
          /**
@@ -3887,7 +3887,7 @@ public class QuantificationWizard
          }
       }
 
-      private final ArrayList<ISpectrumData> mStandards = new ArrayList<ISpectrumData>();
+      private final ArrayList<ISpectrumData> mStandards = new ArrayList<>();
 
       /**
        * Does this spectrum have all the properties necessary to be a standard?
@@ -3898,9 +3898,7 @@ public class QuantificationWizard
       private boolean isSuitableAsStandard(ISpectrumData spec) {
          final SpectrumProperties props = spec.getProperties();
          final Composition comp = props.getCompositionWithDefault(SpectrumProperties.StandardComposition, null);
-         if(comp == null)
-            return false;
-         if(!(comp instanceof Material))
+         if((comp == null) || !(comp instanceof Material))
             return false;
          // Get the list of elements which this spectrum could provide standards
          Set<Element> elms = props.getStandardizedElements();
@@ -3927,7 +3925,7 @@ public class QuantificationWizard
       }
 
       private TreeSet<Element> getPreviouslyStandardized() {
-         final TreeSet<Element> stdized = new TreeSet<Element>();
+         final TreeSet<Element> stdized = new TreeSet<>();
          for(final ISpectrumData spec : mStandards)
             stdized.addAll(spec.getProperties().getStandardizedElements());
          return stdized;
@@ -3939,7 +3937,7 @@ public class QuantificationWizard
             if(!isSuitableAsStandard(spec))
                spec = editSpectrum(spec, prev);
             if(isSuitableAsStandard(spec)) {
-               Set<Element> stdized = new TreeSet<Element>(spec.getProperties().getStandardizedElements());
+               Set<Element> stdized = new TreeSet<>(spec.getProperties().getStandardizedElements());
                for(Element elm : prev)
                   stdized.remove(elm);
                if(stdized.size() == 0) {
@@ -4023,7 +4021,7 @@ public class QuantificationWizard
          "Beam Energy"
       };
 
-      private final List<ISpectrumData> mSpectra = new ArrayList<ISpectrumData>();
+      private final List<ISpectrumData> mSpectra = new ArrayList<>();
       private boolean mFirstShow = true;
 
       private final class EditUnknownAction
@@ -4066,9 +4064,9 @@ public class QuantificationWizard
          @Override
          public void actionPerformed(ActionEvent e) {
             final int[] rows = jTable_Unknown.getSelectedRows();
-            ArrayList<ISpectrumData> removeMe = new ArrayList<ISpectrumData>();
-            for(int i = 0; i < rows.length; ++i)
-               removeMe.add(mSpectra.get(rows[i]));
+            ArrayList<ISpectrumData> removeMe = new ArrayList<>();
+            for (int row : rows)
+               removeMe.add(mSpectra.get(row));
             mSpectra.removeAll(removeMe);
             jTable_Unknown.setModel(new UnknownTableModel(mSpectra));
          }
@@ -4084,7 +4082,7 @@ public class QuantificationWizard
 
          UnknownTableModel(Collection<ISpectrumData> specs) {
             super(COLUMN_NAMES, specs.size());
-            mSpectra = new ArrayList<ISpectrumData>(specs);
+            mSpectra = new ArrayList<>(specs);
          }
 
          /**
@@ -4195,7 +4193,7 @@ public class QuantificationWizard
       extends
       JWizardPanel {
 
-      private final Map<Element, ISpectrumData> mStrips = new TreeMap<Element, ISpectrumData>();
+      private final Map<Element, ISpectrumData> mStrips = new TreeMap<>();
 
       private final class ActionAdd
          extends
@@ -4212,7 +4210,7 @@ public class QuantificationWizard
             ISpectrumData[] specs = selectSpectra(true);
             for(final ISpectrumData spec : specs) {
                SpectrumProperties props = spec.getProperties();
-               TreeSet<Element> elms = new TreeSet<Element>(props.getElements());
+               TreeSet<Element> elms = new TreeSet<>(props.getElements());
                for(Element prev : prevs)
                   elms.remove(prev);
                if(elms.size() == 1)
@@ -4335,12 +4333,12 @@ public class QuantificationWizard
       PerformSTEMQuant(QuantifyUsingZetaFactors quant, Collection<ISpectrumData> unknowns) {
          super();
          mQuant = quant;
-         mUnknowns = new ArrayList<ISpectrumData>(unknowns);
+         mUnknowns = new ArrayList<>(unknowns);
       }
 
       @Override
       public ArrayList<String> doInBackground() {
-         final ArrayList<String> errors = new ArrayList<String>();
+         final ArrayList<String> errors = new ArrayList<>();
          for(final ISpectrumData unk : mUnknowns)
             try {
                final QuantifyUsingZetaFactors.Result results = mQuant.compute(unk, true);
@@ -4435,11 +4433,11 @@ public class QuantificationWizard
          extends
          AbstractTableModel {
          private static final long serialVersionUID = 0L;
-         private final ArrayList<ISpectrumData> mResults = new ArrayList<ISpectrumData>();
-         private final ArrayList<ISpectrumData> mResiduals = new ArrayList<ISpectrumData>();
-         private final ArrayList<Composition> mCompositions = new ArrayList<Composition>();
-         private final ArrayList<Number> mMassThickness = new ArrayList<Number>();
-         private final ArrayList<Element> mElements = new ArrayList<Element>();
+         private final ArrayList<ISpectrumData> mResults = new ArrayList<>();
+         private final ArrayList<ISpectrumData> mResiduals = new ArrayList<>();
+         private final ArrayList<Composition> mCompositions = new ArrayList<>();
+         private final ArrayList<Number> mMassThickness = new ArrayList<>();
+         private final ArrayList<Element> mElements = new ArrayList<>();
          private ResultMode mMode = ResultMode.WEIGHT_PERCENT;
          private final NumberFormat mFormat = new HalfUpFormat("0.0000");
 
@@ -4567,7 +4565,7 @@ public class QuantificationWizard
                   pw.print("\tSum");
                pw.print("\n");
                // Result rows
-               final Map<Element, DescriptiveStatistics> stats = new TreeMap<Element, DescriptiveStatistics>();
+               final Map<Element, DescriptiveStatistics> stats = new TreeMap<>();
                for(final Element elm : mElements)
                   stats.put(elm, new DescriptiveStatistics());
                for(int row = 0; row < mResults.size(); ++row) {
@@ -4771,7 +4769,7 @@ public class QuantificationWizard
       jfc.setDialogTitle("Open DTSA-II Standard File");
       jfc.setAcceptAllFileFilterUsed(true);
       final int open = jfc.showOpenDialog(QuantificationWizard.this);
-      ArrayList<StandardBundle> res = new ArrayList<StandardBundle>();
+      ArrayList<StandardBundle> res = new ArrayList<>();
       if(open == JFileChooser.APPROVE_OPTION) {
          mUserPref.put(REFERENCE_DIR, jfc.getCurrentDirectory().toString());
          File[] selF = jfc.getSelectedFiles();

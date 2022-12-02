@@ -4,17 +4,6 @@
  */
 package gov.nist.microanalysis.dtsa2;
 
-import gov.nist.microanalysis.EPQLibrary.EPQException;
-import gov.nist.microanalysis.EPQLibrary.Element;
-import gov.nist.microanalysis.EPQLibrary.ISpectrumData;
-import gov.nist.microanalysis.EPQLibrary.MicrocalSpectrumFitter;
-import gov.nist.microanalysis.EPQLibrary.RegionOfInterestSet;
-import gov.nist.microanalysis.EPQLibrary.SpectrumUtils;
-import gov.nist.microanalysis.EPQTools.JWizardDialog;
-import gov.nist.microanalysis.Utility.EachRowEditor;
-import gov.nist.microanalysis.Utility.HalfUpFormat;
-import gov.nist.microanalysis.Utility.ProgressEvent;
-
 import java.awt.BorderLayout;
 import java.awt.Frame;
 import java.awt.SystemColor;
@@ -39,6 +28,17 @@ import com.jgoodies.forms.builder.PanelBuilder;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
 
+import gov.nist.microanalysis.EPQLibrary.EPQException;
+import gov.nist.microanalysis.EPQLibrary.Element;
+import gov.nist.microanalysis.EPQLibrary.ISpectrumData;
+import gov.nist.microanalysis.EPQLibrary.MicrocalSpectrumFitter;
+import gov.nist.microanalysis.EPQLibrary.RegionOfInterestSet;
+import gov.nist.microanalysis.EPQLibrary.SpectrumUtils;
+import gov.nist.microanalysis.EPQTools.JWizardDialog;
+import gov.nist.microanalysis.Utility.EachRowEditor;
+import gov.nist.microanalysis.Utility.HalfUpFormat;
+import gov.nist.microanalysis.Utility.ProgressEvent;
+
 /**
  * <p>
  * Description
@@ -50,7 +50,7 @@ import com.jgoodies.forms.layout.FormLayout;
  * <p>
  * Institution: National Institute of Standards and Technology
  * </p>
- * 
+ *
  * @author nritchie
  * @version 1.0
  */
@@ -114,7 +114,7 @@ public class MicrocalFitDialog
          if(er >= 0) {
             final Element elmObj = (Element) jComboBox_Elements.getSelectedItem();
             final double width = getWidthValue(er);
-            final JComboBox<RegionOfInterestSet.RegionOfInterest> jcb = new JComboBox<RegionOfInterestSet.RegionOfInterest>();
+            final JComboBox<RegionOfInterestSet.RegionOfInterest> jcb = new JComboBox<>();
             if(elmObj instanceof Element) {
                final Element elm = elmObj;
                final RegionOfInterestSet rois = mFitter.getElementROIS(elm, width);
@@ -147,7 +147,7 @@ public class MicrocalFitDialog
          jTable_Setup.setForeground(SystemColor.textText);
          add(new JScrollPane(jTable_Setup), BorderLayout.CENTER);
 
-         jComboBox_Elements = new JComboBox<Element>();
+         jComboBox_Elements = new JComboBox<>();
          jComboBox_Elements.addItem(Element.None);
          for(int z = Element.elmBe; z < Element.elmFm; ++z)
             jComboBox_Elements.addItem(Element.byAtomicNumber(z));
@@ -172,7 +172,7 @@ public class MicrocalFitDialog
          jEachRowEditor_Lines = new EachRowEditor(jTable_Setup);
          jEachRowEditor_Lines.setDefaultEditor(new JComboBox<RegionOfInterestSet.RegionOfInterest>());
 
-         jComboBox_FitE = new JComboBox<Boolean>();
+         jComboBox_FitE = new JComboBox<>();
          jComboBox_FitE.addItem(Boolean.TRUE);
          jComboBox_FitE.addItem(Boolean.FALSE);
          jComboBox_FitE.setSelectedIndex(0);
@@ -340,7 +340,7 @@ public class MicrocalFitDialog
 
          return true;
       }
-   };
+   }
 
    private class FinalEnergyFitPanel
       extends EnergyFitPanel {
@@ -376,7 +376,7 @@ public class MicrocalFitDialog
          getWizard().setBackEnabled(true);
       }
 
-   };
+   }
 
    private class ProgressPanel
       extends JWizardDialog.JProgressPanel {
@@ -393,14 +393,8 @@ public class MicrocalFitDialog
          getWizard().setBackEnabled(false);
          getWizard().enableFinish(false);
          getWizard().enableNext(false);
-         final SwingWorker<Object, Integer> sw = new SwingWorker<Object, Integer>() {
-
-            public void setStatus(int progress) {
-               publish(Integer.valueOf(progress));
-               if(progress == 100)
-                  getWizard().setNextPanel(jWizardPanel_FinalEnergyFit, "Final Energy Fit");
-            }
-
+         final SwingWorker<Object, Integer> sw = new SwingWorker<>() {
+            
             @Override
             public void process(List<Integer> vals) {
                int progress = 0;
@@ -417,7 +411,11 @@ public class MicrocalFitDialog
                   @Override
                   public void actionPerformed(ActionEvent e) {
                      final ProgressEvent pe = (ProgressEvent) e;
-                     setStatus(pe.getProgress());
+                     int progress = pe.getProgress();
+                     publish(Integer.valueOf(progress));
+                     if(progress == 100)
+                        getWizard().setNextPanel(jWizardPanel_FinalEnergyFit, "Final Energy Fit");
+
                   }
                };
                mFitter.addProgressListener(al);
@@ -438,7 +436,7 @@ public class MicrocalFitDialog
          };
          sw.execute();
       }
-   };
+   }
 
    private final SetupPanel jWizardPanel_Setup = new SetupPanel(this);
    private final FirstEnergyFitPanel jWizardPanel_FirstEnergyFit = new FirstEnergyFitPanel(this);

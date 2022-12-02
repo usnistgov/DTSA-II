@@ -12,7 +12,7 @@
  * <p>
  * Institution: National Institute of Standards and Technology
  * </p>
- * 
+ *
  * @author nritchie
  * @version 1.0
  */
@@ -207,7 +207,7 @@ public class RescaleDialog
 
    /**
     * setChannelWidth - in eV
-    * 
+    *
     * @param d
     */
    public void setChannelWidth(double d) {
@@ -221,7 +221,7 @@ public class RescaleDialog
 
    /**
     * getChannelWidth - In eV
-    * 
+    *
     * @return double
     */
    public double getChannelWidth() {
@@ -235,7 +235,7 @@ public class RescaleDialog
 
    /**
     * getPolynomial - Returns the polynomial coefficients entered by the user.
-    * 
+    *
     * @return double[]
     */
    public double[] getPolynomial() {

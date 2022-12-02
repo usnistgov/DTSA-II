@@ -32,7 +32,7 @@ import gov.nist.microanalysis.dtsa2.JCommandLine.JythonWorker;
  * <p>
  * Company: National Institute of Standards and Technology
  * </p>
- * 
+ *
  * @author Nicholas W. M. Ritchie
  * @version 1.0
  */
@@ -69,13 +69,13 @@ public class DataManager {
    private DataManager() {
    }
 
-   private final ArrayList<ISpectrumData> mSpectra = new ArrayList<ISpectrumData>();
-   private final HashMap<ISpectrumData, Integer> mSpectrumIndex = new HashMap<ISpectrumData, Integer>();
-   private final ArrayList<ISpectrumData> mSelected = new ArrayList<ISpectrumData>();
+   private final ArrayList<ISpectrumData> mSpectra = new ArrayList<>();
+   private final HashMap<ISpectrumData, Integer> mSpectrumIndex = new HashMap<>();
+   private final ArrayList<ISpectrumData> mSelected = new ArrayList<>();
    private boolean mNotify = true;
    private JythonWorker mJython;
 
-   private final Set<ActionListener> mListeners = new HashSet<ActionListener>();
+   private final Set<ActionListener> mListeners = new HashSet<>();
 
    private void fireActionListener(int action) {
 
@@ -100,7 +100,7 @@ public class DataManager {
 
    /**
     * getInstance - Get the singleton instance of this class.
-    * 
+    *
     * @return DataManager
     */
    public static DataManager getInstance() {
@@ -113,7 +113,7 @@ public class DataManager {
    /**
     * addActionListener - This class fires when the contents of the data manager
     * change.
-    * 
+    *
     * @param ae ActionListener
     */
    public void addActionListener(ActionListener ae) {
@@ -122,7 +122,7 @@ public class DataManager {
 
    /**
     * removeActionListener - Remove the specified action listener.
-    * 
+    *
     * @param ae ActionListener
     */
    public void removeActionListener(ActionListener ae) {
@@ -138,7 +138,7 @@ public class DataManager {
 
    /**
     * addSpectrum - Add a spectrum to the spectrum list but don't select it.
-    * 
+    *
     * @param sd ISpectrumData
     */
    public void addSpectrum(ISpectrumData sd) {
@@ -148,7 +148,7 @@ public class DataManager {
    /**
     * addSpectrum - Add a spectrum to the spectrum list and optionally select
     * it.
-    * 
+    *
     * @param sd ISpectrumData
     */
    public void addSpectrum(ISpectrumData sd, boolean select) {
@@ -158,7 +158,7 @@ public class DataManager {
    /**
     * addSpectrum - Add a spectrum to the spectrum list and optionally select
     * it.
-    * 
+    *
     * @param sd ISpectrumData
     */
    public void addSpectrum(ISpectrumData sd, boolean select, ISpectrumData assoc) {
@@ -196,7 +196,7 @@ public class DataManager {
     * Shifts the selected spectra up in the spectrum list
     */
    public void moveSelectedUp() {
-      final ArrayList<ISpectrumData> sel = new ArrayList<ISpectrumData>();
+      final ArrayList<ISpectrumData> sel = new ArrayList<>();
       for(final ISpectrumData spec : mSpectra)
          if(mSelected.contains(spec))
             sel.add(spec);
@@ -220,7 +220,7 @@ public class DataManager {
     * Shifts the selected spectra down in the spectrum list
     */
    public void moveSelectedDown() {
-      final ArrayList<ISpectrumData> sel = new ArrayList<ISpectrumData>();
+      final ArrayList<ISpectrumData> sel = new ArrayList<>();
       for(final ISpectrumData spec : mSpectra)
          if(mSelected.contains(spec))
             sel.add(spec);
@@ -243,7 +243,7 @@ public class DataManager {
     */
    public void group() {
       int first = -1;
-      final ArrayList<ISpectrumData> sel = new ArrayList<ISpectrumData>();
+      final ArrayList<ISpectrumData> sel = new ArrayList<>();
       for(int i = 0; i < mSpectra.size(); ++i) {
          final ISpectrumData spec = mSpectra.get(i);
          if(mSelected.contains(spec)) {
@@ -262,7 +262,7 @@ public class DataManager {
 
    /**
     * removeSpectrum - Remove the specified spectrum from the spectrum list.
-    * 
+    *
     * @param sd ISpectrumData
     */
    public void removeSpectrum(ISpectrumData sd) {
@@ -290,7 +290,7 @@ public class DataManager {
    /**
     * replaceSpectrum - Replace the old spectrum with the newSp spectrum. If old
     * was selected then newSp will be selected; otherwise newSp is not selected.
-    * 
+    *
     * @param old ISpectrumData
     * @param newSp ISpectrumData
     */
@@ -325,7 +325,7 @@ public class DataManager {
    /**
     * replaceSpectra - Replace a group of old spectra with new spectra. The map
     * is old to new.
-    * 
+    *
     * @param oldToNew
     */
    public void replaceSpectra(Map<ISpectrumData, ISpectrumData> oldToNew) {
@@ -360,7 +360,7 @@ public class DataManager {
 
    /**
     * containsSpectrum - Does the data manager contain the specified spectrum?
-    * 
+    *
     * @param spec ISpectrumData
     * @return boolean
     */
@@ -371,7 +371,7 @@ public class DataManager {
    /**
     * spectrumList - Returns the spectra ISpectrumData items in the spectrum
     * list as an immutable List.
-    * 
+    *
     * @return Collection&lt;ISpectrumData&gt;
     */
    public Collection<ISpectrumData> spectrumList() {
@@ -418,7 +418,7 @@ public class DataManager {
 
    /**
     * Returns a unmodifiable list containing all selected ISpectrumData objects.
-    * 
+    *
     * @return List&lt;ISpectrumData&gt;
     */
    public List<ISpectrumData> getSelected() {
@@ -428,7 +428,7 @@ public class DataManager {
 
    /**
     * Set the selected spectra to the specified set.
-    * 
+    *
     * @param specs
     */
    public void setSelected(Collection<ISpectrumData> specs) {
@@ -446,7 +446,7 @@ public class DataManager {
 
    /**
     * Select or deselect the specified collection of spectra.
-    * 
+    *
     * @param specs
     * @param select
     */
@@ -470,7 +470,7 @@ public class DataManager {
    /**
     * Mark the specified spectrum as selected or unselected as specified by the
     * boolean argument <code>select</code>.
-    * 
+    *
     * @param spec
     * @param select
     */
@@ -511,7 +511,7 @@ public class DataManager {
 
    /**
     * Is the specified spectrum in the selected set?
-    * 
+    *
     * @param spec
     * @return boolean
     */
@@ -525,7 +525,7 @@ public class DataManager {
 
    /**
     * Returns the number of selected spectra.
-    * 
+    *
     * @return int
     */
    public int getSelectedCount() {
@@ -535,7 +535,7 @@ public class DataManager {
    /**
     * Permit registration of the Python interpreter with the DataManager so the
     * DataManager can register and unregister spectra with the interpreter.
-    * 
+    *
     * @param interpreter
     */
    void setJythonWorker(JythonWorker worker) {
@@ -545,12 +545,12 @@ public class DataManager {
    /**
     * A string containing a row per spectrum with the Jython name and the
     * descriptive name.
-    * 
+    *
     * @return String
     */
    public String listSpectra() {
       final StringBuffer res = new StringBuffer();
-      final TreeMap<Integer, ISpectrumData> ordered = new TreeMap<Integer, ISpectrumData>();
+      final TreeMap<Integer, ISpectrumData> ordered = new TreeMap<>();
       for(final Map.Entry<ISpectrumData, Integer> me : mSpectrumIndex.entrySet())
          ordered.put(me.getValue(), me.getKey());
       for(final Map.Entry<Integer, ISpectrumData> me : ordered.entrySet()) {

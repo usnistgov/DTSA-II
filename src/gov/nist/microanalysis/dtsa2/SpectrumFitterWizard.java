@@ -38,7 +38,7 @@ import gov.nist.microanalysis.EPQTools.JWizardDialog;
  * <p>
  * Institution: National Institute of Standards and Technology
  * </p>
- * 
+ *
  * @author nicholas
  * @version 1.0
  */
@@ -96,13 +96,13 @@ public class SpectrumFitterWizard extends JWizardDialog {
 			pb.addLabel("keV", cc.xy(5, 3));
 
 			pb.addLabel("Instrument", cc.xy(1, 5));
-			jComboBox_Instrument = new JComboBox<ElectronProbe>();
+			jComboBox_Instrument = new JComboBox<>();
 			pb.add(jComboBox_Instrument, cc.xyw(3, 5, 5));
 			pb.addLabel("Detector", cc.xy(1, 7));
-			jComboBox_Detector = new JComboBox<DetectorProperties>();
+			jComboBox_Detector = new JComboBox<>();
 			pb.add(jComboBox_Detector, cc.xyw(3, 7, 5));
 			pb.addLabel("Calibration", cc.xy(1, 9));
-			jComboBox_Calibration = new JComboBox<DetectorCalibration>();
+			jComboBox_Calibration = new JComboBox<>();
 			pb.add(jComboBox_Calibration, cc.xyw(3, 9, 5));
 
 			pb.addLabel("Material composition", cc.xy(1, 11));
@@ -282,7 +282,7 @@ public class SpectrumFitterWizard extends JWizardDialog {
 			enableFinish(true);
 		}
 
-	};
+	}
 
 	public static void main(String[] args) {
 		try {

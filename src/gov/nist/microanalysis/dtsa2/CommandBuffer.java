@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package gov.nist.microanalysis.dtsa2;
 

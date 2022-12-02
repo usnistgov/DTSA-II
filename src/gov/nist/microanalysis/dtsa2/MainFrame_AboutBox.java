@@ -41,7 +41,7 @@ import com.jgoodies.forms.layout.FormLayout;
  * <p>
  * Company: National Institute of Standards and Technology
  * </p>
- * 
+ *
  * @author Nicholas W. M. Ritchie
  * @version 1.0
  */

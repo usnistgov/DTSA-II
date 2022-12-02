@@ -141,7 +141,7 @@ import gov.nist.microanalysis.Utility.UncertainValue2;
  * <p>
  * Institution: National Institute of Standards and Technology
  * </p>
- * 
+ *
  * @author Nicholas
  * @version 1.0
  */
@@ -228,9 +228,9 @@ public class OptimizationWizard
       extends
       JWizardPanel {
 
-      private final JComboBox<ElectronProbe> jComboBox_Instrument = new JComboBox<ElectronProbe>();
-      private final JComboBox<DetectorProperties> jComboBox_Detector = new JComboBox<DetectorProperties>();
-      private final JComboBox<EDSCalibration> jComboBox_Calibration = new JComboBox<EDSCalibration>();
+      private final JComboBox<ElectronProbe> jComboBox_Instrument = new JComboBox<>();
+      private final JComboBox<DetectorProperties> jComboBox_Detector = new JComboBox<>();
+      private final JComboBox<EDSCalibration> jComboBox_Calibration = new JComboBox<>();
       private final JTextFieldDouble jTextField_BeamEnergy = new JTextFieldDouble();
 
       private static final long serialVersionUID = -6481374858932055638L;
@@ -284,7 +284,7 @@ public class OptimizationWizard
             }
             {
                final Set<ElectronProbe> eps = mSession.getCurrentProbes();
-               final DefaultComboBoxModel<ElectronProbe> dcmb = new DefaultComboBoxModel<ElectronProbe>();
+               final DefaultComboBoxModel<ElectronProbe> dcmb = new DefaultComboBoxModel<>();
                for(final ElectronProbe pr : eps)
                   dcmb.addElement(pr);
                dcmb.setSelectedItem(defProps != null ? defProps.getOwner() : eps.iterator().next());
@@ -325,7 +325,7 @@ public class OptimizationWizard
          final double beamEnergy = jTextField_BeamEnergy.getValue();
          assert det.getOwner() == probe;
          final boolean res = (probe != null);
-         if(res == false)
+         if(!res)
             getWizard().setErrorText("Please specify an instrument and detector.");
          if(res) {
             mDetector = det;
@@ -337,7 +337,7 @@ public class OptimizationWizard
       private void updateDetectors(final DetectorProperties defDp) {
          final ElectronProbe newProbe = (ElectronProbe) jComboBox_Instrument.getSelectedItem();
          if(newProbe != null) {
-            final DefaultComboBoxModel<DetectorProperties> dcmb = new DefaultComboBoxModel<DetectorProperties>();
+            final DefaultComboBoxModel<DetectorProperties> dcmb = new DefaultComboBoxModel<>();
             jTextField_BeamEnergy.initialize(15.0, FromSI.keV(newProbe.getMinBeamEnergy()), FromSI.keV(newProbe.getMaxBeamEnergy()));
             for(final DetectorProperties dp : mSession.getDetectors(newProbe))
                dcmb.addElement(dp);
@@ -349,7 +349,7 @@ public class OptimizationWizard
 
       private void updateCalibrations(final DetectorCalibration defCal) {
          final DetectorProperties newDet = (DetectorProperties) jComboBox_Detector.getSelectedItem();
-         final DefaultComboBoxModel<EDSCalibration> dcmb = new DefaultComboBoxModel<EDSCalibration>();
+         final DefaultComboBoxModel<EDSCalibration> dcmb = new DefaultComboBoxModel<>();
          if(newDet != null) {
             for(final DetectorCalibration dc : mSession.getCalibrations(newDet))
                if(dc instanceof EDSCalibration)
@@ -483,7 +483,7 @@ public class OptimizationWizard
          update();
          setNextPanel(jWizardPanel_Blocks, "Select standard blocks");
       }
-   };
+   }
 
    class CheckListItem {
       private final String mLabel;
@@ -532,7 +532,7 @@ public class OptimizationWizard
       JWizardPanel {
 
       private static final long serialVersionUID = 8738771800233144836L;
-      private final JList<CheckListItem> jList_Standards = new JList<CheckListItem>();
+      private final JList<CheckListItem> jList_Standards = new JList<>();
       private final JButton jButton_All = new JButton("Select all");
       private final JButton jButton_Invert = new JButton("Invert selection");
 
@@ -591,7 +591,7 @@ public class OptimizationWizard
 
       @Override
       public void onShow() {
-         final DefaultListModel<CheckListItem> dlm = new DefaultListModel<CheckListItem>();
+         final DefaultListModel<CheckListItem> dlm = new DefaultListModel<>();
          if(mStandards != null)
             for(final String bn : mStandards.getBlockNames()) {
                final CheckListItem cli = new CheckListItem(bn);
@@ -604,7 +604,7 @@ public class OptimizationWizard
 
       @Override
       public boolean permitNext() {
-         final ArrayList<StandardBlock2> blks = new ArrayList<StandardBlock2>();
+         final ArrayList<StandardBlock2> blks = new ArrayList<>();
          final DefaultListModel<CheckListItem> dlm = (DefaultListModel<CheckListItem>) jList_Standards.getModel();
          for(int i = 0; i < dlm.size(); ++i) {
             final CheckListItem cli = dlm.get(i);
@@ -615,7 +615,7 @@ public class OptimizationWizard
          return true;
       }
 
-   };
+   }
 
    // Select the material, the ROI, the beam energy
    private class SelectStandardPanel
@@ -624,7 +624,7 @@ public class OptimizationWizard
 
       private static final long serialVersionUID = -2247781803732630782L;
 
-      private final JComboBox<BeamEnergy> jComboBox_BeamEnergy = new JComboBox<BeamEnergy>();
+      private final JComboBox<BeamEnergy> jComboBox_BeamEnergy = new JComboBox<>();
       // Columns are element, ROI, material
 
       private static final int ELEMENT_COL = 0;
@@ -652,7 +652,7 @@ public class OptimizationWizard
          }
       };
       private final EachRowEditor jEachRowEditor_Material = new EachRowEditor(jTable_Standard);
-      private final Map<JComboBox<OptimizedStandard>, Integer> mToRow = new HashMap<JComboBox<OptimizedStandard>, Integer>();
+      private final Map<JComboBox<OptimizedStandard>, Integer> mToRow = new HashMap<>();
 
       private DefaultTableModel mTableModel;
 
@@ -718,7 +718,7 @@ public class OptimizationWizard
 
       private void updateBeamEnergy() {
          final List<Double> energies = mOptimizer.suggestBeamEnergies(true);
-         final DefaultComboBoxModel<BeamEnergy> dcbm = new DefaultComboBoxModel<BeamEnergy>();
+         final DefaultComboBoxModel<BeamEnergy> dcbm = new DefaultComboBoxModel<>();
          for(final double energy : energies)
             dcbm.addElement(new BeamEnergy(energy));
          jComboBox_BeamEnergy.setModel(dcbm);
@@ -727,7 +727,7 @@ public class OptimizationWizard
 
       private void fillTable() {
          final double beamEnergy = getBeamEnergy();
-         mElements = new ArrayList<Element>(mEstComposition.getElementSet());
+         mElements = new ArrayList<>(mEstComposition.getElementSet());
          for(final Element elm : mElements)
             try {
                final List<OptimizedStandard> stds = mOptimizer.getOptimizedStandards(elm, beamEnergy, 60.0e-9);
@@ -751,7 +751,7 @@ public class OptimizationWizard
                nf.format(os.getScore())
             });
             mOptimizer.assignStandard(elm, os);
-            final JComboBox<OptimizedStandard> ecb = new JComboBox<OptimizedStandard>();
+            final JComboBox<OptimizedStandard> ecb = new JComboBox<>();
             for(final OptimizedStandard std : stds)
                ecb.addItem(std);
             ecb.addActionListener(new ActionListener() {
@@ -815,7 +815,7 @@ public class OptimizationWizard
 
       private final JTable jTable_References = new JTable();
       private final EachRowEditor jEditor_Material = new EachRowEditor(jTable_References);
-      private final Map<JComboBox<Composition>, Integer> mToRow = new HashMap<JComboBox<Composition>, Integer>();
+      private final Map<JComboBox<Composition>, Integer> mToRow = new HashMap<>();
 
       public SelectReferencePanel() {
          super(OptimizationWizard.this);
@@ -838,7 +838,7 @@ public class OptimizationWizard
          final NumberFormat nf = new HalfUpFormat("0.000");
          int row = 0;
          for(final RegionOfInterest roi : mOptimizer.getAllReferences()) {
-            final JComboBox<Composition> jcb = new JComboBox<Composition>();
+            final JComboBox<Composition> jcb = new JComboBox<>();
             mToRow.put(jcb, row);
             Composition mat = mOptimizer.getReference(roi);
             if(mat == null)
@@ -903,14 +903,14 @@ public class OptimizationWizard
          setNextPanel(jWizardPanel_Results, "Summary results");
          enableFinish(false);
       }
-   };
+   }
 
    private class SelectMaterialsPanel
       extends
       JWizardPanel {
 
       private static final long serialVersionUID = -316782184969068750L;
-      private final JList<Composition> jList_Materials = new JList<Composition>();
+      private final JList<Composition> jList_Materials = new JList<>();
 
       public SelectMaterialsPanel() {
          super(OptimizationWizard.this);
@@ -926,7 +926,7 @@ public class OptimizationWizard
 
       @Override
       public void onShow() {
-         final ArrayList<Composition> comps = new ArrayList<Composition>(mStandards.allCompositions());
+         final ArrayList<Composition> comps = new ArrayList<>(mStandards.allCompositions());
          Collections.sort(comps, new Comparator<Composition>() {
             @Override
             public int compare(final Composition arg0, final Composition arg1) {
@@ -937,7 +937,7 @@ public class OptimizationWizard
             }
 
          });
-         final DefaultListModel<Composition> dlm = new DefaultListModel<Composition>();
+         final DefaultListModel<Composition> dlm = new DefaultListModel<>();
          for(final Composition comp : comps)
             dlm.addElement(comp);
          jList_Materials.setModel(dlm);
@@ -947,7 +947,7 @@ public class OptimizationWizard
       }
 
       public Set<Composition> getSelectedMaterials() {
-         final TreeSet<Composition> res = new TreeSet<Composition>();
+         final TreeSet<Composition> res = new TreeSet<>();
          for(final Object obj : jList_Materials.getSelectedValuesList())
             if(obj instanceof Composition)
                res.add((Composition) obj);
@@ -971,7 +971,7 @@ public class OptimizationWizard
          sb.append("<ul><li>Optimal: " + mStandards.suggestBlocks(comps, null) + "</li></ul>");
          return sb.toString();
       }
-   };
+   }
 
    private class ResultsPanel
       extends
@@ -1006,7 +1006,7 @@ public class OptimizationWizard
                sb.append("<tr><th align=\"right\">Standards</th><td>");
                sb.append(TextUtilities.toList(mOptimizer.getStandards()));
                sb.append("</td></tr>");
-               final ArrayList<Composition> al = new ArrayList<Composition>(mOptimizer.getReferences());
+               final ArrayList<Composition> al = new ArrayList<>(mOptimizer.getReferences());
                al.removeAll(mOptimizer.getStandards());
                sb.append("<tr><th align=\"right\">References</th><td>");
                sb.append(al.size() > 0 ? TextUtilities.toList(al) : "--None required--");
@@ -1047,10 +1047,10 @@ public class OptimizationWizard
          setNextPanel(null, "Done");
          enableFinish(true);
       }
-   };
+   }
 
    public Set<ISpectrumData> simulateSpectra() {
-      final TreeSet<ISpectrumData> res = new TreeSet<ISpectrumData>();
+      final TreeSet<ISpectrumData> res = new TreeSet<>();
       if(jWizardPanel_Results.jCheckBox_Simulate.isSelected()) {
          final SpectrumSimulator ss = new SpectrumSimulator.BasicSpectrumSimulator();
          final SpectrumProperties sp = new SpectrumProperties();
@@ -1146,7 +1146,7 @@ public class OptimizationWizard
                updateStandards();
             }
          }
-      };
+      }
 
       private void updateStandards() {
          jTable_Standards.setModel(new StandardsTableModel(mQuantOutline));
@@ -1179,7 +1179,7 @@ public class OptimizationWizard
                updateStandards();
             }
          }
-      };
+      }
 
       private class ClearAction
          extends
@@ -1196,7 +1196,7 @@ public class OptimizationWizard
             mQuantOutline.clearStandards();
             updateStandards();
          }
-      };
+      }
 
       private final JTable jTable_Standards = new JTable();
       private final JTextField jTextField_Elements = new JTextField();
@@ -1262,7 +1262,7 @@ public class OptimizationWizard
          public void actionPerformed(final ActionEvent arg0) {
             jTable_Stoichiometry.setEnabled(false);
          }
-      };
+      }
 
       private class StoichiometryAction
          extends
@@ -1278,7 +1278,7 @@ public class OptimizationWizard
          public void actionPerformed(final ActionEvent arg0) {
             jTable_Stoichiometry.setEnabled(true);
          }
-      };
+      }
 
       private class DifferenceAction
          extends
@@ -1294,7 +1294,7 @@ public class OptimizationWizard
          public void actionPerformed(final ActionEvent arg0) {
             jTable_Stoichiometry.setEnabled(false);
          }
-      };
+      }
 
       private class WatersOfCrystallizationAction
          extends
@@ -1310,10 +1310,10 @@ public class OptimizationWizard
          public void actionPerformed(final ActionEvent arg0) {
             jTable_Stoichiometry.setEnabled(true);
          }
-      };
+      }
 
       private final JTextField jTextField_Strip = new JTextField();
-      private final JComboBox<Element> jComboBox_Difference = new JComboBox<Element>();
+      private final JComboBox<Element> jComboBox_Difference = new JComboBox<>();
       private final JRadioButton jRadioButton_None = new JRadioButton(new NoneAction());
       private final JRadioButton jRadioButton_Stoichiometry = new JRadioButton(new StoichiometryAction());
       private final JRadioButton jRadioButton_Difference = new JRadioButton(new DifferenceAction());
@@ -1350,7 +1350,7 @@ public class OptimizationWizard
 
             @Override
             public void focusLost(final FocusEvent e) {
-               final Set<Element> elms = new TreeSet<Element>(Element.parseElementString(jTextField_Strip.getText()));
+               final Set<Element> elms = new TreeSet<>(Element.parseElementString(jTextField_Strip.getText()));
                elms.removeAll(mQuantOutline.getMeasuredElements());
                jTextField_Strip.setText(Element.toString(elms, true));
                mQuantOutline.clearElementsToStrip();
@@ -1369,10 +1369,10 @@ public class OptimizationWizard
       public void onShow() {
          final List<UnmeasuredElementRule> rules = mQuantOutline.getUnmeasuredElementRules();
          final UnmeasuredElementRule rule = rules.size() > 0 ? rules.get(0) : null;
-         final Set<Element> elms = new TreeSet<Element>(Arrays.asList(Element.range(Element.H, Element.Pu)));
+         final Set<Element> elms = new TreeSet<>(Arrays.asList(Element.range(Element.H, Element.Pu)));
          final Set<Element> measuredElements = mQuantOutline.getMeasuredElements();
          elms.removeAll(measuredElements);
-         final DefaultComboBoxModel<Element> elmModel = new DefaultComboBoxModel<Element>(elms.toArray(new Element[elms.size()]));
+         final DefaultComboBoxModel<Element> elmModel = new DefaultComboBoxModel<>(elms.toArray(new Element[elms.size()]));
          final Element difElm = (rule != null) && (rule instanceof CompositionFromKRatios.ElementByDifference)
                ? ((ElementByDifference) rule).getElement()
                : elms.iterator().next();
@@ -1551,7 +1551,7 @@ public class OptimizationWizard
                updateComposition(MaterialsCreator.createMaterial(OptimizationWizard.this, mSession, false));
             update();
          }
-      };
+      }
 
       private class ApproxAction
          extends
@@ -1604,7 +1604,7 @@ public class OptimizationWizard
 
       @Override
       public boolean permitNext() {
-         final Set<Element> extraElms = new TreeSet<Element>(mEstComposition.getElementSet());
+         final Set<Element> extraElms = new TreeSet<>(mEstComposition.getElementSet());
          extraElms.removeAll(mQuantOutline.getUnknownElements());
          if(extraElms.size() > 0) {
             JOptionPane.showMessageDialog(OptimizationWizard.this, "The elements " + extraElms.toString()
@@ -1649,7 +1649,7 @@ public class OptimizationWizard
             try {
                // Initialize mSelected
                if(mSelected == null)
-                  mSelected = new TreeMap<Element, RegionOfInterest>();
+                  mSelected = new TreeMap<>();
                for(final Element elm : mQuantOutline.getMeasuredElements())
                   if((!mSelected.containsKey(elm)) && mEstComposition.containsElement(elm)) {
                      double bestU = Double.MAX_VALUE;
@@ -1710,7 +1710,7 @@ public class OptimizationWizard
          int i = 0;
          for(final Element elm : mQuantOutline.getMeasuredElements()) {
             final RegionOfInterest selected = mSelected.get(elm);
-            final JComboBox<RegionOfInterest> rcb = new JComboBox<RegionOfInterestSet.RegionOfInterest>();
+            final JComboBox<RegionOfInterest> rcb = new JComboBox<>();
             for(final RegionOfInterest roi : mQuantOutline.getStandardROIS(elm))
                rcb.addItem(roi);
             rcb.setSelectedItem(selected);
@@ -1771,7 +1771,7 @@ public class OptimizationWizard
             });
          }
 
-      };
+      }
 
       public SelectTransitionPanel() {
          super(OptimizationWizard.this);
@@ -1815,7 +1815,7 @@ public class OptimizationWizard
          public void actionPerformed(final ActionEvent arg0) {
             PrintUtilities.printComponent(jTextPane_Report);
          }
-      };
+      }
 
       private class OpenAction
          extends
@@ -1857,7 +1857,7 @@ public class OptimizationWizard
                   for(final ISpectrumData spec : res.values())
                      DataManager.getInstance().addSpectrum(spec, true);
                   QuantifyUsingStandards qus = mQuantPlan.buildQuantifyUsingStandards(res);
-                  ArrayList<QuantifyUsingStandards.Result> results = new ArrayList<QuantifyUsingStandards.Result>();
+                  ArrayList<QuantifyUsingStandards.Result> results = new ArrayList<>();
                   List<ISpectrumData> unknowns = mQuantPlan.simulateUnknown(ss, 9);
                   for(final ISpectrumData spec : unknowns) {
                      DataManager.getInstance().addSpectrum(spec, true);
@@ -1959,7 +1959,7 @@ public class OptimizationWizard
       public boolean permitNext() {
          return true;
       }
-   };
+   }
 
    enum Mode {
       OptimizeEDS, OptimizeWDS, OptimizeMixed, OptimizeExpert, FindStandards;
@@ -2009,7 +2009,7 @@ public class OptimizationWizard
 
    /**
     * Constructs a ExperimentOptimizationWIzard
-    * 
+    *
     * @param owner
     * @param detector
     * @param session

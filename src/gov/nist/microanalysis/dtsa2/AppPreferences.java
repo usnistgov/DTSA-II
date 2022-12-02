@@ -84,7 +84,7 @@ import gov.nist.microanalysis.dtsa2.PreferenceDialog.PreferencePanel;
  * <p>
  * Institution: National Institute of Standards and Technology
  * </p>
- * 
+ *
  * @author nritchie
  * @version 1.0
  */
@@ -92,7 +92,7 @@ public class AppPreferences {
 
 	enum Appearance {
 		System, FlatLight, Darcula, Ugly
-	};
+	}
 
 	private static final String DEFAULT_DETECTOR_KEY = "Default Detector";
 	private static final String EPQ_JAVA_DOC_DEFAULT = "http://www.cstl.nist.gov/div837/837.02/epq/dtsa2/JavaDoc/index.html";
@@ -139,7 +139,7 @@ public class AppPreferences {
 
 		/**
 		 * Constructs a UserPreferences
-		 * 
+		 *
 		 * @param pref
 		 * @param name
 		 * @param desc
@@ -291,7 +291,7 @@ public class AppPreferences {
 
 		/**
 		 * Constructs a QuantPreferences
-		 * 
+		 *
 		 * @param pref
 		 * @param name
 		 * @param desc
@@ -311,7 +311,7 @@ public class AppPreferences {
 			setLayout(fl);
 			final CellConstraints cc = new CellConstraints();
 			add(new JLabel("Correction Algorithm"), cc.xy(2, 1));
-			jComboBox_ZAFAlgorithm = new JComboBox<String>();
+			jComboBox_ZAFAlgorithm = new JComboBox<>();
 			jComboBox_ZAFAlgorithm.addItem(CorrectionAlgorithm.XPPExtended.getName());
 			jComboBox_ZAFAlgorithm.addItem(CorrectionAlgorithm.PouchouAndPichoir.getName());
 			jComboBox_ZAFAlgorithm.addItem(CorrectionAlgorithm.ZAFCorrection.getName());
@@ -321,7 +321,7 @@ public class AppPreferences {
 			add(jComboBox_ZAFAlgorithm, cc.xy(4, 1));
 
 			add(new JLabel("Mass Absorption Coefficient"), cc.xy(2, 3));
-			jComboBox_MAC = new JComboBox<String>();
+			jComboBox_MAC = new JComboBox<>();
 			jComboBox_MAC.addItem(MassAbsorptionCoefficient.Sabbatucci2016.getName());
 			jComboBox_MAC.addItem(MassAbsorptionCoefficient.Chantler2005.getName());
 			jComboBox_MAC.addItem(MassAbsorptionCoefficient.HeinrichDtsa.getName());
@@ -339,14 +339,14 @@ public class AppPreferences {
 			jComboBox_MAC.setSelectedItem(getMACAlgorithm());
 			add(jComboBox_MAC, cc.xy(4, 3));
 
-			jComboBox_BremAngular = new JComboBox<String>();
+			jComboBox_BremAngular = new JComboBox<>();
 			add(new JLabel("Bremsstrahlung angular distribution"), cc.xy(2, 5));
 			for (final AlgorithmClass alg : BremsstrahlungAngularDistribution.Acosta2002.getAllImplementations())
 				jComboBox_BremAngular.addItem(alg.getName());
 			jComboBox_BremAngular.setSelectedItem(getBremsstrahlungAngularDistribution());
 			add(jComboBox_BremAngular, cc.xy(4, 5));
 
-			jComboBox_Ionization = new JComboBox<String>();
+			jComboBox_Ionization = new JComboBox<>();
 			add(new JLabel("Ionization cross section"), cc.xy(2, 7));
 			jComboBox_Ionization.addItem(AbsoluteIonizationCrossSection.BoteSalvat2008.getName());
 			jComboBox_Ionization.addItem(AbsoluteIonizationCrossSection.Casnati82.getName());
@@ -601,7 +601,7 @@ public class AppPreferences {
 
 		private void load() {
 			final Set<EDSDetector> xrds = mSession.getEDSDetectors(false);
-			final TreeMap<ElectronProbe, InstrumentPanel> ei = new TreeMap<ElectronProbe, InstrumentPanel>();
+			final TreeMap<ElectronProbe, InstrumentPanel> ei = new TreeMap<>();
 			for (final EDSDetector xrd : xrds) {
 				final ElectronProbe ep = xrd.getOwner();
 				InstrumentPanel ip = ei.get(ep);
@@ -638,7 +638,7 @@ public class AppPreferences {
 
 		/**
 		 * Returns the original (pre edited) EDSDetector object
-		 * 
+		 *
 		 * @return EDSDetector
 		 */
 		abstract public EDSDetector getOriginal();
@@ -647,7 +647,7 @@ public class AppPreferences {
 		 * Returns the modified (post-edited) EDSDetector object. Check isModified() to
 		 * determine if getOriginal() and getModified() represent different detector
 		 * definitions.
-		 * 
+		 *
 		 * @return EDSDetector
 		 * @throws EPQException
 		 */
@@ -655,7 +655,7 @@ public class AppPreferences {
 
 		/**
 		 * Was the original EDSDetector object modified by user input edits?
-		 * 
+		 *
 		 * @return boolean
 		 */
 		abstract public boolean isModified();
@@ -696,7 +696,7 @@ public class AppPreferences {
 		private final JTextFieldDouble jTextField_Offset = new JTextFieldDouble(0.0, -10000.0, 10000.0);
 		private final JTextFieldDouble jTextField_Resolution = new JTextFieldDouble(130.0, 120.0, 1000.0);
 		// Window paramters
-		private final JComboBox<String> jComboBox_Window = new JComboBox<String>();
+		private final JComboBox<String> jComboBox_Window = new JComboBox<>();
 		// Button to export detector
 		private final JButton jButton_Export = new JButton("Export detector");
 
@@ -902,7 +902,7 @@ public class AppPreferences {
 			window.addLabel("Window", cc.xy(1, 1));
 			window.add(jComboBox_Window, cc.xyw(3, 1, 3));
 			jComboBox_Window.setEditable(false);
-			final DefaultComboBoxModel<String> cbm = new DefaultComboBoxModel<String>();
+			final DefaultComboBoxModel<String> cbm = new DefaultComboBoxModel<>();
 			for (final String s : XRayWindowFactory.WindowTypes)
 				cbm.addElement(s);
 			// cbm.addElement("User defined window");
@@ -1083,11 +1083,7 @@ public class AppPreferences {
 
 		@Override
 		public boolean isModified() {
-			if (!jTextField_Name.getText().equals(mOriginal.getName()))
-				return true;
-			if (jTextField_GUID.getText().equals(AUTO_GENERATE))
-				return true;
-			if (!((String) jComboBox_Window.getSelectedItem()).equals(mOriginal.getWindow().getName()))
+			if (!jTextField_Name.getText().equals(mOriginal.getName()) || jTextField_GUID.getText().equals(AUTO_GENERATE) || !((String) jComboBox_Window.getSelectedItem()).equals(mOriginal.getWindow().getName()))
 				return true;
 			return isModified(this);
 		}
@@ -1205,7 +1201,7 @@ public class AppPreferences {
 		private final JTextFieldDouble jTextField_Offset = new JTextFieldDouble(0.0, -10000.0, 10000.0);
 		private final JTextFieldDouble jTextField_Resolution = new JTextFieldDouble(6.0, 0.1, 1000.0);
 		// Window paramters
-		private final JComboBox<String> jComboBox_Window = new JComboBox<String>();
+		private final JComboBox<String> jComboBox_Window = new JComboBox<>();
 		// Button to export detector
 		private final JButton jButton_Export = new JButton("Export detector");
 
@@ -1388,7 +1384,7 @@ public class AppPreferences {
 			window.addLabel("Window", cc.xy(1, 1));
 			window.add(jComboBox_Window, cc.xyw(3, 1, 3));
 			jComboBox_Window.setEditable(false);
-			final DefaultComboBoxModel<String> cbm = new DefaultComboBoxModel<String>();
+			final DefaultComboBoxModel<String> cbm = new DefaultComboBoxModel<>();
 			for (final String s : XRayWindowFactory.WindowTypes)
 				cbm.addElement(s);
 			// cbm.addElement("User defined window");
@@ -1554,11 +1550,7 @@ public class AppPreferences {
 
 		@Override
 		public boolean isModified() {
-			if (!jTextField_Name.getText().equals(mOriginal.getName()))
-				return true;
-			if (jTextField_GUID.getText().equals(AUTO_GENERATE))
-				return true;
-			if (!((String) jComboBox_Window.getSelectedItem()).equals(mOriginal.getWindow().getName()))
+			if (!jTextField_Name.getText().equals(mOriginal.getName()) || jTextField_GUID.getText().equals(AUTO_GENERATE) || !((String) jComboBox_Window.getSelectedItem()).equals(mOriginal.getWindow().getName()))
 				return true;
 			return isModified(this);
 		}
@@ -1651,7 +1643,7 @@ public class AppPreferences {
 			addPanel(new QuantPreferences(this));
 			addPanel(new AddInstrument(this));
 		}
-	};
+	}
 
 	static public void editPreferences(Frame owner) {
 		final AppPreferences tp = getInstance();
@@ -1684,7 +1676,7 @@ public class AppPreferences {
 
 	/**
 	 * Gets the current value assigned to correctionAlgorithm
-	 * 
+	 *
 	 * @return Returns the correctionAlgorithm.
 	 */
 	public String getCorrectionAlgorithm() {
@@ -1693,7 +1685,7 @@ public class AppPreferences {
 
 	/**
 	 * Sets the value assigned to correctionAlgorithm.
-	 * 
+	 *
 	 * @param correctionAlgorithm The value to which to set correctionAlgorithm.
 	 */
 	public void setCorrectionAlgorithm(String correctionAlgorithm) {
@@ -1733,7 +1725,7 @@ public class AppPreferences {
 
 	/**
 	 * Gets the current value assigned to mACAlgorithm
-	 * 
+	 *
 	 * @return Returns the mACAlgorithm.
 	 */
 	public String getMACAlgorithm() {
@@ -1742,7 +1734,7 @@ public class AppPreferences {
 
 	/**
 	 * Sets the value assigned to mACAlgorithm.
-	 * 
+	 *
 	 * @param algorithm The value to which to set mACAlgorithm.
 	 */
 	public void setMACAlgorithm(String algorithm) {
@@ -1756,7 +1748,7 @@ public class AppPreferences {
 
 	/**
 	 * Gets the current value assigned to userName
-	 * 
+	 *
 	 * @return Returns the userName.
 	 */
 	public String getUserName() {
@@ -1769,7 +1761,7 @@ public class AppPreferences {
 
 	/**
 	 * Sets the value assigned to startup script path
-	 * 
+	 *
 	 * @param path
 	 */
 	public void setStartupScript(String path) {
@@ -1786,7 +1778,7 @@ public class AppPreferences {
 
 	/**
 	 * Sets the value assigned to shutdown script path.
-	 * 
+	 *
 	 * @param path
 	 */
 	public void setShutdownScript(String path) {
@@ -1864,7 +1856,7 @@ public class AppPreferences {
 
 	/**
 	 * Sets the value assigned to userName.
-	 * 
+	 *
 	 * @param userName The value to which to set userName.
 	 */
 	public void setUserName(String userName) {
@@ -1877,7 +1869,7 @@ public class AppPreferences {
 
 	/**
 	 * Gets the current value assigned to the base report path
-	 * 
+	 *
 	 * @return String
 	 */
 	public String getBaseReportPath() {
@@ -1886,7 +1878,7 @@ public class AppPreferences {
 
 	/**
 	 * Sets the value assigned to the base report path.
-	 * 
+	 *
 	 * @param baseReportPath
 	 */
 	public void setBaseReportPath(String baseReportPath) {

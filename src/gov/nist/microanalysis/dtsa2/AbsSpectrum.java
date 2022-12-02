@@ -16,7 +16,7 @@ import gov.nist.microanalysis.EPQLibrary.ISpectrumData;
  * <p>
  * Company: National Institute of Standards and Technology
  * </p>
- * 
+ *
  * @author not attributable
  * @version 1.0
  */
@@ -28,7 +28,7 @@ public class AbsSpectrum
 
    /**
     * getCounts
-    * 
+    *
     * @param i int
     * @return double
     */

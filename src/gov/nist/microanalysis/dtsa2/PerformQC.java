@@ -52,7 +52,7 @@ import gov.nist.microanalysis.Utility.UtilException;
  * <p>
  * Institution: National Institute of Standards and Technology
  * </p>
- * 
+ *
  * @author Tescan
  * @version 1.0
  */
@@ -77,7 +77,7 @@ public class PerformQC {
    public Map<String, UncertainValue2> compute()
          throws SQLException, EPQException, UtilException, IOException {
       if(mResults == null) {
-         final TreeMap<String, UncertainValue2> res = new TreeMap<String, UncertainValue2>();
+         final TreeMap<String, UncertainValue2> res = new TreeMap<>();
          final SpectrumFitter8 sf8 = new SpectrumFitter8(mQCProject.getDetector(), mQCProject.getStandard(), mSpectrum);
          final double[] coeff = new double[] {
             mQCProject.getDetector().getZeroOffset(),
@@ -132,7 +132,7 @@ public class PerformQC {
 
    /**
     * Gets the current value assigned to qCProject
-    * 
+    *
     * @return Returns the qCProject.
     */
    public QCProject getQCProject() {
@@ -141,7 +141,7 @@ public class PerformQC {
 
    /**
     * Gets the current value assigned to spectrum
-    * 
+    *
     * @return Returns the spectrum.
     */
    public ISpectrumData getSpectrum() {
@@ -150,7 +150,7 @@ public class PerformQC {
 
    /**
     * Gets the current value assigned to fitSpectrum
-    * 
+    *
     * @return Returns the fitSpectrum.
     */
    public ISpectrumData getFitSpectrum() {
@@ -159,7 +159,7 @@ public class PerformQC {
 
    /**
     * Gets the current value assigned to residual
-    * 
+    *
     * @return Returns the residual.
     */
    public ISpectrumData getResidual() {
@@ -206,7 +206,7 @@ public class PerformQC {
          result.append("<tr><th>Status</th></td>Archived</td>");
          result.append("<tr><th>Index</th><td>" + mEntry.getIndex() + "</td></tr>\n");
          result.append("<tr><th>Timestamp</th><td>" + mEntry.getTimestamp().toString() + "</td></tr>\n");
-      } else 
+      } else
          result.append("<tr><th>Status</th></td>Not archived</td>");
       result.append("<tr><th>Project</th><td>" + mQCProject.toString() + "</td></tr>\n");
       result.append("</table>\n");
@@ -227,7 +227,7 @@ public class PerformQC {
 
    /**
     * Gets the current value assigned to last10
-    * 
+    *
     * @return Returns the last10.
     * @throws EPQException
     * @throws IOException
@@ -242,7 +242,7 @@ public class PerformQC {
 
    /**
     * Gets the current value assigned to first10
-    * 
+    *
     * @return Returns the first10.
     * @throws EPQException
     * @throws IOException
@@ -257,7 +257,7 @@ public class PerformQC {
 
    /**
     * Gets the current value assigned to all
-    * 
+    *
     * @return Returns the all.
     * @throws EPQException
     * @throws IOException
@@ -285,7 +285,7 @@ public class PerformQC {
    public static void generateReport(QCProject qcp, File file, Collection<String> items)
          throws IOException, SQLException, EPQException {
       final int HEIGHT = 256, WIDTH = 1024;
-      final TreeMap<String, ControlChart> charts = new TreeMap<String, ControlChart>();
+      final TreeMap<String, ControlChart> charts = new TreeMap<>();
       final TreeSet<QCEntry> entries = qcp.getEntries();
       for(final QCEntry qce : entries) {
          final Map<String, UncertainValue2> data = qce.getData();

@@ -173,7 +173,7 @@ import gov.nist.microanalysis.dtsa2.JCommandLine.JythonWorker;
  * <p>
  * Company: National Institute of Standards and Technology
  * </p>
- * 
+ *
  * @author Nicholas W. M. Ritchie
  * @version 1.0
  */
@@ -198,7 +198,7 @@ public class MainFrame extends JFrame {
 
 		private static final long serialVersionUID = 3349320405633474918L;
 
-		private final ArrayList<RecentFile> mFiles = new ArrayList<RecentFile>();
+		private final ArrayList<RecentFile> mFiles = new ArrayList<>();
 		private RecentFile mSelected = null;
 
 		private RecentPyModel() {
@@ -273,10 +273,10 @@ public class MainFrame extends JFrame {
 			"Move the selected spectra down in the list.");
 	private final JButton jButton_SpecGroup = createButton("group.png", "Group the selected spectra.");
 	private final JButton jButton_SpecDelete = createButton("red_x.png", "Delete the selected spectra.");
-	private final JList<ISpectrumData> jList_Spectrum = new JList<ISpectrumData>();
+	private final JList<ISpectrumData> jList_Spectrum = new JList<>();
 	private final JPopupMenu jPopupMenu_SpectrumList = new JPopupMenu();
-	private final JComboBox<Object> jComboBox_Instrument = new JComboBox<Object>();
-	private final JComboBox<Object> jComboBox_Detector = new JComboBox<Object>();
+	private final JComboBox<Object> jComboBox_Instrument = new JComboBox<>();
+	private final JComboBox<Object> jComboBox_Detector = new JComboBox<>();
 	private final JPanel jPanel_Composition = new JPanel();
 	private final TitledBorder jBorder_Composition = DTSA2.createTitledBorder("Composition");
 	private final JTable jTable_SpecComposition = new JTable();
@@ -286,7 +286,7 @@ public class MainFrame extends JFrame {
 	private final JCommandLine jCommandLine_Main = new JCommandLine();
 	private final JButton jButton_OpenPy = new JButton();
 	private final JButton jButton_Stop = new JButton();
-	private final JComboBox<RecentFile> jComboBox_PrevPy = new JComboBox<RecentFile>();
+	private final JComboBox<RecentFile> jComboBox_PrevPy = new JComboBox<>();
 	private final JButton jButton_Play = new JButton();
 	private RecentPyModel mRecentPyModel = null;
 	private boolean mPyDisabled = false;
@@ -374,7 +374,7 @@ public class MainFrame extends JFrame {
 
 	private Date mSessionStarted = new Date();
 	private int mLastMark = 0;
-	private ArrayList<String> mStartUp = new ArrayList<String>();
+	private ArrayList<String> mStartUp = new ArrayList<>();
 
 	private static final Color FOREGROUND_COLOR = SystemColor.textText;
 
@@ -398,7 +398,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * Word-wrap a string.
-	 * 
+	 *
 	 * @param str         String to word-wrap
 	 * @param width       int to wrap at
 	 * @param delim       String to use to separate lines
@@ -523,7 +523,7 @@ public class MainFrame extends JFrame {
 	 * A method for invoking a Runnable object on the Event Dispatch thread. If the
 	 * current thread is the Event Dispatch thread then the Runnable is just run.
 	 * Otherwise the SwingUtilities method invokeAndWait is called.
-	 * 
+	 *
 	 * @param as
 	 */
 	public void invokeCarefully(Runnable as) {
@@ -616,7 +616,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * Writes a block of HTML at the end of the current report.
-	 * 
+	 *
 	 * @param html
 	 */
 	public synchronized void appendHTML(String html) {
@@ -874,7 +874,7 @@ public class MainFrame extends JFrame {
 				if (!mInside) {
 					mInside = true;
 					try {
-						final List<ISpectrumData> sel = new ArrayList<ISpectrumData>();
+						final List<ISpectrumData> sel = new ArrayList<>();
 						for (final ISpectrumData obj : jList_Spectrum.getSelectedValuesList())
 							sel.add(obj);
 						mDataManager.setSelected(sel);
@@ -942,7 +942,7 @@ public class MainFrame extends JFrame {
 			ElectronProbe[] ep = null;
 			try {
 				ep = DTSA2.getSession().getCurrentProbes().toArray(new ElectronProbe[0]);
-				final DefaultComboBoxModel<Object> dcbm = new DefaultComboBoxModel<Object>(ep);
+				final DefaultComboBoxModel<Object> dcbm = new DefaultComboBoxModel<>(ep);
 				dcbm.addElement(NONE_STRING);
 				jComboBox_Instrument.setModel(dcbm);
 			} catch (final Exception e1) {
@@ -951,7 +951,7 @@ public class MainFrame extends JFrame {
 		}
 		{
 			// Update detector panel
-			final DefaultComboBoxModel<Object> dcbm = new DefaultComboBoxModel<Object>();
+			final DefaultComboBoxModel<Object> dcbm = new DefaultComboBoxModel<>();
 			if (selInst instanceof ElectronProbe) {
 				for (final DetectorProperties dp : DTSA2.getSession().getDetectors())
 					if (dp.getOwner().equals(selInst))
@@ -1184,7 +1184,7 @@ public class MainFrame extends JFrame {
 		 * jMenuItem_Install.setMnemonic(KeyEvent.VK_I);
 		 * jMenuItem_Install.setText("Install plug-in");
 		 * jMenuItem_Install.addActionListener(new ActionListener() {
-		 * 
+		 *
 		 * @Override public void actionPerformed(ActionEvent e) { // installPlugin(); }
 		 * });
 		 */
@@ -1866,8 +1866,8 @@ public class MainFrame extends JFrame {
 						Object data = dtde.getTransferable().getTransferData(flavor);
 						if (data instanceof List<?>) {
 							final List<?> files = (List<?>) data;
-							final List<ISpectrumData> success = new ArrayList<ISpectrumData>();
-							final List<Object> failed = new ArrayList<Object>();
+							final List<ISpectrumData> success = new ArrayList<>();
+							final List<Object> failed = new ArrayList<>();
 							for (Object file : files) {
 								try {
 									if (file instanceof File) {
@@ -2105,7 +2105,7 @@ public class MainFrame extends JFrame {
 	 * serialVersionUID = -6928508033213127087L; private final PyFunction mFunction;
 	 * public PluginAction(String name, PyFunction func) { super(name); mFunction =
 	 * func; }
-	 * 
+	 *
 	 * @Override public void actionPerformed(ActionEvent arg0) { try {
 	 * mFunction.__call__(); } catch(Error e) { } } }; public void
 	 * installPlugIn(String menuItemName, PyFunction func) { jMenu_PlugIn.add(new
@@ -2272,7 +2272,7 @@ public class MainFrame extends JFrame {
 	}
 
 	private ISpectrumData readUCalFile(File file) throws EPQException {
-		final ArrayList<double[]> lines = new ArrayList<double[]>();
+		final ArrayList<double[]> lines = new ArrayList<>();
 		try {
 			try (final FileInputStream fis = new FileInputStream(file)) {
 				try (final InputStreamReader isr = new InputStreamReader(fis, Charset.forName("US-ASCII"))) {
@@ -2608,14 +2608,14 @@ public class MainFrame extends JFrame {
 		final Runnable r = new Runnable() {
 			@Override
 			public void run() {
-				final Set<SpectrumProperties> sps = new HashSet<SpectrumProperties>();
+				final Set<SpectrumProperties> sps = new HashSet<>();
 				for (final ISpectrumData sd : getSelectedSpectra())
 					sps.add(sd.getProperties());
 				if (sps.size() > 0) {
 					final SpectrumProperties res = doEditSpectrumProperties(sps, DTSA2.getSession());
 					final EDSDetector det = (res.getDetector() instanceof EDSDetector ? (EDSDetector) res.getDetector()
 							: null);
-					final List<ISpectrumData> sel = new ArrayList<ISpectrumData>();
+					final List<ISpectrumData> sel = new ArrayList<>();
 					for (final ISpectrumData sd : getSelectedSpectra()) {
 						final SpectrumProperties sp = sd.getProperties();
 						sp.addAll(res);
@@ -2809,7 +2809,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * Save a single spectrum to an EMSA file.
-	 * 
+	 *
 	 * @param sd
 	 * @return true on success, false otherwise.
 	 */
@@ -2946,8 +2946,8 @@ public class MainFrame extends JFrame {
 			}
 		}
 	}
-	
-	
+
+
 	public static String formatDate(Date fn) {
 		DateFormat df =new SimpleDateFormat("yyyyMMdd HHmmss z");
 		return df.format(fn);
@@ -2955,7 +2955,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * Replaces or appends a new extension onto the specified file name.
-	 * 
+	 *
 	 * @param name   The file name
 	 * @param newExt The new extension starting with a '.' (ie. ".msa")
 	 * @return The full filename with extension
@@ -3112,7 +3112,7 @@ public class MainFrame extends JFrame {
 	}
 
 	private List<ISpectrumData> getSelectedSpectra() {
-		return new ArrayList<ISpectrumData>(mDataManager.getSelected());
+		return new ArrayList<>(mDataManager.getSelected());
 	}
 
 	public void processStripBackground() {
@@ -3135,7 +3135,7 @@ public class MainFrame extends JFrame {
 		list.setHeader("Bremsstrahlung fit");
 		for (final ISpectrumData sd : getSelectedSpectra())
 			try {
-				final ArrayList<String> missing = new ArrayList<String>();
+				final ArrayList<String> missing = new ArrayList<>();
 				final SpectrumProperties sp = sd.getProperties();
 				if (!sp.isDefined(SpectrumProperties.BeamEnergy))
 					missing.add("beam energy");
@@ -3172,7 +3172,7 @@ public class MainFrame extends JFrame {
 				if (comp != null) {
 					ba.initialize(comp, e0, toa);
 					final SpecDisplay.Regions r = jSpecDisplay_Main.getRegions();
-					final ArrayList<int[]> rois = new ArrayList<int[]>();
+					final ArrayList<int[]> rois = new ArrayList<>();
 					for (int i = r.size() - 1; i >= 0; --i) {
 						final SpecDisplay.Region rr = r.get(i);
 						rois.add(new int[] { SpectrumUtils.channelForEnergy(sd, rr.getLowEnergy()),
@@ -3366,7 +3366,7 @@ public class MainFrame extends JFrame {
 	/**
 	 * Opens a MaterialsCreator dialog in the Event Dispatch thread regardless of
 	 * which thread it was opened in.
-	 * 
+	 *
 	 * @return Composition
 	 */
 	public Composition editMaterial(Composition comp) {
@@ -3376,7 +3376,7 @@ public class MainFrame extends JFrame {
 	/**
 	 * Opens a MaterialsCreator dialog in the Event Dispatch thread regardless of
 	 * which thread it was opened in.
-	 * 
+	 *
 	 * @return Composition
 	 */
 	public Composition createMaterial() {
@@ -3386,7 +3386,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * Add a menu item to the end of the Tools menu.
-	 * 
+	 *
 	 * @param mi
 	 */
 	public void addToolsMenuItem(JMenuItem mi) {
@@ -3403,7 +3403,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * Add a menu item to the end of the Process menu.
-	 * 
+	 *
 	 * @param mi
 	 */
 	public void addProcessMenuItem(JMenuItem mi) {
@@ -3597,7 +3597,7 @@ public class MainFrame extends JFrame {
 	/**
 	 * Adds a tab containing the component to the utility panel with the specified
 	 * title and toolTip.
-	 * 
+	 *
 	 * @param title
 	 * @param component
 	 * @param toolTip
@@ -3608,7 +3608,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * Removes the last user added tab with the specified title.
-	 * 
+	 *
 	 * @param title
 	 */
 	public void removeUtilityTab(String title) {
@@ -3621,7 +3621,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * Bring the last tab with the specified title to the forefront.
-	 * 
+	 *
 	 * @param title
 	 */
 	public void selectUtilityTab(String title) {
