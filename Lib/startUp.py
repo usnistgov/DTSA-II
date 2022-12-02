@@ -167,7 +167,7 @@ connect = (jop.showConfirmDialog(MainFrame, "Connect to the TESCAN?", "Start-up 
 if SITE==ORNL:
 	IMAGE_MAGICK = "C:\\Program Files\\ImageMagick-6.9.9-Q16"
 elif SITE==NIST:
-	IMAGE_MAGICK = "C:\\Program Files\\ImageMagick-6.9.12-31"    
+	IMAGE_MAGICK = "C:\Program Files\ImageMagick-6.9.12-Q8"
 else:
 	IMAGE_MAGICK = "C:\\Program Files\\ImageMagick-6.9.6-Q16"
 
@@ -368,7 +368,7 @@ if connect:
 		finally:
 			fos.close()
 
-	def collectSI(name, fov, frameCount=1, dwell=9, dims=(1024, 1024), vectorSet=None, subRaster=None, path=None, rotation=0.0):
+	def collectSI(name, fov, frameCount=1, dwell=9, dims=(1024, 1024), vectorSet=None, subRaster=None, path=None, rotation=0.0, off=False):
 		"""collectSI(name, fov, frameCount=1, dwell=9, dims=(1024, 1024), subRaster=None, path=defaultPath, rotation=0.0)
 		Collect x-ray spectrum image data, write the results to a directory called 'name' in 'path'.
 		fov is the horizontal field-of-view in mm,
@@ -417,12 +417,16 @@ if connect:
 		_ts.chamberLed(defLED)
 		logImage((path if path else defaultPath), name, "SI", fov, dims, dwell, sem.beamEnergy, frameCount)
 		report("<p>Collected SI <i>%s</i> %0.1f &mu;m FOV %d &times; %d with %d frames at dwell %d </p>" % (name, 1000.0*fov, dims[0], dims[1], frameCount, dwell ))
+		if off:
+			turnOff()
 
 
 	def collectSIs(pts, dwell=6, dims=(1024, 1024)):
 		"""Collects a sequence of spectrum images.	Each item in 'pts' is a list containing
 	[ 'name', stgPos, fieldOfView, workingDistance ].
-	The algorithm moves to "stgPos", sets the image width to fieldOfView (in mm), sets the focal distance to "workingDistance". The resulting spectrum image is recorded in a directory named "name"."""
+	The algorithm moves to "stgPos", sets the image width to fieldOfView (in mm), sets the focal distance to "workingDistance". 
+	The resulting spectrum image is recorded in a directory named "name".  You are encouraged to maintain the same working distance
+	throughout."""
 		try:
 			for name, pos, fov, wd in pts:
 				if terminated:
@@ -590,9 +594,10 @@ image: Determines whether an image is collected after acquiring the spectrum (de
 			if image:
 				imageFOV = (fov if fov else oldVf)
 				imgs=collectImages(name, 5*imageFOV, (256,256), 4, rotation=0.0, markCenter=False, writeMask=0)
-				for p, i in _apaWrite:
-					imgs[i].applyCenterBox(imageFOV*0.001)
-					sp.setObjectProperty(p, imgs[i])
+				if imgs!=None:
+					for p, i in _apaWrite:
+						imgs[i].applyCenterBox(imageFOV*0.001)
+						sp.setObjectProperty(p, imgs[i])
 			if pc:
 				fe = updatedPC(interval=(0 if forcePC else 300))
 				if fe:
@@ -605,6 +610,8 @@ image: Determines whether an image is collected after acquiring the spectrum (de
 			report("<p>Collected spectrum <i>%s</i> for %0.1f s %s at %0.1f keV</p>" % (name, acqTime, mode, hv))
 		wspec=wrap(spec)
 		DataManager.replaceSpectrum(rep, wspec)
+		if terminated:
+			print "Acqisition terminated prematurely."
 		return wspec
 
 	def collect2ts(acqTime=60, name=None, pc=True, mode='L', disp=True, forcePC=False, comp=None, path=None, fov=None):
@@ -699,6 +706,8 @@ fov: An optional field of view width to which to set the SEM imaging while colle
 			report("<p>Collected %d time series spectra <i>%s</i> from %s for %0.1f s %s at %0.1f keV</p>" % (len(specs), name, comp, acqTime, mode, hv))
 		else:
 			report("<p>Collected %d time series spectra <i>%s</i> for %0.1f s %s at %0.1f keV</p>" % (len(specs), name, acqTime, mode, hv))
+		if terminated:
+			print "Acqisition terminated prematurely."
 		return tuple(specs)
 
 	def collect(acqTime=60, name=None, pc=True, mode='L', disp=True, forcePC=False, comp=None, path=None, fov=None, image=True):
@@ -771,10 +780,11 @@ image: Determines whether an image is collected after acquiring the spectrum (de
 		if image:
 			imageFOV = (fov if fov else oldVf)
 			imgs=collectImages(name, 5*imageFOV, (256,256), 4, rotation=0.0, markCenter=False, writeMask=0)
-			for spec in specs:
-				for p, i in _apaWrite:
-					imgs[i].applyCenterBox(imageFOV*0.001)
-					spec.getProperties().setObjectProperty(p, imgs[i])
+			if imgs!=None:
+				for spec in specs:
+					for p, i in _apaWrite:
+						imgs[i].applyCenterBox(imageFOV*0.001)
+						spec.getProperties().setObjectProperty(p, imgs[i])
 		if fov:
 			_ts.setViewField(oldVf)
 		_ts.scSetSpeed(oldSp)
@@ -799,6 +809,8 @@ image: Determines whether an image is collected after acquiring the spectrum (de
 			report("<p>Collected %d spectra <i>%s</i> from %s for %0.1f s %s at %0.1f keV</p>" % (len(specs), name, comp, acqTime, mode, hv))
 		else:
 			report("<p>Collected %d spectra <i>%s</i> for %0.1f s %s at %0.1f keV</p>" % (len(specs), name, acqTime, mode, hv))
+		if terminated:
+			print "Acqisition terminated prematurely."
 		return tuple(specs)
 
 	def collectPoints2(fov, pts, baseName, acqTime=60, pc=True, mode='L', disp=True, path=None):
