@@ -351,7 +351,6 @@ public class MainFrame extends JFrame {
 	private final JMenuItem jMenuItem_HelpPython = new JMenuItem();
 	private final JMenuItem jMenuItem_HelpEPQ = new JMenuItem();
 	private final JMenuItem jMenuItem_ProbeUserGroup = new JMenuItem();
-	private final JMenuItem jMenuItem_HelpUserGroup = new JMenuItem();
 	private final JMenuItem jMenuItem_HelpAbout = new JMenuItem();
 
 	private final JPopupMenu jPopupMenu_Tabs = new JPopupMenu();
