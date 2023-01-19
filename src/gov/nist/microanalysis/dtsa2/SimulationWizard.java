@@ -1248,7 +1248,7 @@ public class SimulationWizard extends JWizardDialog {
 								ti.dump(tf);
 								final double[] fov = ti.getFOV();
 								HalfUpFormat huf = new HalfUpFormat(fov[0] > 100.0e-6 ? "0.0" : "0.00");
-								final String lbl = "Tajectories<br/>FOV = " + huf.format(1.0e6 * fov[0]) + " &mu;m &times; " + //
+								final String lbl = "Trajectories<br/>FOV = " + huf.format(1.0e6 * fov[0]) + " &mu;m &times; " + //
 										huf.format(1.0e6 * fov[1]) + " &mu;m";
 								mEmissionFiles.put(lbl, tf.toURI().toURL().toString());
 							}

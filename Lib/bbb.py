@@ -2,6 +2,8 @@
 # Name:     bbb.py
 # Purpose:  Special code to control a TESCAN MIRA3 to search for and collect rastered spectra from 'blebs'
 # Created: 3-Oct-2018
+# Updated 22-Dec-2022
+sys.packageManager.makeJavaPackage("gov.nist.microanalysis.EPQImage", "EPQImage", None)
 import gov.nist.microanalysis.EPQImage as epqi
 
 def defBlebCriterion(bleb, scale):
