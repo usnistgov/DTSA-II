@@ -1,5 +1,5 @@
-set "D2V=2022-12-5"
-set "NUM_VER=14.0.9.0"
+set "D2V=2023-1-27"
+set "NUM_VER=14.0.13.0"
 set "BPATH=C:\Users\nritchie\git"
 cd %BPATH% 
 
@@ -27,14 +27,14 @@ call "%BPATH%\nist-dtsa-ii\Installer\DTSA-II Build\buildjre.bat"
 "C:\Program Files (x86)\GnuWin32\bin\sed.exe" -e "s/NUMBER_VERSION/%NUM_VER%/" -e "s/DATE_VERSION/%D2V%/" "%BPATH%\nist-dtsa-ii\Installer\Launch4j_relocate.template" > "%BPATH%\nist-dtsa-ii\Installer\Launch4j_relocate.xml"
 "C:\Program Files (x86)\GnuWin32\bin\sed.exe" -e "s/NUMBER_VERSION/%NUM_VER%/" -e "s/DATE_VERSION/%D2V%/" "%BPATH%\graf\Launch4j config.template" > "%BPATH%\graf\Launch4j config.xml"
 
-call "C:\Program Files (x86)\Launch4j\launch4j_2.bat" "%BPATH%\nist-dtsa-ii\Installer\Launch4j_config.xml"
-call "C:\Program Files (x86)\Launch4j\launch4j_2.bat" "%BPATH%\nist-dtsa-ii\Installer\Launch4j_relocate.xml"
-call "C:\Program Files (x86)\Launch4j\launch4j_2.bat" "%BPATH%\graf\Launch4j config.xml"
+call "C:\Program Files (x86)\Launch4j\launch4jc.exe" "%BPATH%\nist-dtsa-ii\Installer\Launch4j_config.xml"
+call "C:\Program Files (x86)\Launch4j\launch4jc.exe" "%BPATH%\nist-dtsa-ii\Installer\Launch4j_relocate.xml"
+call "C:\Program Files (x86)\Launch4j\launch4jc.exe" "%BPATH%\graf\Launch4j config.xml"
 
 cd %BPATH%\nist-dtsa-ii\Installer
-call "C:\Program Files (x86)\IzPack\bin\compile.bat" -h ${IZPACK_HOME} izPack_install.xml -b . -o dtsa2_neptune.jar -k standard
-call "C:\Program Files (x86)\IzPack\bin\compile.bat" -h ${IZPACK_HOME} izPack_install_nojre.xml -b . -o dtsa2_neptune_nojre.jar -k standard
-call "C:\Program Files (x86)\IzPack\bin\compile.bat" -h ${IZPACK_HOME} izPack_install_full.xml -b . -o dtsa2_neptune_full.jar -k standard
+call "C:\Program Files\IzPack\bin\compile.bat" -h ${IZPACK_HOME} izPack_install.xml -b . -o dtsa2_neptune.jar -k standard
+call "C:\Program Files\IzPack\bin\compile.bat" -h ${IZPACK_HOME} izPack_install_nojre.xml -b . -o dtsa2_neptune_nojre.jar -k standard
+call "C:\Program Files\IzPack\bin\compile.bat" -h ${IZPACK_HOME} izPack_install_full.xml -b . -o dtsa2_neptune_full.jar -k standard
 
 copy dtsa2_neptune.jar "V:\internal\643_violet\DTSA-II Latest"
 copy dtsa2_neptune_nojre.jar "V:\internal\643_violet\DTSA-II Latest"

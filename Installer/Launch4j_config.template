@@ -16,12 +16,10 @@
   <icon>C:\Users\nritchie\git\nist-dtsa-ii\trixy.ico</icon>
   <jre>
     <path>java-runtime</path>
-    <bundledJre64Bit>true</bundledJre64Bit>
-    <bundledJreAsFallback>false</bundledJreAsFallback>
+    <requiresJdk>false</requiresJdk>
+    <requires64Bit>false</requires64Bit>
     <minVersion>1.15.0</minVersion>
     <maxVersion></maxVersion>
-    <jdkPreference>jdkOnly</jdkPreference>
-    <runtimeBits>64/32</runtimeBits>
     <initialHeapPercent>10</initialHeapPercent>
     <maxHeapPercent>70</maxHeapPercent>
   </jre>
