@@ -2575,7 +2575,7 @@ if connect:
 			pts.append(next)
 		next[1].append(_stg.getPosition())
 		if withImg:
-			imgLabel = "%s %s[%d]" % (sample, comp, len(next[1]))
+			imgLabel = "%s[%d]" % (comp, len(next[1]))
 			imgs = collectImages(imgLabel, fov=0.5, dims=(256, 256), markCenter=True, writeMask=SAVE_IMAGE_MASK)
 			for img in imgs:
 				img.applyCenterCrossHair()
