@@ -89,7 +89,7 @@
             <file override="update" src="$JARPATH/com/thoughtworks/xstream/xstream/1.4.19/xstream-1.4.19.jar" targetdir="$INSTALL_PATH/"/>
             <!-- Not in EPQ but in DTSA-II -->
             <file override="update" src="$JARPATH/com/toedter/jcalendar/1.4/jcalendar-1.4.jar" targetdir="$INSTALL_PATH/"/>
-            <file override="update" src="$JARPATH/com/formdev/flatlaf/2.6/flatlaf-2.6.jar" targetdir="$INSTALL_PATH/"/>
+            <file override="update" src="$JARPATH/com/formdev/flatlaf/3.0/flatlaf-3.0.jar" targetdir="$INSTALL_PATH/"/>
             <!-- My EPQ and DTSA-II jars -->
             <file override="update" src="$BUILDPATH/epq.jar" targetdir="$INSTALL_PATH/"/>
             <fileset dir="$BUILDPATH/../../Lib/dtsa2" targetdir="${INSTALL_PATH}/Lib/dtsa2" excludes="*/.class"/>

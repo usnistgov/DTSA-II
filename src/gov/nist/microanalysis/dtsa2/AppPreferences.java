@@ -37,6 +37,8 @@ import javax.swing.UnsupportedLookAndFeelException;
 
 import com.formdev.flatlaf.FlatDarculaLaf;
 import com.formdev.flatlaf.FlatLightLaf;
+import com.formdev.flatlaf.themes.FlatMacDarkLaf;
+import com.formdev.flatlaf.themes.FlatMacLightLaf;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.PanelBuilder;
 import com.jgoodies.forms.layout.CellConstraints;
@@ -91,7 +93,7 @@ import gov.nist.microanalysis.dtsa2.PreferenceDialog.PreferencePanel;
 public class AppPreferences {
 
 	enum Appearance {
-		System, FlatLight, Darcula, Ugly
+		System, FlatLight, FlatMacLightLaf, FlatMacDarkLaf, Darcula, Ugly
 	}
 
 	private static final String DEFAULT_DETECTOR_KEY = "Default Detector";
@@ -1817,6 +1819,12 @@ public class AppPreferences {
 		case FlatLight:
 			UIManager.setLookAndFeel(new FlatLightLaf());
 			break;
+		case FlatMacLightLaf:
+		   UIManager.setLookAndFeel(new FlatMacLightLaf());
+		   break;
+		case FlatMacDarkLaf:
+         UIManager.setLookAndFeel(new FlatMacDarkLaf());
+         break;
 		case Ugly:
 			UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
 			break;
