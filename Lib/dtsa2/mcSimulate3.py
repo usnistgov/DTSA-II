@@ -376,7 +376,7 @@ def base(det, e0, withPoisson, nTraj, dose, sf, bf, name, buildSample, buildPara
     spec = det.getSpectrum((dose * 1.0e-9) / (nTraj * epq.PhysicalConstants.ElectronCharge))
     props = spec.getProperties()
     props.setNumericProperty(epq.SpectrumProperties.LiveTime, dose)
-    props.setNumericProperty(epq.SpectrumProperties.FaradayBegin, 1.0)
+    props.setNumericProperty(epq.SpectrumProperties.ProbeCurrent, 1.0)
     props.setNumericProperty(epq.SpectrumProperties.BeamEnergy, e0)
     epq.SpectrumUtils.rename(spec, name)
     if withPoisson:

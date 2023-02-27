@@ -38,7 +38,7 @@ import gov.nist.microanalysis.EPQTools.JWizardDialog;
  * <p>
  * Institution: National Institute of Standards and Technology
  * </p>
- * 
+ *
  * @author nicholas
  * @version 1.0
  */
@@ -60,8 +60,8 @@ public class SpectrumFitterWizard extends JWizardDialog {
 	}
 
 	private void initialize() {
-		setActivePanel(jWizardPanel_Intro, "Non-linear spectrum fitter");
-		setNextPanel(jWizardPanel_Element, "Select elements to fit");
+		setActivePanel(jWizardPanel_Intro);
+		setNextPanel(jWizardPanel_Element);
 		pack();
 		enableFinish(false);
 	}
@@ -77,7 +77,7 @@ public class SpectrumFitterWizard extends JWizardDialog {
 		private JButton jButton_Composition;
 
 		private IntroPanel(JWizardDialog parent) {
-			super(parent);
+			super(parent, "Non-linear spectrum fitter");
 			initialize();
 		}
 
@@ -96,13 +96,13 @@ public class SpectrumFitterWizard extends JWizardDialog {
 			pb.addLabel("keV", cc.xy(5, 3));
 
 			pb.addLabel("Instrument", cc.xy(1, 5));
-			jComboBox_Instrument = new JComboBox<ElectronProbe>();
+			jComboBox_Instrument = new JComboBox<>();
 			pb.add(jComboBox_Instrument, cc.xyw(3, 5, 5));
 			pb.addLabel("Detector", cc.xy(1, 7));
-			jComboBox_Detector = new JComboBox<DetectorProperties>();
+			jComboBox_Detector = new JComboBox<>();
 			pb.add(jComboBox_Detector, cc.xyw(3, 7, 5));
 			pb.addLabel("Calibration", cc.xy(1, 9));
-			jComboBox_Calibration = new JComboBox<DetectorCalibration>();
+			jComboBox_Calibration = new JComboBox<>();
 			pb.add(jComboBox_Calibration, cc.xyw(3, 9, 5));
 
 			pb.addLabel("Material composition", cc.xy(1, 11));
@@ -126,7 +126,7 @@ public class SpectrumFitterWizard extends JWizardDialog {
 		public JPeriodicTable jPeriodicTable_Elements;
 
 		public ElementPanel(JWizardDialog parent) {
-			super(parent);
+			super(parent, "Select elements to fit");
 			jPeriodicTable_Elements = new JPeriodicTable();
 			for (int z = 1; z < 4; ++z)
 				jPeriodicTable_Elements.setEnabled(Element.byAtomicNumber(z), false);
@@ -137,9 +137,9 @@ public class SpectrumFitterWizard extends JWizardDialog {
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
 					if (jPeriodicTable_Elements.getSelected().size() > 0)
-						setNextPanel(jWizardPanel_Options, "Fit options");
+						setNextPanel(jWizardPanel_Options);
 					else
-						setNextPanel(null, "Fit options");
+						setNextPanel(null);
 				}
 
 			});
@@ -149,9 +149,9 @@ public class SpectrumFitterWizard extends JWizardDialog {
 		@Override
 		public void onShow() {
 			if (jPeriodicTable_Elements.getSelected().size() > 0)
-				setNextPanel(jWizardPanel_Options, "Fit options");
+				setNextPanel(jWizardPanel_Options);
 			else
-				setNextPanel(null, "Fit options");
+				setNextPanel(null);
 			setMessageText("Specify all the elements represented in this spectrum.");
 			enableFinish(false);
 		}
@@ -182,7 +182,7 @@ public class SpectrumFitterWizard extends JWizardDialog {
 		private JRadioButton jRadioButton_DefaultLineWeights;
 
 		OptionsPanel(JWizardDialog parent) {
-			super(parent);
+			super(parent, "Fit options");
 			initialize();
 		}
 
@@ -282,7 +282,7 @@ public class SpectrumFitterWizard extends JWizardDialog {
 			enableFinish(true);
 		}
 
-	};
+	}
 
 	public static void main(String[] args) {
 		try {

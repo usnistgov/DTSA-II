@@ -1,7 +1,5 @@
 package gov.nist.microanalysis.dtsa2;
 
-import gov.nist.microanalysis.EPQTools.ErrorDialog;
-
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -17,6 +15,8 @@ import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
 
+import gov.nist.microanalysis.EPQTools.ErrorDialog;
+
 /**
  * <p>
  * A dialog to permit users to enter an annotation into the HTML report
@@ -28,7 +28,7 @@ import com.jgoodies.forms.layout.FormLayout;
  * <p>
  * Institution: National Institute of Standards and Technology
  * </p>
- * 
+ *
  * @author nicholas
  * @version 1.0
  */
@@ -117,7 +117,6 @@ public class AnnotationDialog
             mResult = ad.getResult();
          }
       }
-      ;
       final AnnotRunnable ar = new AnnotRunnable(fm);
       if(SwingUtilities.isEventDispatchThread())
          ar.run();

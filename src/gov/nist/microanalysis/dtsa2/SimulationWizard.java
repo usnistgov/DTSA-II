@@ -111,7 +111,7 @@ import gov.nist.microanalysis.Utility.Transform3D;
  * <p>
  * Institution: National Institute of Standards and Technology
  * </p>
- * 
+ *
  * @author Nicholas @version 1.0
  */
 public class SimulationWizard extends JWizardDialog {
@@ -133,7 +133,7 @@ public class SimulationWizard extends JWizardDialog {
 		MCRectangularPrism, //
 		MCTriangularPrism, //
 		MCBuriedLayer //
-	};
+	}
 
 	enum VPGas {
 		HELIUM("Helium") {
@@ -189,7 +189,7 @@ public class SimulationWizard extends JWizardDialog {
 	private final SimConfiguration mConfig = new SimConfiguration(this);
 	private final SimOther mOther = new SimOther(this);
 	private final SimVP mVariablePressure = new SimVP(this);
-	private final JWizardProgressPanel<ISpectrumData[]> mProgress = new JWizardProgressPanel<ISpectrumData[]>(this,
+	private final JWizardProgressPanel<ISpectrumData[]> mProgress = new JWizardProgressPanel<>(this,
 			"Computing the requested spectra...", mThread);
 	private Session mSession;
 
@@ -633,7 +633,7 @@ public class SimulationWizard extends JWizardDialog {
 			ISpectrumData spec = null, rawSpec = null;
 			final SpectrumProperties props = new SpectrumProperties();
 			props.setNumericProperty(SpectrumProperties.BeamEnergy, FromSI.keV(mBeamEnergy));
-			props.setNumericProperty(SpectrumProperties.FaradayBegin, 1.0);
+			props.setNumericProperty(SpectrumProperties.ProbeCurrent, 1.0);
 			props.setNumericProperty(SpectrumProperties.LiveTime, mProbeDose * FromSI.NANO);
 			props.setDetector(mDetector);
 			double[] sNorm;
@@ -668,7 +668,7 @@ public class SimulationWizard extends JWizardDialog {
 					// sample position
 					final double[] origin = SpectrumUtils.getSamplePosition(props);
 					props.setNumericProperty(SpectrumProperties.WorkingDistance, 1.0e3 * origin[2]);
-					final Set<Element> elms = new TreeSet<Element>();
+					final Set<Element> elms = new TreeSet<>();
 					// sc is used to size the emission images
 					double sc = 1.0e-4;
 					MonteCarloSS.ElectronGun gun = new GaussianBeam(1.0e-8);
@@ -1089,8 +1089,8 @@ public class SimulationWizard extends JWizardDialog {
 						mAnnularDetector[0] = new AnnularDetector(1.0e-7, 1, origin, Math2.MINUS_Z_AXIS);
 						mAnnularDetector[1] = new AnnularDetector(50.0e-6, 20, origin, Math2.MINUS_Z_AXIS);
 						mAnnularDetector[2] = new AnnularDetector(1000.0e-6, 20, origin, Math2.MINUS_Z_AXIS);
-						for (int i = 0; i < mAnnularDetector.length; ++i)
-							mc.addActionListener(mAnnularDetector[i]);
+						for (AnnularDetector element : mAnnularDetector)
+                     mc.addActionListener(element);
 					}
 					{
 						CharacteristicXRayGeneration3 cxg = null;
@@ -1121,9 +1121,9 @@ public class SimulationWizard extends JWizardDialog {
 							//		XRayTransitionSet.M_ALPHA };
 							final String[] families = new String[] {
 									XRayTransitionSet.K_FAMILY, XRayTransitionSet.L_FAMILY, //
-									XRayTransitionSet.M_FAMILY, XRayTransitionSet.N_FAMILY	
+									XRayTransitionSet.M_FAMILY, XRayTransitionSet.N_FAMILY
 							};
-							final Set<XRayTransitionSet> xrtss = new TreeSet<XRayTransitionSet>();
+							final Set<XRayTransitionSet> xrtss = new TreeSet<>();
 							for (final Element elm : elms)
 								for (final String family : families) {
 									final XRayTransitionSet xrts = new XRayTransitionSet(elm, family, 0.0,
@@ -1148,7 +1148,7 @@ public class SimulationWizard extends JWizardDialog {
 							if (mEnableVP)
 								sc *= 10.0;
 							if (mGenImages && ((ctr != null) || (ctrFl != null))) {
-								mEmissionImages3 = new ArrayList<EmissionImage3>();
+								mEmissionImages3 = new ArrayList<>();
 								for (final XRayTransitionSet xrts : xrtss) {
 									final XRayTransition xrt = xrts.getWeighiestTransition();
 									final EmissionImage3 ei = new EmissionImage3(256, 256, xrt);
@@ -1216,7 +1216,7 @@ public class SimulationWizard extends JWizardDialog {
 							}
 							mEmissionFiles = null;
 							if (mEmissionImages3 != null) {
-								mEmissionFiles = new TreeMap<String, String>();
+								mEmissionFiles = new TreeMap<>();
 								final Iterator<ImageWriter> writers = ImageIO.getImageWritersByFormatName("png");
 								if (writers.hasNext()) {
 									final ImageWriter writer = writers.next();
@@ -1248,7 +1248,7 @@ public class SimulationWizard extends JWizardDialog {
 								ti.dump(tf);
 								final double[] fov = ti.getFOV();
 								HalfUpFormat huf = new HalfUpFormat(fov[0] > 100.0e-6 ? "0.0" : "0.00");
-								final String lbl = "Tajectories<br/>FOV = " + huf.format(1.0e6 * fov[0]) + " &mu;m &times; " + //
+								final String lbl = "Trajectories<br/>FOV = " + huf.format(1.0e6 * fov[0]) + " &mu;m &times; " + //
 										huf.format(1.0e6 * fov[1]) + " &mu;m";
 								mEmissionFiles.put(lbl, tf.toURI().toURL().toString());
 							}
@@ -1343,7 +1343,7 @@ public class SimulationWizard extends JWizardDialog {
 		protected void done() {
 			enableFinish(true);
 		}
-	};
+	}
 
 	public class SimMode extends JWizardPanel {
 		static private final long serialVersionUID = 0x34;
@@ -1370,7 +1370,7 @@ public class SimulationWizard extends JWizardDialog {
 		private final JRadioButton mMCBuriedLayer = new JRadioButton("Monte Carlo model of a buried layer of material");
 
 		private SimMode(SimulationWizard wiz) {
-			super(wiz);
+			super(wiz, "Specify the simulation mode");
 			initialize();
 			mSession = DTSA2.getSession();
 		}
@@ -1446,7 +1446,7 @@ public class SimulationWizard extends JWizardDialog {
 		@Override
 		public void onShow() {
 			getWizard().setMessageText("Select the type of spectrum simulation to perform.");
-			getWizard().setNextPanel(mGeometry, "Configure sample");
+			getWizard().setNextPanel(mGeometry);
 			getWizard().enableFinish(false);
 		}
 
@@ -1547,13 +1547,13 @@ public class SimulationWizard extends JWizardDialog {
 		private final JTextField jTextField_BeamEnergy = new JTextField();
 		private final JTextField jTextField_ProbeDose = new JTextField();
 		private final JTextField jTextField_IncidentAngle = new JTextField();
-		private final JComboBox<ElectronProbe> jComboBox_Instrument = new JComboBox<ElectronProbe>();
-		private final JComboBox<DetectorProperties> jComboBox_Detector = new JComboBox<DetectorProperties>();
-		private final JComboBox<DetectorCalibration> jComboBox_Calibration = new JComboBox<DetectorCalibration>();
+		private final JComboBox<ElectronProbe> jComboBox_Instrument = new JComboBox<>();
+		private final JComboBox<DetectorProperties> jComboBox_Detector = new JComboBox<>();
+		private final JComboBox<DetectorCalibration> jComboBox_Calibration = new JComboBox<>();
 		private final NumberFormat mFormatter = new HalfUpFormat("0.0");
 
 		private SimConfiguration(SimulationWizard sw) {
-			super(sw);
+			super(sw, "Instrument configuration");
 			initialize();
 		}
 
@@ -1605,7 +1605,7 @@ public class SimulationWizard extends JWizardDialog {
 
 			pb.addLabel("Instrument", cc.xy(2, 3));
 			pb.add(jComboBox_Instrument, cc.xyw(4, 3, 4));
-			final DefaultComboBoxModel<ElectronProbe> dcbm = new DefaultComboBoxModel<ElectronProbe>(
+			final DefaultComboBoxModel<ElectronProbe> dcbm = new DefaultComboBoxModel<>(
 					mSession.getCurrentProbes().toArray(new ElectronProbe[0]));
 			jComboBox_Instrument.setModel(dcbm);
 
@@ -1656,7 +1656,7 @@ public class SimulationWizard extends JWizardDialog {
 			if (det != null) {
 				jComboBox_Instrument.setSelectedItem(det.getOwner());
 				final Set<DetectorProperties> dets = mSession.getDetectors(det.getOwner());
-				final DefaultComboBoxModel<DetectorProperties> dcbm = new DefaultComboBoxModel<DetectorProperties>(
+				final DefaultComboBoxModel<DetectorProperties> dcbm = new DefaultComboBoxModel<>(
 						dets.toArray(new DetectorProperties[0]));
 				dcbm.setSelectedItem(det.getDetectorProperties());
 				jComboBox_Detector.setModel(dcbm);
@@ -1665,7 +1665,7 @@ public class SimulationWizard extends JWizardDialog {
 				final Object selDet = jComboBox_Detector.getSelectedItem();
 				final ElectronProbe ep = (ElectronProbe) jComboBox_Instrument.getSelectedItem();
 				final Set<DetectorProperties> dets = mSession.getDetectors(ep);
-				final DefaultComboBoxModel<DetectorProperties> dcbm = new DefaultComboBoxModel<DetectorProperties>(
+				final DefaultComboBoxModel<DetectorProperties> dcbm = new DefaultComboBoxModel<>(
 						dets.toArray(new DetectorProperties[0]));
 				if (dets.contains(selDet))
 					dcbm.setSelectedItem(selDet);
@@ -1737,7 +1737,7 @@ public class SimulationWizard extends JWizardDialog {
 			if (jComboBox_Detector.getSelectedItem() instanceof DetectorProperties) {
 				final DetectorProperties dp = (DetectorProperties) jComboBox_Detector.getSelectedItem();
 				final List<DetectorCalibration> cals = mSession.getCalibrations(dp);
-				final DefaultComboBoxModel<DetectorCalibration> dcbm = new DefaultComboBoxModel<DetectorCalibration>(
+				final DefaultComboBoxModel<DetectorCalibration> dcbm = new DefaultComboBoxModel<>(
 						cals.toArray(new DetectorCalibration[0]));
 				if (cals.contains(last))
 					dcbm.setSelectedItem(last);
@@ -1755,7 +1755,7 @@ public class SimulationWizard extends JWizardDialog {
 			jTextField_IncidentAngle.setText(mFormatter.format(Math.toDegrees(mThread.mIncidentAngle)));
 			updateDetectors(mThread.mDetector);
 			updateCalibrations(mThread.mDetector);
-			getWizard().setNextPanel(mOther, "Other options");
+			getWizard().setNextPanel(mOther);
 			getWizard().enableFinish(false);
 		}
 	}
@@ -1763,13 +1763,13 @@ public class SimulationWizard extends JWizardDialog {
 	public class SimVP extends JWizardPanel {
 
 		private final JCheckBox jCheckBox_Enable = new JCheckBox("Enable variable pressure");
-		private final JComboBox<VPGas> jComboBox_Gas = new JComboBox<VPGas>();
+		private final JComboBox<VPGas> jComboBox_Gas = new JComboBox<>();
 		private final JTextField jTextField_Length = new JTextField();
 		private final JTextField jTextField_Pressure = new JTextField();
 		private JPanel jPanel_VP = null;
 
 		public SimVP(JWizardDialog wiz) {
-			super(wiz);
+			super(wiz,"Specify variable-pressure options");
 			initialize();
 		}
 
@@ -1800,7 +1800,7 @@ public class SimulationWizard extends JWizardDialog {
 					enableVP(jCheckBox_Enable.isSelected());
 				}
 			});
-			final DefaultComboBoxModel<VPGas> model = new DefaultComboBoxModel<VPGas>(VPGas.values());
+			final DefaultComboBoxModel<VPGas> model = new DefaultComboBoxModel<>(VPGas.values());
 			jComboBox_Gas.setModel(model);
 		}
 
@@ -1840,7 +1840,7 @@ public class SimulationWizard extends JWizardDialog {
 			final NumberFormat df = new HalfUpFormat("0.000");
 			jTextField_Length.setText(df.format(userPref.getDouble("Path Length", 10.0)));
 			jTextField_Pressure.setText(df.format(userPref.getDouble("Pressure", 100.0)));
-			getWizard().setNextPanel(mProgress, "Perform Simulation");
+			getWizard().setNextPanel(mProgress);
 			getWizard().enableFinish(false);
 		}
 
@@ -1874,14 +1874,14 @@ public class SimulationWizard extends JWizardDialog {
 
 		private static final long serialVersionUID = -2608824770868058496L;
 
-	};
+	}
 
 	public class SimOther extends JWizardPanel {
 
 		private static final long serialVersionUID = -303750288614337274L;
 		private final JCheckBox jCheckBox_AddNoise = new JCheckBox("Apply simulated count statistics");
 		private final JTextField jTextField_Count = new JTextField("Instance count");
-		private final JComboBox<String> jComboBox_Extra = new JComboBox<String>();
+		private final JComboBox<String> jComboBox_Extra = new JComboBox<>();
 		private final JCheckBox jCheckBox_CharFluor = new JCheckBox("Characteristic secondary");
 		private final JCheckBox jCheckBox_BremFluor = new JCheckBox("Bremsstrahlung secondary");
 		private final JCheckBox jCheckBox_Bremsstrahlung = new JCheckBox("Bremsstrahlung primary");
@@ -1890,7 +1890,7 @@ public class SimulationWizard extends JWizardDialog {
 		private int mReplicas = 1;
 
 		public SimOther(SimulationWizard wiz) {
-			super(wiz);
+			super(wiz, "Other options");
 			initialize();
 		}
 
@@ -1967,9 +1967,9 @@ public class SimulationWizard extends JWizardDialog {
 			jTextField_Count.setEnabled(jCheckBox_AddNoise.isSelected());
 			jComboBox_Extra.setSelectedIndex(Integer.highestOneBit(mThread.mExtraElectrons) / 2);
 			if (mThread.mMode == SimulationMode.AnalyticalBulk)
-				getWizard().setNextPanel(mProgress, "Perform Simulation");
+				getWizard().setNextPanel(mProgress);
 			else
-				getWizard().setNextPanel(mVariablePressure, "Configure VP");
+				getWizard().setNextPanel(mVariablePressure);
 			getWizard().enableFinish(false);
 		}
 
@@ -2019,7 +2019,7 @@ public class SimulationWizard extends JWizardDialog {
 		private final NumberFormat mFormatter = new HalfUpFormat("0.000");
 
 		private SimGeometry(SimulationWizard sw) {
-			super(sw);
+			super(sw, "Specify geometry");
 			initialize();
 		}
 
@@ -2277,7 +2277,7 @@ public class SimulationWizard extends JWizardDialog {
 			case MCHemisphere:
 			case MCSphere:
 			case MCCylinderOnEnd:
-			case MCFilm: 
+			case MCFilm:
 			case MCBuriedLayer: {
 				boolean b = false;
 				jLabel_Rotate.setVisible(b);
@@ -2439,7 +2439,7 @@ public class SimulationWizard extends JWizardDialog {
 				break;
 			}
 			getWizard().setMessageText("Specify the sample material and scale.");
-			getWizard().setNextPanel(mConfig, "Instrument configuration");
+			getWizard().setNextPanel(mConfig);
 			getWizard().enableFinish(false);
 		}
 	}
@@ -2461,7 +2461,7 @@ public class SimulationWizard extends JWizardDialog {
 	}
 
 	private void initialize() {
-		setActivePanel(mSimMode, "Simulation Mode");
+		setActivePanel(mSimMode);
 		pack();
 	}
 

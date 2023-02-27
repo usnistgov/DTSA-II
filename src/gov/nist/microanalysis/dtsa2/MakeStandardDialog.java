@@ -49,6 +49,7 @@ import com.jgoodies.forms.layout.FormLayout;
 import gov.nist.microanalysis.EPQDatabase.Session;
 import gov.nist.microanalysis.EPQLibrary.Composition;
 import gov.nist.microanalysis.EPQLibrary.ConductiveCoating;
+import gov.nist.microanalysis.EPQLibrary.DuaneHuntLimit;
 import gov.nist.microanalysis.EPQLibrary.EPQException;
 import gov.nist.microanalysis.EPQLibrary.EditableSpectrum;
 import gov.nist.microanalysis.EPQLibrary.Element;
@@ -115,7 +116,7 @@ public class MakeStandardDialog extends JWizardDialog {
 		private final JButton jButton_UpdateLT = new JButton("Update");
 
 		public DosePanel(JWizardDialog wiz) {
-			super(wiz);
+			super(wiz, "Specify probe dose");
 			initialize();
 		}
 
@@ -144,15 +145,11 @@ public class MakeStandardDialog extends JWizardDialog {
 					} catch (NumberFormatException nfe) {
 						MakeStandardDialog.this.setErrorText("Please specify a positive number.");
 					}
-					for (PropertyId pid : new PropertyId[] { //
-							SpectrumProperties.FaradayBegin,
-							SpectrumProperties.FaradayEnd }) {
-						for (int sel : sels)
-							if (val > 0.0)
-								mSpectra.get(sel).getProperties().setNumericProperty(pid, val);
-							else
-								mSpectra.get(sel).getProperties().clear(pid);
-					}
+					for (int sel : sels)
+						if (val > 0.0)
+							mSpectra.get(sel).getProperties().setNumericProperty(SpectrumProperties.ProbeCurrent, val);
+						else
+							mSpectra.get(sel).getProperties().clear(SpectrumProperties.ProbeCurrent);
 					update();
 				}
 			});
@@ -178,13 +175,15 @@ public class MakeStandardDialog extends JWizardDialog {
 
 		}
 
-		public void onShow() {
+		@Override
+      public void onShow() {
 			update();
-			setNextPanel(mStandardPanel, "Standard Properties");
+			setNextPanel(mStandardPanel);
 			enableFinish(false);
 		}
 
-		public boolean permitNext() {
+		@Override
+      public boolean permitNext() {
 			boolean ok = checkDoses(mSpectra);
 			if (ok)
 				MakeStandardDialog.this.setMessageText("");
@@ -197,8 +196,9 @@ public class MakeStandardDialog extends JWizardDialog {
 			DefaultTableModel model = new DefaultTableModel(new Object[] { "Spectrum", "Probe Current", "Live Time" },
 					0);
 			for (ISpectrumData spec : mSpectra) {
-				model.addRow(new Object[] { spec,
-						spec.getProperties().getTextWithDefault(SpectrumProperties.FaradayBegin, "missing"),
+				final String faraday = spec.getProperties().getTextWithDefault(SpectrumProperties.ProbeCurrent,
+						"missing");
+				model.addRow(new Object[] { spec, faraday,
 						spec.getProperties().getTextWithDefault(SpectrumProperties.LiveTime, "missing") });
 			}
 			jTable_Dose.setModel(model);
@@ -208,10 +208,9 @@ public class MakeStandardDialog extends JWizardDialog {
 	public static boolean checkDoses(Collection<ISpectrumData> specs) {
 		for (ISpectrumData spec : specs) {
 			SpectrumProperties sp = spec.getProperties();
-			final double fb = sp.getNumericWithDefault(SpectrumProperties.FaradayBegin, -1.0);
-			final double fe = sp.getNumericWithDefault(SpectrumProperties.FaradayEnd, fb);
+			final double f = sp.getNumericWithDefault(SpectrumProperties.ProbeCurrent, -1.0);
 			final double lt = sp.getNumericWithDefault(SpectrumProperties.LiveTime, -1.0);
-			if ((fe < 0.0) || (lt < 0.0))
+			if ((f < 0.0) || (lt < 0.0))
 				return false;
 		}
 		return true;
@@ -229,11 +228,12 @@ public class MakeStandardDialog extends JWizardDialog {
 		private final JButton jButton_SpecProperties = new JButton("Properties");
 
 		public StandardPanel(JWizardDialog wiz) {
-			super(wiz);
+			super(wiz, "Specify standards");
 			initialize();
 		}
 
-		public void onShow() {
+		@Override
+      public void onShow() {
 			if (mSpectra.size() == 1)
 				setMessageText("Creating a standard from a single spectrum.");
 			else
@@ -246,7 +246,7 @@ public class MakeStandardDialog extends JWizardDialog {
 			jTextField_Detector.setText(mDetector != null ? mDetector.getName() : "--------");
 			jTextField_Material.requestFocus();
 
-			setNextPanel(mFilterPanel, "Select Spectra");
+			setNextPanel(mFilterPanel);
 			enableFinish(false);
 		}
 
@@ -392,7 +392,8 @@ public class MakeStandardDialog extends JWizardDialog {
 			addInScrollPane(pb.getPanel());
 		}
 
-		public boolean permitNext() {
+		@Override
+      public boolean permitNext() {
 			return mMaterial.getElementCount() > 0;
 		}
 
@@ -410,8 +411,7 @@ public class MakeStandardDialog extends JWizardDialog {
 			final SpectrumPropertyPanel.PropertyDialog dlg = new SpectrumPropertyPanel.PropertyDialog(
 					MakeStandardDialog.this, mSession);
 			final SpectrumProperties.PropertyId[] required = new SpectrumProperties.PropertyId[] {
-					SpectrumProperties.BeamEnergy, SpectrumProperties.FaradayBegin, SpectrumProperties.FaradayEnd,
-					SpectrumProperties.LiveTime };
+					SpectrumProperties.BeamEnergy, SpectrumProperties.ProbeCurrent, SpectrumProperties.LiveTime };
 			dlg.setRequiredProperties(Arrays.asList(required));
 			dlg.addSpectrumProperties(sp);
 			dlg.setLocationRelativeTo(this);
@@ -450,7 +450,7 @@ public class MakeStandardDialog extends JWizardDialog {
 		};
 
 		public FilterPanel(JWizardDialog wiz) {
-			super(wiz);
+			super(wiz, "Select spectra");
 			initialize();
 		}
 
@@ -470,9 +470,10 @@ public class MakeStandardDialog extends JWizardDialog {
 			jFilterTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		}
 
-		public void onShow() {
+		@Override
+      public void onShow() {
 			setMessageText("Select which spectra to include in the bundle.");
-			setNextPanel(mSpecialPanel, "Special Options");
+			setNextPanel(mSpecialPanel);
 			updateSelected();
 			enableFinish(false);
 		}
@@ -480,21 +481,23 @@ public class MakeStandardDialog extends JWizardDialog {
 		private void updateSelected() {
 			DecimalFormat nf = new DecimalFormat("#.##");
 			RegionOfInterestSet rois = computeROIS();
-			DefaultTableModel model = new DefaultTableModel(new Object[] { "Spectrum", "Score", "Included" }, 0);
+			DefaultTableModel model = new DefaultTableModel(
+					new Object[] { "Spectrum", "Score", "Duane-Hunt", "Included" }, 0);
 			ArrayList<ISpectrumData> sel = new ArrayList<>();
-			for (int i = 0; i < mSpectra.size(); ++i)
+			final int spSize = mSpectra.size();
+			for (int i = 0; i < spSize; ++i)
 				if (mSelected.get(i))
 					sel.add(mSpectra.get(i));
-			double[] scores = new double[mSpectra.size()];
+			double[] scores = new double[spSize];
 			int selCount = 0;
-			for (int i = 0; i < mSpectra.size(); ++i)
+			for (int i = 0; i < spSize; ++i)
 				if (mSelected.get(i)) {
 					++selCount;
 					scores[i] = score(mSpectra.get(i), sel, rois);
 				}
-			final String[] html = new String[scores.length];
+			final String[] html = new String[spSize];
 			final double ss = Math2.sum(scores);
-			for (int i = 0; i < scores.length; ++i) {
+			for (int i = 0; i < spSize; ++i) {
 				if (scores[i] > 0.0) {
 					final double sc = scores[i] / ((ss - scores[i]) / (selCount - 1));
 					if (sc < 2.0)
@@ -506,16 +509,34 @@ public class MakeStandardDialog extends JWizardDialog {
 				} else
 					html[i] = "N/A";
 			}
-			for (int i = 0; i < mSpectra.size(); ++i)
+			double e0 = mSpectra.get(0).getProperties().getNumericWithDefault(SpectrumProperties.BeamEnergy,
+					Double.NaN);
+			assert !Double.isNaN(e0);
+			final String[] dhunt = new String[spSize];
+			for (int i = 0; i < spSize; ++i) {
+				double dh = FromSI.keV(DuaneHuntLimit.DefaultDuaneHunt.compute(mSpectra.get(i)));
+				if (!Double.isNaN(dh)) {
+					final double de0 = ((e0 - dh) / e0);
+					if (de0 < 0.025) // less than 2.5% less than the beam energy
+						dhunt[i] = "<html><font color=\"black\">" + nf.format(dh) + " keV</font>";
+					else if (de0 < 0.05) // less than 5% less
+						dhunt[i] = "<html><font color=\"orange\">" + nf.format(dh) + " keV</font>";
+					else // more than 5% less than the beam energy
+						dhunt[i] = "<html><font color=\"red\">" + nf.format(dh) + " keV</font>";
+				} else
+					dhunt[i] = "<html><font color=\"red\">Unknown keV</font>";
+			}
+			for (int i = 0; i < spSize; ++i)
 				model.addRow(new Object[] { //
 						mSpectra.get(i).toString(), //
 						html[i], //
-						mSelected.get(i).toString() //
+						dhunt[i], mSelected.get(i).toString() //
 				});
 			jFilterTable.setModel(model);
 		}
 
-		public boolean permitNext() {
+		@Override
+      public boolean permitNext() {
 			int i = 0;
 			for (Boolean b : mSelected)
 				if (b)
@@ -588,17 +609,18 @@ public class MakeStandardDialog extends JWizardDialog {
 		}
 
 		public SpecialPanel(JWizardDialog wiz) {
-			super(wiz);
+			super(wiz, "Special options");
 			initialize();
 		}
 
-		public void onShow() {
+		@Override
+      public void onShow() {
 
 			jCheckBox_Film.setSelected(mThinFilmStandard);
 			updateThicknessCheckBox();
 			updateCoatingCheckBox();
 
-			setNextPanel(mReferencePanel, "Specify References");
+			setNextPanel(mReferencePanel);
 			enableFinish(true);
 			mSave = true;
 		}
@@ -729,7 +751,7 @@ public class MakeStandardDialog extends JWizardDialog {
 		private final JButton jButton_Clear = new JButton("Clear");
 
 		public ReferencePanel(JWizardDialog wiz) {
-			super(wiz);
+			super(wiz, "Specify references");
 			initialize();
 		}
 
@@ -752,7 +774,8 @@ public class MakeStandardDialog extends JWizardDialog {
 			add(pb.build());
 		}
 
-		public void onShow() {
+		@Override
+      public void onShow() {
 			if (jTable_Refs.getRowCount() == 0) {
 				jLabel_Refs.setText("<html><b>No references are required!</b>");
 				jTable_Refs.setVisible(false);
@@ -769,7 +792,8 @@ public class MakeStandardDialog extends JWizardDialog {
 			}
 		}
 
-		public boolean permitNext() {
+		@Override
+      public boolean permitNext() {
 			if (jTable_Refs.getRowCount() > 0) {
 				int missing = 0;
 				for (StandardBundle sb : mBundle.values())
@@ -824,7 +848,7 @@ public class MakeStandardDialog extends JWizardDialog {
 		}
 
 		private Set<Element> getElementsForRows(final int[] rows) {
-			final Set<Element> res = new TreeSet<Element>();
+			final Set<Element> res = new TreeSet<>();
 			for (final int row : rows)
 				res.addAll(((RegionOfInterest) jTable_Refs.getModel().getValueAt(row, 0)).getElementSet());
 			return res;
@@ -948,8 +972,8 @@ public class MakeStandardDialog extends JWizardDialog {
 
 	private final Session mSession;
 	private Composition mMaterial = new Composition();
-	private final ArrayList<ISpectrumData> mSpectra = new ArrayList<ISpectrumData>();
-	private final ArrayList<Boolean> mSelected = new ArrayList<Boolean>();
+	private final ArrayList<ISpectrumData> mSpectra = new ArrayList<>();
+	private final ArrayList<Boolean> mSelected = new ArrayList<>();
 	private double mBeamEnergy = Double.NaN;
 	private boolean mThinFilmStandard = false;
 	private boolean mCoating = false;
@@ -962,9 +986,9 @@ public class MakeStandardDialog extends JWizardDialog {
 	private ISpectrumData mRough = null;
 	private boolean mSave = false;
 
-	private final Map<Element, StandardBundle> mBundle = new TreeMap<Element, StandardBundle>();
-	private final Set<RegionOfInterest> mROI = new HashSet<RegionOfInterest>();
-	private final Set<Element> mStrip = new TreeSet<Element>();
+	private final Map<Element, StandardBundle> mBundle = new TreeMap<>();
+	private final Set<RegionOfInterest> mROI = new HashSet<>();
+	private final Set<Element> mStrip = new TreeSet<>();
 
 	public MakeStandardDialog(final Frame frame, final Session session) {
 		super(frame, "Build standard bundle", true);
@@ -975,7 +999,7 @@ public class MakeStandardDialog extends JWizardDialog {
 	}
 
 	private void initialize() {
-		setActivePanel(mDosePanel, "Standard Dose");
+		setActivePanel(mDosePanel);
 		enableFinish(false);
 	}
 
@@ -1018,7 +1042,7 @@ public class MakeStandardDialog extends JWizardDialog {
 			mCoatingMaterial = Material.Null;
 		}
 		mStandardPanel.jPanel_Element.setAvailableElements(mMaterial.getElementSet());
-		setActivePanel(mDosePanel, "Standard Dose");
+		setActivePanel(mDosePanel);
 	}
 
 	private double getProbeDose() {
@@ -1047,7 +1071,7 @@ public class MakeStandardDialog extends JWizardDialog {
 			mBundle.clear();
 			final Set<Element> selected = mStandardPanel.jPanel_Element.getSelected();
 			for (final Element elm : selected) {
-				final Set<Element> strip = new TreeSet<Element>();
+				final Set<Element> strip = new TreeSet<>();
 				if (mSpecialPanel.jCheckBox_Carbon.isSelected())
 					strip.add(Element.C);
 				if (mSpecialPanel.jCheckBox_Oxygen.isSelected())
@@ -1088,7 +1112,7 @@ public class MakeStandardDialog extends JWizardDialog {
 
 	private TableModel buildRefTable() {
 		final HashMap<RegionOfInterest, ISpectrumData> rois = getAllROIS();
-		final TreeSet<RegionOfInterest> sorted = new TreeSet<RegionOfInterest>(new ROICompare());
+		final TreeSet<RegionOfInterest> sorted = new TreeSet<>(new ROICompare());
 		sorted.addAll(rois.keySet());
 		final Object[][] data = new Object[rois.size()][2];
 		int i = 0;
@@ -1126,7 +1150,7 @@ public class MakeStandardDialog extends JWizardDialog {
 	}
 
 	protected HashMap<RegionOfInterest, ISpectrumData> getAllROIS() {
-		final HashMap<RegionOfInterest, ISpectrumData> rois = new HashMap<RegionOfInterest, ISpectrumData>();
+		final HashMap<RegionOfInterest, ISpectrumData> rois = new HashMap<>();
 		for (final StandardBundle sb : mBundle.values()) {
 			final Set<RegionOfInterest> reqRefs = sb.getAllRequiredReferences();
 			for (final RegionOfInterest roi : reqRefs)
@@ -1182,10 +1206,27 @@ public class MakeStandardDialog extends JWizardDialog {
 				sp.setNumericProperty(SpectrumProperties.BeamEnergy, mBeamEnergy);
 				sp.setCompositionProperty(SpectrumProperties.StandardComposition, mMaterial);
 				final double pd = getProbeDose();
-				sp.setNumericProperty(SpectrumProperties.FaradayBegin, pd / lt);
-				sp.setNumericProperty(SpectrumProperties.FaradayEnd, pd / lt);
+				sp.setNumericProperty(SpectrumProperties.ProbeCurrent, pd / lt);
 				sp.setNumericProperty(SpectrumProperties.LiveTime, lt);
 				sp.setNumericProperty(SpectrumProperties.RealTime, rt);
+				// Add a metric which indicates how much the sum spectrum differs from the count
+				// statistic limit
+				try {
+					ArrayList<ISpectrumData> specs = new ArrayList<>();
+					for (int i = 0; i < mSpectra.size(); ++i)
+						if (mSelected.get(i))
+							specs.add(mSpectra.get(i));
+					double msm = 0.0;
+					RegionOfInterestSet rois = computeROIS();
+					for (ISpectrumData spec : specs) {
+						ArrayList<ISpectrumData> others = new ArrayList<>(specs);
+						others.remove(spec);
+						msm += SpectrumUtils.measureDissimilarity(spec, others, rois);
+					}
+					sp.setNumericProperty(SpectrumProperties.MultiSpectrumMetric, msm / specs.size());
+				} catch (EPQException e) {
+					// Just don't add it...
+				}
 				if (mThinFilmStandard && (!Double.isNaN(mThickness))) {
 					final ThinFilm tf = new ThinFilm(Math2.MINUS_Z_AXIS, mThickness);
 					sp.setSampleShape(SpectrumProperties.SampleShape, tf);
@@ -1213,7 +1254,7 @@ public class MakeStandardDialog extends JWizardDialog {
 	}
 
 	public List<ISpectrumData> getSelected() {
-		ArrayList<ISpectrumData> res = new ArrayList<ISpectrumData>();
+		ArrayList<ISpectrumData> res = new ArrayList<>();
 		for (int i = 0; i < mSelected.size(); ++i)
 			if (mSelected.get(i))
 				res.add(mSpectra.get(i));

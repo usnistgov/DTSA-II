@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="izpack" default="compile">
    
-  <property name="izpack-dist" value="C:/Program Files/IzPack"/>
+  <property name="izpack-dist" value="C:/Program Files (x86)/IzPack"/>
   <property name="izpack-installer" value="dtsa2_jupiter.jar"/>
 	
   <path id="lib.path">

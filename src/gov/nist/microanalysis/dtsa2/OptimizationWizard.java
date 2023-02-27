@@ -141,17 +141,13 @@ import gov.nist.microanalysis.Utility.UncertainValue2;
  * <p>
  * Institution: National Institute of Standards and Technology
  * </p>
- * 
+ *
  * @author Nicholas
  * @version 1.0
  */
-public class OptimizationWizard
-   extends
-   JWizardDialog {
+public class OptimizationWizard extends JWizardDialog {
 
-   public class IntroductionPanel
-      extends
-      JWizardPanel {
+   public class IntroductionPanel extends JWizardPanel {
 
       private static final long serialVersionUID = 5292911814090992349L;
 
@@ -164,7 +160,7 @@ public class OptimizationWizard
       ButtonGroup buttonGroup_RB = new ButtonGroup();
 
       public IntroductionPanel() {
-         super(OptimizationWizard.this);
+         super(OptimizationWizard.this, "Select optimization method");
          this.setName("Welcome");
          jRadioButton_OptimizeEDS.setToolTipText("Optimize a measurement made with an energy dispersive spectrometer.");
          jRadioButton_OptimizeExp.setToolTipText("Optimize a measurement made with an energy dispersive spectrometer. Manually select standards.");
@@ -189,7 +185,7 @@ public class OptimizationWizard
          jRadioButton_OptimizeEDS.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
-               setNextPanel(jWizardPanel_EstComposition, "Estimate material");
+               setNextPanel(jWizardPanel_EstComposition);
                mMode = Mode.OptimizeEDS;
             }
          });
@@ -197,7 +193,7 @@ public class OptimizationWizard
          jRadioButton_OptimizeExp.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
-               setNextPanel(jWizardPanel_Instrument, "Specify a detector");
+               setNextPanel(jWizardPanel_Instrument);
                mMode = Mode.OptimizeExpert;
             }
          });
@@ -208,7 +204,7 @@ public class OptimizationWizard
          jRadioButton_FindStandards.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
-               setNextPanel(jWizardPanel_SelectMaterials, "Specify materials");
+               setNextPanel(jWizardPanel_SelectMaterials);
                mMode = Mode.FindStandards;
             }
          });
@@ -224,30 +220,28 @@ public class OptimizationWizard
     * Allows the user to specify an Instrument, Detector/Calibration and beam
     * energy for the unknown spectrum.
     */
-   public class InstrumentDetectorPanel
-      extends
-      JWizardPanel {
+   public class InstrumentDetectorPanel extends JWizardPanel {
 
-      private final JComboBox<ElectronProbe> jComboBox_Instrument = new JComboBox<ElectronProbe>();
-      private final JComboBox<DetectorProperties> jComboBox_Detector = new JComboBox<DetectorProperties>();
-      private final JComboBox<EDSCalibration> jComboBox_Calibration = new JComboBox<EDSCalibration>();
+      private final JComboBox<ElectronProbe> jComboBox_Instrument = new JComboBox<>();
+      private final JComboBox<DetectorProperties> jComboBox_Detector = new JComboBox<>();
+      private final JComboBox<EDSCalibration> jComboBox_Calibration = new JComboBox<>();
       private final JTextFieldDouble jTextField_BeamEnergy = new JTextFieldDouble();
 
       private static final long serialVersionUID = -6481374858932055638L;
       private boolean mFirstShow = true;
 
       public InstrumentDetectorPanel() {
-         super(OptimizationWizard.this);
+         super(OptimizationWizard.this, "Specify detector options");
          try {
             initialize();
-         }
-         catch(final Exception ex) {
+         } catch (final Exception ex) {
             ex.printStackTrace();
          }
       }
 
       private void initialize() {
-         final FormLayout fl = new FormLayout("10dlu, right:pref, 3dlu, 40dlu, 3dlu, 80dlu, 3dlu, pref", "pref, 3dlu, pref, 3dlu, pref, 3dlu, pref, 3dlu, pref, 3dlu, pref, 3dlu, pref");
+         final FormLayout fl = new FormLayout("10dlu, right:pref, 3dlu, 40dlu, 3dlu, 80dlu, 3dlu, pref",
+               "pref, 3dlu, pref, 3dlu, pref, 3dlu, pref, 3dlu, pref, 3dlu, pref, 3dlu, pref");
          final PanelBuilder pb = new PanelBuilder(fl, this);
          final CellConstraints cc = new CellConstraints();
          pb.addSeparator("Instrument", cc.xyw(1, 1, 8));
@@ -269,13 +263,13 @@ public class OptimizationWizard
 
       @Override
       public void onShow() {
-         if(mFirstShow) {
+         if (mFirstShow) {
             DetectorProperties defProps = AppPreferences.getInstance().getDefaultDetector();
             DetectorCalibration defCal = null;
-            if(defProps != null) {
+            if (defProps != null) {
                defCal = mSession.getMostRecentCalibration(defProps);
-               for(final ISpectrumData spec : DataManager.getInstance().getSelected())
-                  if(spec.getProperties().getDetector() instanceof EDSDetector) {
+               for (final ISpectrumData spec : DataManager.getInstance().getSelected())
+                  if (spec.getProperties().getDetector() instanceof EDSDetector) {
                      final EDSDetector det = (EDSDetector) spec.getProperties().getDetector();
                      defProps = det.getDetectorProperties();
                      defCal = det.getCalibration();
@@ -284,8 +278,8 @@ public class OptimizationWizard
             }
             {
                final Set<ElectronProbe> eps = mSession.getCurrentProbes();
-               final DefaultComboBoxModel<ElectronProbe> dcmb = new DefaultComboBoxModel<ElectronProbe>();
-               for(final ElectronProbe pr : eps)
+               final DefaultComboBoxModel<ElectronProbe> dcmb = new DefaultComboBoxModel<>();
+               for (final ElectronProbe pr : eps)
                   dcmb.addElement(pr);
                dcmb.setSelectedItem(defProps != null ? defProps.getOwner() : eps.iterator().next());
                jComboBox_Instrument.setModel(dcmb);
@@ -310,10 +304,10 @@ public class OptimizationWizard
             mFirstShow = false;
          }
 
-         if(mMode.equals(Mode.OptimizeEDS))
-            getWizard().setNextPanel(jWizardPanel_EstComposition, "Specify standard spectra");
-         else if(mMode.equals(Mode.OptimizeExpert))
-            getWizard().setNextPanel(jWizardPanel_SelectStdExp, "Select standards");
+         if (mMode.equals(Mode.OptimizeEDS))
+            getWizard().setNextPanel(jWizardPanel_EstComposition);
+         else if (mMode.equals(Mode.OptimizeExpert))
+            getWizard().setNextPanel(jWizardPanel_SelectStdExp);
       }
 
       @Override
@@ -325,9 +319,9 @@ public class OptimizationWizard
          final double beamEnergy = jTextField_BeamEnergy.getValue();
          assert det.getOwner() == probe;
          final boolean res = (probe != null);
-         if(res == false)
+         if (!res)
             getWizard().setErrorText("Please specify an instrument and detector.");
-         if(res) {
+         if (res) {
             mDetector = det;
             mBeamEnergy = ToSI.keV(beamEnergy);
          }
@@ -336,10 +330,10 @@ public class OptimizationWizard
 
       private void updateDetectors(final DetectorProperties defDp) {
          final ElectronProbe newProbe = (ElectronProbe) jComboBox_Instrument.getSelectedItem();
-         if(newProbe != null) {
-            final DefaultComboBoxModel<DetectorProperties> dcmb = new DefaultComboBoxModel<DetectorProperties>();
+         if (newProbe != null) {
+            final DefaultComboBoxModel<DetectorProperties> dcmb = new DefaultComboBoxModel<>();
             jTextField_BeamEnergy.initialize(15.0, FromSI.keV(newProbe.getMinBeamEnergy()), FromSI.keV(newProbe.getMaxBeamEnergy()));
-            for(final DetectorProperties dp : mSession.getDetectors(newProbe))
+            for (final DetectorProperties dp : mSession.getDetectors(newProbe))
                dcmb.addElement(dp);
             dcmb.setSelectedItem(defDp != null ? defDp : (dcmb.getSize() > 0 ? dcmb.getElementAt(0) : null));
             jComboBox_Detector.setModel(dcmb);
@@ -349,10 +343,10 @@ public class OptimizationWizard
 
       private void updateCalibrations(final DetectorCalibration defCal) {
          final DetectorProperties newDet = (DetectorProperties) jComboBox_Detector.getSelectedItem();
-         final DefaultComboBoxModel<EDSCalibration> dcmb = new DefaultComboBoxModel<EDSCalibration>();
-         if(newDet != null) {
-            for(final DetectorCalibration dc : mSession.getCalibrations(newDet))
-               if(dc instanceof EDSCalibration)
+         final DefaultComboBoxModel<EDSCalibration> dcmb = new DefaultComboBoxModel<>();
+         if (newDet != null) {
+            for (final DetectorCalibration dc : mSession.getCalibrations(newDet))
+               if (dc instanceof EDSCalibration)
                   dcmb.addElement((EDSCalibration) dc);
             dcmb.setSelectedItem(defCal != null ? defCal : (dcmb.getSize() > 0 ? dcmb.getElementAt(0) : null));
          }
@@ -360,9 +354,7 @@ public class OptimizationWizard
       }
    }
 
-   private class EstimateCompositionPanel
-      extends
-      JWizardPanel {
+   private class EstimateCompositionPanel extends JWizardPanel {
 
       private static final double TRACE = 0.001;
       private static final long serialVersionUID = -6177624872137694722L;
@@ -372,7 +364,7 @@ public class OptimizationWizard
       private JLabel jLabel_Detector = null;
 
       public EstimateCompositionPanel() {
-         super(OptimizationWizard.this);
+         super(OptimizationWizard.this, "Estimate the composition");
          init();
       }
 
@@ -393,9 +385,9 @@ public class OptimizationWizard
          jTable_EstComp.setToolTipText("<html>The estimated composition is used as a starting point for<br>"
                + "the optimization process. The better the estimate the more<br>"
                + "reliable the optimization.  However, a very good optimization<br>"
-               + "can be performed with a crude estimate.  (This might actually<br>"
-               + "be a suitable use for a standardless quantification.)");
-         final FormLayout fl = new FormLayout("10dlu, 150dlu, 5dlu, pref, 10dlu", "pref, 5dlu, 75dlu, 5dlu, pref, 5dlu, pref, 5dlu, pref, 5dlu, pref");
+               + "can be performed with a crude estimate.  (This might actually<br>" + "be a suitable use for a standardless quantification.)");
+         final FormLayout fl = new FormLayout("10dlu, 150dlu, 5dlu, pref, 10dlu",
+               "pref, 5dlu, 75dlu, 5dlu, pref, 5dlu, pref, 5dlu, pref, 5dlu, pref");
          final PanelBuilder pb = new PanelBuilder(fl);
          final CellConstraints cc = new CellConstraints();
          pb.addSeparator("Estimated composition", cc.xyw(1, 1, 5));
@@ -415,11 +407,8 @@ public class OptimizationWizard
          ds.append(" on ");
          ds.append((mDetector != null) && (mDetector.getOwner() != null) ? mDetector.getOwner().toString() : "unknown");
          jLabel_Detector.setText(ds.toString());
-         if(mEstComposition != null) {
-            final DefaultTableModel dfm = new DefaultTableModel(new Object[] {
-               "Element",
-               "Mass Fraction"
-            }, 0) {
+         if (mEstComposition != null) {
+            final DefaultTableModel dfm = new DefaultTableModel(new Object[]{"Element", "Mass Fraction"}, 0) {
                private static final long serialVersionUID = 1L;
 
                @Override
@@ -428,11 +417,8 @@ public class OptimizationWizard
                }
             };
             final HalfUpFormat df = new HalfUpFormat("0.00000");
-            for(final Element elm : mEstComposition.getElementSet())
-               dfm.addRow(new Object[] {
-                  elm,
-                  df.format(mEstComposition.weightFraction(elm, false))
-               });
+            for (final Element elm : mEstComposition.getElementSet())
+               dfm.addRow(new Object[]{elm, df.format(mEstComposition.weightFraction(elm, false))});
             jTable_EstComp.setModel(dfm);
          }
       }
@@ -447,7 +433,7 @@ public class OptimizationWizard
          mc.setModal(true);
          mc.setVisible(true);
          updateComposition(mc.getMaterial());
-         if(mEstComposition != null)
+         if (mEstComposition != null)
             update();
       }
 
@@ -455,16 +441,16 @@ public class OptimizationWizard
          final SelectElements se = new SelectElements(OptimizationWizard.this, "Select the trace elements");
          se.enableAll(false);
          se.enableElements(Element.H, Element.Am, true);
-         for(final Element elm : mEstComposition.getElementSet())
+         for (final Element elm : mEstComposition.getElementSet())
             se.setEnabled(elm, false);
          se.setVisible(true);
          final Set<Element> elms = se.getElements();
-         if(elms.size() > 0) {
+         if (elms.size() > 0) {
             final double norm = mEstComposition.sumWeightFraction() - (TRACE * elms.size());
             final Composition newComp = new Composition();
-            for(final Element elm : mEstComposition.getElementSet())
+            for (final Element elm : mEstComposition.getElementSet())
                newComp.addElement(elm, mEstComposition.weightFraction(elm, false) / norm);
-            for(final Element elm : elms)
+            for (final Element elm : elms)
                newComp.addElement(elm, TRACE / norm);
             updateComposition(newComp);
             update();
@@ -481,9 +467,9 @@ public class OptimizationWizard
       @Override
       public void onShow() {
          update();
-         setNextPanel(jWizardPanel_Blocks, "Select standard blocks");
+         setNextPanel(jWizardPanel_Blocks);
       }
-   };
+   }
 
    class CheckListItem {
       private final String mLabel;
@@ -507,16 +493,13 @@ public class OptimizationWizard
       }
    }
 
-   class CheckListRenderer
-      extends
-      JCheckBox
-      implements
-      ListCellRenderer<CheckListItem> {
+   class CheckListRenderer extends JCheckBox implements ListCellRenderer<CheckListItem> {
 
       private static final long serialVersionUID = -2772183311699556951L;
 
       @Override
-      public Component getListCellRendererComponent(final JList<? extends CheckListItem> list, final CheckListItem value, final int index, final boolean isSelected, final boolean hasFocus) {
+      public Component getListCellRendererComponent(final JList<? extends CheckListItem> list, final CheckListItem value, final int index,
+            final boolean isSelected, final boolean hasFocus) {
          setEnabled(list.isEnabled());
          setSelected(value.isSelected());
          setFont(list.getFont());
@@ -527,17 +510,15 @@ public class OptimizationWizard
       }
    }
 
-   private class SelectBlocksPanel
-      extends
-      JWizardPanel {
+   private class SelectBlocksPanel extends JWizardPanel {
 
       private static final long serialVersionUID = 8738771800233144836L;
-      private final JList<CheckListItem> jList_Standards = new JList<CheckListItem>();
+      private final JList<CheckListItem> jList_Standards = new JList<>();
       private final JButton jButton_All = new JButton("Select all");
       private final JButton jButton_Invert = new JButton("Invert selection");
 
       private SelectBlocksPanel() {
-         super(OptimizationWizard.this);
+         super(OptimizationWizard.this, "Select which blocks");
          init();
       }
 
@@ -562,7 +543,7 @@ public class OptimizationWizard
             @Override
             public void actionPerformed(final ActionEvent e) {
                final DefaultListModel<CheckListItem> dlm = (DefaultListModel<CheckListItem>) jList_Standards.getModel();
-               for(int i = 0; i < dlm.getSize(); ++i) {
+               for (int i = 0; i < dlm.getSize(); ++i) {
                   final CheckListItem cli = dlm.get(i);
                   cli.setSelected(true);
                }
@@ -574,7 +555,7 @@ public class OptimizationWizard
             @Override
             public void actionPerformed(final ActionEvent e) {
                final DefaultListModel<CheckListItem> dlm = (DefaultListModel<CheckListItem>) jList_Standards.getModel();
-               for(int i = 0; i < dlm.getSize(); ++i) {
+               for (int i = 0; i < dlm.getSize(); ++i) {
                   final CheckListItem cli = dlm.get(i);
                   cli.setSelected(!cli.isSelected());
                }
@@ -591,40 +572,38 @@ public class OptimizationWizard
 
       @Override
       public void onShow() {
-         final DefaultListModel<CheckListItem> dlm = new DefaultListModel<CheckListItem>();
-         if(mStandards != null)
-            for(final String bn : mStandards.getBlockNames()) {
+         final DefaultListModel<CheckListItem> dlm = new DefaultListModel<>();
+         if (mStandards != null)
+            for (final String bn : mStandards.getBlockNames()) {
                final CheckListItem cli = new CheckListItem(bn);
                cli.setSelected(true);
                dlm.addElement(cli);
             }
          jList_Standards.setModel(dlm);
-         setNextPanel(jWizardPanel_SelectStandard, "Select standards.");
+         setNextPanel(jWizardPanel_SelectStandard);
       }
 
       @Override
       public boolean permitNext() {
-         final ArrayList<StandardBlock2> blks = new ArrayList<StandardBlock2>();
+         final ArrayList<StandardBlock2> blks = new ArrayList<>();
          final DefaultListModel<CheckListItem> dlm = (DefaultListModel<CheckListItem>) jList_Standards.getModel();
-         for(int i = 0; i < dlm.size(); ++i) {
+         for (int i = 0; i < dlm.size(); ++i) {
             final CheckListItem cli = dlm.get(i);
-            if(!cli.isSelected())
+            if (!cli.isSelected())
                blks.add(mStandards.getBlock(cli.toString()));
          }
          mOptimizer.setExclusionList(blks);
          return true;
       }
 
-   };
+   }
 
    // Select the material, the ROI, the beam energy
-   private class SelectStandardPanel
-      extends
-      JWizardPanel {
+   private class SelectStandardPanel extends JWizardPanel {
 
       private static final long serialVersionUID = -2247781803732630782L;
 
-      private final JComboBox<BeamEnergy> jComboBox_BeamEnergy = new JComboBox<BeamEnergy>();
+      private final JComboBox<BeamEnergy> jComboBox_BeamEnergy = new JComboBox<>();
       // Columns are element, ROI, material
 
       private static final int ELEMENT_COL = 0;
@@ -639,10 +618,10 @@ public class OptimizationWizard
          public String getToolTipText(final MouseEvent e) {
             String tip = null;
             final int rowIndex = rowAtPoint(e.getPoint());
-            for(final Map.Entry<JComboBox<OptimizedStandard>, Integer> me : mToRow.entrySet())
-               if(me.getValue().intValue() == rowIndex) {
+            for (final Map.Entry<JComboBox<OptimizedStandard>, Integer> me : mToRow.entrySet())
+               if (me.getValue().intValue() == rowIndex) {
                   final Object obj = me.getKey().getSelectedItem();
-                  if(obj instanceof OptimizedStandard) {
+                  if (obj instanceof OptimizedStandard) {
                      final OptimizedStandard os = (OptimizedStandard) obj;
                      tip = os.toolTipText();
                      break;
@@ -652,14 +631,14 @@ public class OptimizationWizard
          }
       };
       private final EachRowEditor jEachRowEditor_Material = new EachRowEditor(jTable_Standard);
-      private final Map<JComboBox<OptimizedStandard>, Integer> mToRow = new HashMap<JComboBox<OptimizedStandard>, Integer>();
+      private final Map<JComboBox<OptimizedStandard>, Integer> mToRow = new HashMap<>();
 
       private DefaultTableModel mTableModel;
 
       private List<Element> mElements;
 
       public SelectStandardPanel() {
-         super(OptimizationWizard.this);
+         super(OptimizationWizard.this, "Select standard");
          init();
       }
 
@@ -678,9 +657,7 @@ public class OptimizationWizard
          });
       }
 
-      private class BeamEnergy
-         implements
-         Comparable<BeamEnergy> {
+      private class BeamEnergy implements Comparable<BeamEnergy> {
 
          private final double mValue;
 
@@ -712,14 +689,14 @@ public class OptimizationWizard
       public void onShow() {
          updateBeamEnergy();
          updateTable();
-         setNextPanel(jWizardPanel_SelectReference, "Select references");
+         setNextPanel(jWizardPanel_SelectReference);
          enableFinish(false);
       }
 
       private void updateBeamEnergy() {
          final List<Double> energies = mOptimizer.suggestBeamEnergies(true);
-         final DefaultComboBoxModel<BeamEnergy> dcbm = new DefaultComboBoxModel<BeamEnergy>();
-         for(final double energy : energies)
+         final DefaultComboBoxModel<BeamEnergy> dcbm = new DefaultComboBoxModel<>();
+         for (final double energy : energies)
             dcbm.addElement(new BeamEnergy(energy));
          jComboBox_BeamEnergy.setModel(dcbm);
          jComboBox_BeamEnergy.setSelectedIndex(0);
@@ -727,32 +704,26 @@ public class OptimizationWizard
 
       private void fillTable() {
          final double beamEnergy = getBeamEnergy();
-         mElements = new ArrayList<Element>(mEstComposition.getElementSet());
-         for(final Element elm : mElements)
+         mElements = new ArrayList<>(mEstComposition.getElementSet());
+         for (final Element elm : mElements)
             try {
                final List<OptimizedStandard> stds = mOptimizer.getOptimizedStandards(elm, beamEnergy, 60.0e-9);
                process(elm, stds);
-            }
-            catch(final EPQException e) {
+            } catch (final EPQException e) {
                e.printStackTrace();
             }
       }
 
-      private void process(final Element elm, final List<OptimizedStandard> stds)
-            throws EPQException {
+      private void process(final Element elm, final List<OptimizedStandard> stds) throws EPQException {
          OptimizedStandard os;
          final NumberFormat nf = new HalfUpFormat("0.0");
          final int row = mElements.indexOf(elm);
-         if(stds.size() > 0) {
+         if (stds.size() > 0) {
             os = stds.get(0);
-            mTableModel.addRow(new Object[] {
-               elm,
-               os,
-               nf.format(os.getScore())
-            });
+            mTableModel.addRow(new Object[]{elm, os, nf.format(os.getScore())});
             mOptimizer.assignStandard(elm, os);
-            final JComboBox<OptimizedStandard> ecb = new JComboBox<OptimizedStandard>();
-            for(final OptimizedStandard std : stds)
+            final JComboBox<OptimizedStandard> ecb = new JComboBox<>();
+            for (final OptimizedStandard std : stds)
                ecb.addItem(std);
             ecb.addActionListener(new ActionListener() {
                @Override
@@ -766,8 +737,7 @@ public class OptimizationWizard
                      final NumberFormat nf = new HalfUpFormat("0.0");
                      jTable_Standard.setValueAt(nf.format(os.getScore()), r, SCORE_COL);
                      jcb.setToolTipText(os.toolTipText());
-                  }
-                  catch(final EPQException e1) {
+                  } catch (final EPQException e1) {
                      e1.printStackTrace();
                   }
                }
@@ -776,19 +746,11 @@ public class OptimizationWizard
             jEachRowEditor_Material.setEditorAt(row, new DefaultCellEditor(ecb));
             mToRow.put(ecb, row);
          } else
-            mTableModel.addRow(new Object[] {
-               elm,
-               "No suitable standard",
-               "~"
-            });
+            mTableModel.addRow(new Object[]{elm, "No suitable standard", "~"});
       }
 
       private void updateTable() {
-         mTableModel = new DefaultTableModel(new Object[] {
-            "Element",
-            "Standard",
-            "Score"
-         }, 0);
+         mTableModel = new DefaultTableModel(new Object[]{"Element", "Standard", "Score"}, 0);
          fillTable();
          jTable_Standard.setModel(mTableModel);
          jTable_Standard.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -801,9 +763,7 @@ public class OptimizationWizard
       }
    }
 
-   private class SelectReferencePanel
-      extends
-      JWizardPanel {
+   private class SelectReferencePanel extends JWizardPanel {
 
       private static final long serialVersionUID = 464249581199062088L;
 
@@ -815,10 +775,10 @@ public class OptimizationWizard
 
       private final JTable jTable_References = new JTable();
       private final EachRowEditor jEditor_Material = new EachRowEditor(jTable_References);
-      private final Map<JComboBox<Composition>, Integer> mToRow = new HashMap<JComboBox<Composition>, Integer>();
+      private final Map<JComboBox<Composition>, Integer> mToRow = new HashMap<>();
 
       public SelectReferencePanel() {
-         super(OptimizationWizard.this);
+         super(OptimizationWizard.this, "Select references");
          init();
       }
 
@@ -828,24 +788,18 @@ public class OptimizationWizard
       }
 
       private void updateTable() {
-         final DefaultTableModel dtm = new DefaultTableModel(new Object[] {
-            "Region-of-Interest",
-            "Material",
-            "K-ratio",
-            "Required?",
-            "Standard?"
-         }, 0);
+         final DefaultTableModel dtm = new DefaultTableModel(new Object[]{"Region-of-Interest", "Material", "K-ratio", "Required?", "Standard?"}, 0);
          final NumberFormat nf = new HalfUpFormat("0.000");
          int row = 0;
-         for(final RegionOfInterest roi : mOptimizer.getAllReferences()) {
-            final JComboBox<Composition> jcb = new JComboBox<Composition>();
+         for (final RegionOfInterest roi : mOptimizer.getAllReferences()) {
+            final JComboBox<Composition> jcb = new JComboBox<>();
             mToRow.put(jcb, row);
             Composition mat = mOptimizer.getReference(roi);
-            if(mat == null)
+            if (mat == null)
                mat = Material.Null;
             try {
-               for(final Composition comp : mOptimizer.suggestReferences(roi)) {
-                  if(mat == Material.Null)
+               for (final Composition comp : mOptimizer.suggestReferences(roi)) {
+                  if (mat == Material.Null)
                      mat = comp;
                   jcb.addItem(comp);
                }
@@ -865,29 +819,21 @@ public class OptimizationWizard
                         jTable_References.setValueAt(nf.format(comp.weightFraction(roi.getElementSet().first(), false)), row, MASS_FRAC_COL);
                         jTable_References.setValueAt(mOptimizer.isRequired(roi) ? "Required" : "Optional", row, OPTIONAL_COL);
                         jTable_References.setValueAt(mOptimizer.isStandard(comp) ? "Yes" : "No", row, STANDARD_COL);
-                     }
-                     catch(final EPQException e1) {
+                     } catch (final EPQException e1) {
                         e1.printStackTrace();
                      }
                   }
                });
-            }
-            catch(final EPQException e) {
+            } catch (final EPQException e) {
                e.printStackTrace();
             }
-            if(mat != null)
-               dtm.addRow(new Object[] {
-                  roi,
-                  mat,
-                  nf.format(mat.weightFraction(roi.getElementSet().first(), false)),
-                  mOptimizer.isRequired(roi) ? "Required" : "Optional",
-                  mOptimizer.isStandard(mat) ? "Yes" : "No"
-               });
+            if (mat != null)
+               dtm.addRow(new Object[]{roi, mat, nf.format(mat.weightFraction(roi.getElementSet().first(), false)),
+                     mOptimizer.isRequired(roi) ? "Required" : "Optional", mOptimizer.isStandard(mat) ? "Yes" : "No"});
             try {
-               if(mat != null)
+               if (mat != null)
                   mOptimizer.assignReference(roi, mat);
-            }
-            catch(final EPQException e1) {
+            } catch (final EPQException e1) {
                e1.printStackTrace();
             }
             ++row;
@@ -900,20 +846,18 @@ public class OptimizationWizard
       @Override
       public void onShow() {
          updateTable();
-         setNextPanel(jWizardPanel_Results, "Summary results");
+         setNextPanel(jWizardPanel_Results);
          enableFinish(false);
       }
-   };
+   }
 
-   private class SelectMaterialsPanel
-      extends
-      JWizardPanel {
+   private class SelectMaterialsPanel extends JWizardPanel {
 
       private static final long serialVersionUID = -316782184969068750L;
-      private final JList<Composition> jList_Materials = new JList<Composition>();
+      private final JList<Composition> jList_Materials = new JList<>();
 
       public SelectMaterialsPanel() {
-         super(OptimizationWizard.this);
+         super(OptimizationWizard.this, "Select materials");
          init();
       }
 
@@ -926,30 +870,30 @@ public class OptimizationWizard
 
       @Override
       public void onShow() {
-         final ArrayList<Composition> comps = new ArrayList<Composition>(mStandards.allCompositions());
+         final ArrayList<Composition> comps = new ArrayList<>(mStandards.allCompositions());
          Collections.sort(comps, new Comparator<Composition>() {
             @Override
             public int compare(final Composition arg0, final Composition arg1) {
                int res = arg0.toString().compareTo(arg1.toString());
-               if(res == 0)
+               if (res == 0)
                   res = arg0.compareTo(arg1);
                return res;
             }
 
          });
-         final DefaultListModel<Composition> dlm = new DefaultListModel<Composition>();
-         for(final Composition comp : comps)
+         final DefaultListModel<Composition> dlm = new DefaultListModel<>();
+         for (final Composition comp : comps)
             dlm.addElement(comp);
          jList_Materials.setModel(dlm);
          jList_Materials.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-         setNextPanel(jWizardPanel_Results, "Summary results");
+         setNextPanel(jWizardPanel_Results);
          enableFinish(false);
       }
 
       public Set<Composition> getSelectedMaterials() {
-         final TreeSet<Composition> res = new TreeSet<Composition>();
-         for(final Object obj : jList_Materials.getSelectedValuesList())
-            if(obj instanceof Composition)
+         final TreeSet<Composition> res = new TreeSet<>();
+         for (final Object obj : jList_Materials.getSelectedValuesList())
+            if (obj instanceof Composition)
                res.add((Composition) obj);
          return Collections.unmodifiableSet(res);
       }
@@ -960,7 +904,7 @@ public class OptimizationWizard
          sb.append("<h2>Find standards</h2>");
          sb.append("<p><table>");
          sb.append("<tr><th>Material</th><th>Description</th><th>Blocks</th></tr>");
-         for(final Composition comp : comps) {
+         for (final Composition comp : comps) {
             final List<StandardBlock2> src = mStandards.find(comp);
             sb.append("<th>" + comp.toString() + "</th>");
             sb.append("<td>" + comp.toHTMLTable() + "</td>");
@@ -971,11 +915,9 @@ public class OptimizationWizard
          sb.append("<ul><li>Optimal: " + mStandards.suggestBlocks(comps, null) + "</li></ul>");
          return sb.toString();
       }
-   };
+   }
 
-   private class ResultsPanel
-      extends
-      JWizardPanel {
+   private class ResultsPanel extends JWizardPanel {
 
       private static final long serialVersionUID = 1382545139749510217L;
 
@@ -983,7 +925,7 @@ public class OptimizationWizard
       private final JCheckBox jCheckBox_Simulate = new JCheckBox("Simulate unknown, standard and reference spectra");
 
       public ResultsPanel() {
-         super(OptimizationWizard.this);
+         super(OptimizationWizard.this, "Results");
          init();
       }
 
@@ -999,14 +941,14 @@ public class OptimizationWizard
       private void updateReport() {
          final StringBuffer sb = new StringBuffer();
          sb.append("<HTML>");
-         switch(mMode) {
-            case OptimizeEDS: {
+         switch (mMode) {
+            case OptimizeEDS : {
                final NumberFormat nf = new DecimalFormat("0.0");
                sb.append("<table>\n");
                sb.append("<tr><th align=\"right\">Standards</th><td>");
                sb.append(TextUtilities.toList(mOptimizer.getStandards()));
                sb.append("</td></tr>");
-               final ArrayList<Composition> al = new ArrayList<Composition>(mOptimizer.getReferences());
+               final ArrayList<Composition> al = new ArrayList<>(mOptimizer.getReferences());
                al.removeAll(mOptimizer.getStandards());
                sb.append("<tr><th align=\"right\">References</th><td>");
                sb.append(al.size() > 0 ? TextUtilities.toList(al) : "--None required--");
@@ -1021,12 +963,12 @@ public class OptimizationWizard
                jCheckBox_Simulate.setEnabled(true);
             }
                break;
-            case FindStandards:
+            case FindStandards :
                jCheckBox_Simulate.setEnabled(false);
                final Set<Composition> comps = jWizardPanel_SelectMaterials.getSelectedMaterials();
                sb.append("<table>");
                sb.append("<tr><th>Material</th><th>Blocks</th></tr>");
-               for(final Composition comp : comps) {
+               for (final Composition comp : comps) {
                   final List<StandardBlock2> src = mStandards.find(comp);
                   sb.append("<th>" + comp.toString() + "</th>");
                   sb.append("<td>" + TextUtilities.toList(src) + "</td></tr>");
@@ -1034,7 +976,7 @@ public class OptimizationWizard
                sb.append("</table>");
                sb.append("<p>Optimal: " + mStandards.suggestBlocks(comps, null) + "</p>");
                break;
-            default:
+            default :
                break;
          }
          jTextPane_Summary.setContentType("text/html");
@@ -1044,27 +986,26 @@ public class OptimizationWizard
       @Override
       public void onShow() {
          updateReport();
-         setNextPanel(null, "Done");
+         setNextPanel(null);
          enableFinish(true);
       }
-   };
+   }
 
    public Set<ISpectrumData> simulateSpectra() {
-      final TreeSet<ISpectrumData> res = new TreeSet<ISpectrumData>();
-      if(jWizardPanel_Results.jCheckBox_Simulate.isSelected()) {
+      final TreeSet<ISpectrumData> res = new TreeSet<>();
+      if (jWizardPanel_Results.jCheckBox_Simulate.isSelected()) {
          final SpectrumSimulator ss = new SpectrumSimulator.BasicSpectrumSimulator();
          final SpectrumProperties sp = new SpectrumProperties();
          sp.setNumericProperty(SpectrumProperties.BeamEnergy, FromSI.keV(mOptimizer.getBeamEnergy()));
          sp.setDetector(mOptimizer.getDetector());
-         sp.setNumericProperty(SpectrumProperties.FaradayBegin, 1.0);
+         sp.setNumericProperty(SpectrumProperties.ProbeCurrent, 1.0);
          sp.setNumericProperty(SpectrumProperties.LiveTime, 60.0);
-         for(final Composition comp : mOptimizer.getAllMaterials())
+         for (final Composition comp : mOptimizer.getAllMaterials())
             try {
                final ISpectrumData spec = SpectrumUtils.addNoiseToSpectrum(ss.generateSpectrum(comp, sp, true), 1.0);
                SpectrumUtils.rename(spec, comp.toString() + (mOptimizer.isStandard(comp) ? " std" : " ref"));
                res.add(spec);
-            }
-            catch(final EPQException e) {
+            } catch (final EPQException e) {
                e.printStackTrace();
             }
          {
@@ -1072,8 +1013,7 @@ public class OptimizationWizard
                final ISpectrumData spec = SpectrumUtils.addNoiseToSpectrum(ss.generateSpectrum(mEstComposition, sp, true), 1.0);
                SpectrumUtils.rename(spec, mEstComposition.descriptiveString(false));
                res.add(spec);
-            }
-            catch(final EPQException e) {
+            } catch (final EPQException e) {
                e.printStackTrace();
             }
          }
@@ -1081,37 +1021,23 @@ public class OptimizationWizard
       return Collections.unmodifiableSet(res);
    }
 
-   private class SelectStandardExpPanel
-      extends
-      JWizardPanel {
+   private class SelectStandardExpPanel extends JWizardPanel {
 
       private static final long serialVersionUID = -4588569758666305684L;
 
-      private class StandardsTableModel
-         extends
-         DefaultTableModel {
+      private class StandardsTableModel extends DefaultTableModel {
 
          private static final long serialVersionUID = 5773383510926965470L;
 
          StandardsTableModel(final QuantificationOutline qp2) {
-            super(new String[] {
-               "Element",
-               "Standard",
-               "Precision"
-            }, 0);
+            super(new String[]{"Element", "Standard", "Precision"}, 0);
             final NumberFormat nf4 = new DecimalFormat("0.######");
-            for(final Element elm : qp2.getMeasuredElements())
-               addRow(new Object[] {
-                  elm.toAbbrev(),
-                  qp2.getStandard(elm),
-                  nf4.format(qp2.getDesiredPrecision(elm))
-               });
+            for (final Element elm : qp2.getMeasuredElements())
+               addRow(new Object[]{elm.toAbbrev(), qp2.getStandard(elm), nf4.format(qp2.getDesiredPrecision(elm))});
          }
       }
 
-      private class AddAction
-         extends
-         AbstractAction {
+      private class AddAction extends AbstractAction {
 
          private static final long serialVersionUID = -2821363716296894666L;
 
@@ -1128,15 +1054,15 @@ public class OptimizationWizard
             final Composition comp = strToComp(compStr);
             jTextField_Composition.setBackground(comp != null ? SystemColor.text : Color.pink);
             final double precision = jTextField_Precision.getValue();
-            if(mQuantOutline == null)
+            if (mQuantOutline == null)
                mQuantOutline = new QuantificationOutline(mDetector, mBeamEnergy);
             StringBuffer missed = new StringBuffer();
-            if((elms.size() > 0) && (comp != null) && (precision > 0.0) && (precision < 1.0)) {
-               for(final Element elm : elms)
-                  if(comp.containsElement(elm))
+            if ((elms.size() > 0) && (comp != null) && (precision > 0.0) && (precision < 1.0)) {
+               for (final Element elm : elms)
+                  if (comp.containsElement(elm))
                      mQuantOutline.addStandard(elm, comp, Collections.emptySet(), precision);
                   else {
-                     if(missed.length() > 0)
+                     if (missed.length() > 0)
                         missed.append(", ");
                      missed.append(elm.toAbbrev());
                   }
@@ -1146,7 +1072,7 @@ public class OptimizationWizard
                updateStandards();
             }
          }
-      };
+      }
 
       private void updateStandards() {
          jTable_Standards.setModel(new StandardsTableModel(mQuantOutline));
@@ -1155,9 +1081,7 @@ public class OptimizationWizard
          OptimizationWizard.this.enableNext(mQuantOutline.getMeasuredElements().size() > 0);
       }
 
-      private class RemoveAction
-         extends
-         AbstractAction {
+      private class RemoveAction extends AbstractAction {
 
          private static final long serialVersionUID = -7454144478386772758L;
 
@@ -1169,21 +1093,19 @@ public class OptimizationWizard
          public void actionPerformed(final ActionEvent e) {
             final int[] rows = jTable_Standards.getSelectedRows();
             final TableModel tm = jTable_Standards.getModel();
-            if(tm instanceof StandardsTableModel) {
+            if (tm instanceof StandardsTableModel) {
                final StandardsTableModel stm = (StandardsTableModel) tm;
-               for(final int row : rows) {
+               for (final int row : rows) {
                   final Element elm = Element.byName(stm.getValueAt(row, 0).toString());
-                  if(!elm.equals(Element.None))
+                  if (!elm.equals(Element.None))
                      mQuantOutline.removeStandard(elm);
                }
                updateStandards();
             }
          }
-      };
+      }
 
-      private class ClearAction
-         extends
-         AbstractAction {
+      private class ClearAction extends AbstractAction {
 
          private static final long serialVersionUID = -8656990451393495807L;
 
@@ -1196,7 +1118,7 @@ public class OptimizationWizard
             mQuantOutline.clearStandards();
             updateStandards();
          }
-      };
+      }
 
       private final JTable jTable_Standards = new JTable();
       private final JTextField jTextField_Elements = new JTextField();
@@ -1207,12 +1129,13 @@ public class OptimizationWizard
       private final JButton jButton_Clear = new JButton(new ClearAction());
 
       public SelectStandardExpPanel() {
-         super(OptimizationWizard.this);
+         super(OptimizationWizard.this, "Select standard");
          initialize();
       }
 
       private void initialize() {
-         final FormLayout layout = new FormLayout("pref, 5dlu, 50dlu, 5dlu, pref, 5dlu, 50dlu, 5dlu, pref, 5dlu, 40dlu, 5dlu, pref", "pref, 5dlu, pref, 85dlu, 5dlu, pref");
+         final FormLayout layout = new FormLayout("pref, 5dlu, 50dlu, 5dlu, pref, 5dlu, 50dlu, 5dlu, pref, 5dlu, 40dlu, 5dlu, pref",
+               "pref, 5dlu, pref, 85dlu, 5dlu, pref");
          final PanelBuilder pb = new PanelBuilder(layout, this);
          final int BASE_LINE = 6;
          pb.add(new JScrollPane(jTable_Standards), CC.xywh(1, 1, 11, BASE_LINE - 2));
@@ -1237,20 +1160,16 @@ public class OptimizationWizard
       @Override
       public void onShow() {
          OptimizationWizard.this.setMessageText("Specify the elements to be measured and the associated standard.");
-         setNextPanel(jWizardPanel_OtherElementsPanel, "Select other element rules");
+         setNextPanel(jWizardPanel_OtherElementsPanel);
          enableNext((mQuantOutline != null) && (mQuantOutline.getMeasuredElements().size() > 0));
          enableFinish(false);
 
       }
    }
 
-   private class OtherElementsPanel
-      extends
-      JWizardPanel {
+   private class OtherElementsPanel extends JWizardPanel {
 
-      private class NoneAction
-         extends
-         AbstractAction {
+      private class NoneAction extends AbstractAction {
 
          private static final long serialVersionUID = 3296513503107915920L;
 
@@ -1262,11 +1181,9 @@ public class OptimizationWizard
          public void actionPerformed(final ActionEvent arg0) {
             jTable_Stoichiometry.setEnabled(false);
          }
-      };
+      }
 
-      private class StoichiometryAction
-         extends
-         AbstractAction {
+      private class StoichiometryAction extends AbstractAction {
 
          private static final long serialVersionUID = 5457997540626618291L;
 
@@ -1278,11 +1195,9 @@ public class OptimizationWizard
          public void actionPerformed(final ActionEvent arg0) {
             jTable_Stoichiometry.setEnabled(true);
          }
-      };
+      }
 
-      private class DifferenceAction
-         extends
-         AbstractAction {
+      private class DifferenceAction extends AbstractAction {
 
          private static final long serialVersionUID = 4986426930516496223L;
 
@@ -1294,11 +1209,9 @@ public class OptimizationWizard
          public void actionPerformed(final ActionEvent arg0) {
             jTable_Stoichiometry.setEnabled(false);
          }
-      };
+      }
 
-      private class WatersOfCrystallizationAction
-         extends
-         AbstractAction {
+      private class WatersOfCrystallizationAction extends AbstractAction {
 
          private static final long serialVersionUID = -4185500220696938016L;
 
@@ -1310,10 +1223,10 @@ public class OptimizationWizard
          public void actionPerformed(final ActionEvent arg0) {
             jTable_Stoichiometry.setEnabled(true);
          }
-      };
+      }
 
       private final JTextField jTextField_Strip = new JTextField();
-      private final JComboBox<Element> jComboBox_Difference = new JComboBox<Element>();
+      private final JComboBox<Element> jComboBox_Difference = new JComboBox<>();
       private final JRadioButton jRadioButton_None = new JRadioButton(new NoneAction());
       private final JRadioButton jRadioButton_Stoichiometry = new JRadioButton(new StoichiometryAction());
       private final JRadioButton jRadioButton_Difference = new JRadioButton(new DifferenceAction());
@@ -1321,7 +1234,7 @@ public class OptimizationWizard
       private final JStoichiometryTable jTable_Stoichiometry = new JStoichiometryTable();
 
       public OtherElementsPanel() {
-         super(OptimizationWizard.this);
+         super(OptimizationWizard.this, "Specify other elements");
          init();
       }
 
@@ -1332,7 +1245,8 @@ public class OptimizationWizard
          bg.add(jRadioButton_Stoichiometry);
          bg.add(jRadioButton_WatersOfCrystallization);
 
-         final FormLayout layout = new FormLayout("5dlu, pref, 5dlu, 80dlu, 10dlu, 150dlu", "pref, 5dlu, pref, 5dlu, pref, 5dlu, pref, 3dlu, pref, 3dlu, pref, 3dlu, pref, 30dlu");
+         final FormLayout layout = new FormLayout("5dlu, pref, 5dlu, 80dlu, 10dlu, 150dlu",
+               "pref, 5dlu, pref, 5dlu, pref, 5dlu, pref, 3dlu, pref, 3dlu, pref, 3dlu, pref, 30dlu");
          final PanelBuilder pb = new PanelBuilder(layout, this);
          final int ALL_COLS = 6;
          pb.addSeparator("Peaks to strip", CC.xyw(1, 1, ALL_COLS));
@@ -1350,11 +1264,11 @@ public class OptimizationWizard
 
             @Override
             public void focusLost(final FocusEvent e) {
-               final Set<Element> elms = new TreeSet<Element>(Element.parseElementString(jTextField_Strip.getText()));
+               final Set<Element> elms = new TreeSet<>(Element.parseElementString(jTextField_Strip.getText()));
                elms.removeAll(mQuantOutline.getMeasuredElements());
                jTextField_Strip.setText(Element.toString(elms, true));
                mQuantOutline.clearElementsToStrip();
-               for(final Element elm : elms)
+               for (final Element elm : elms)
                   mQuantOutline.addElementToStrip(elm);
             }
 
@@ -1369,49 +1283,49 @@ public class OptimizationWizard
       public void onShow() {
          final List<UnmeasuredElementRule> rules = mQuantOutline.getUnmeasuredElementRules();
          final UnmeasuredElementRule rule = rules.size() > 0 ? rules.get(0) : null;
-         final Set<Element> elms = new TreeSet<Element>(Arrays.asList(Element.range(Element.H, Element.Pu)));
+         final Set<Element> elms = new TreeSet<>(Arrays.asList(Element.range(Element.H, Element.Pu)));
          final Set<Element> measuredElements = mQuantOutline.getMeasuredElements();
          elms.removeAll(measuredElements);
-         final DefaultComboBoxModel<Element> elmModel = new DefaultComboBoxModel<Element>(elms.toArray(new Element[elms.size()]));
+         final DefaultComboBoxModel<Element> elmModel = new DefaultComboBoxModel<>(elms.toArray(new Element[elms.size()]));
          final Element difElm = (rule != null) && (rule instanceof CompositionFromKRatios.ElementByDifference)
                ? ((ElementByDifference) rule).getElement()
                : elms.iterator().next();
          elmModel.setSelectedItem(difElm);
          jComboBox_Difference.setModel(elmModel);
          jTextField_Strip.setText(Element.toString(mQuantOutline.getStrippedElements(), true));
-         if(rules.size() == 0)
+         if (rules.size() == 0)
             jRadioButton_None.setSelected(true);
-         else if(rule instanceof ElementByDifference)
+         else if (rule instanceof ElementByDifference)
             jRadioButton_Difference.setSelected(true);
-         else if(rule instanceof OxygenByStoichiometry)
+         else if (rule instanceof OxygenByStoichiometry)
             jRadioButton_Stoichiometry.setSelected(true);
-         else if(rule instanceof WatersOfCrystallization)
+         else if (rule instanceof WatersOfCrystallization)
             jRadioButton_WatersOfCrystallization.setSelected(true);
          jRadioButton_Stoichiometry.setEnabled(!measuredElements.contains(Element.O));
          jRadioButton_WatersOfCrystallization.setEnabled(measuredElements.contains(Element.O));
          jTable_Stoichiometry.setElements(measuredElements);
          OptimizationWizard.this.setMessageText("Specify special processing options.");
-         setNextPanel(jWizardPanel_SelectRefExp, "Select references");
+         setNextPanel(jWizardPanel_SelectRefExp);
       }
 
       @Override
       public boolean permitNext() {
          boolean permit = false;
-         if(jRadioButton_Difference.isSelected() && (jComboBox_Difference.getSelectedItem() instanceof Element)) {
+         if (jRadioButton_Difference.isSelected() && (jComboBox_Difference.getSelectedItem() instanceof Element)) {
             final UnmeasuredElementRule uer = new ElementByDifference((Element) jComboBox_Difference.getSelectedItem());
             mQuantOutline.clearUnmeasuredElementRules();
             mQuantOutline.addUnmeasuredElementRule(uer);
             permit = true;
-         } else if(jRadioButton_None.isSelected()) {
+         } else if (jRadioButton_None.isSelected()) {
             mQuantOutline.clearUnmeasuredElementRules();
             permit = true;
-         } else if(jRadioButton_Stoichiometry.isSelected()) {
+         } else if (jRadioButton_Stoichiometry.isSelected()) {
             final OxygenByStoichiometry uer = new OxygenByStoichiometry(mQuantOutline.getMeasuredElements());
             uer.setOxidizer(jTable_Stoichiometry.getOxidizer());
             mQuantOutline.clearUnmeasuredElementRules();
             mQuantOutline.addUnmeasuredElementRule(uer);
             permit = true;
-         } else if(jRadioButton_WatersOfCrystallization.isSelected()) {
+         } else if (jRadioButton_WatersOfCrystallization.isSelected()) {
             final WatersOfCrystallization uer = new WatersOfCrystallization(mQuantOutline.getMeasuredElements());
             uer.setOxidizer(jTable_Stoichiometry.getOxidizer());
             mQuantOutline.clearUnmeasuredElementRules();
@@ -1425,13 +1339,9 @@ public class OptimizationWizard
 
    }
 
-   private class SelectReferenceExpPanel
-      extends
-      JWizardPanel {
+   private class SelectReferenceExpPanel extends JWizardPanel {
 
-      private class ApplyAction
-         extends
-         AbstractAction {
+      private class ApplyAction extends AbstractAction {
 
          private static final long serialVersionUID = -7457759687870859525L;
 
@@ -1443,13 +1353,12 @@ public class OptimizationWizard
          public void actionPerformed(final ActionEvent e) {
             final int[] rows = jTable_Reference.getSelectedRows();
             final Composition ref = strToComp(jTextField_Reference.getText().trim());
-            if(ref != null) {
-               for(final int row : rows) {
+            if (ref != null) {
+               for (final int row : rows) {
                   final RegionOfInterest roi = (RegionOfInterest) jTable_Reference.getValueAt(row, 0);
                   try {
                      mQuantOutline.addReference(roi, ref);
-                  }
-                  catch(final EPQException e1) {
+                  } catch (final EPQException e1) {
                      e1.printStackTrace();
                   }
                }
@@ -1459,9 +1368,7 @@ public class OptimizationWizard
 
       }
 
-      private class ReferenceTableModel
-         extends
-         DefaultTableModel {
+      private class ReferenceTableModel extends DefaultTableModel {
 
          private static final long serialVersionUID = -6899788074545151942L;
 
@@ -1471,11 +1378,11 @@ public class OptimizationWizard
       }
 
       private Object[][] getReferenceData() {
-         if(mQuantOutline != null) {
+         if (mQuantOutline != null) {
             final Set<RegionOfInterest> arr = mQuantOutline.getAllRequiredReferences(true);
             final Object[][] res = new Object[arr.size()][HEADER.length];
             int i = 0;
-            for(final RegionOfInterest roi : arr) {
+            for (final RegionOfInterest roi : arr) {
                final ReferenceMaterial ref = mQuantOutline.getReference(roi);
                res[i][0] = roi;
                res[i][1] = ref;
@@ -1491,14 +1398,10 @@ public class OptimizationWizard
       private final JTextField jTextField_Reference = new JTextField();
       private final JButton jButton_Apply = new JButton(new ApplyAction());
 
-      private final String[] HEADER = new String[] {
-         "ROI",
-         "Material",
-         "Standard?"
-      };
+      private final String[] HEADER = new String[]{"ROI", "Material", "Standard?"};
 
       public SelectReferenceExpPanel() {
-         super(OptimizationWizard.this);
+         super(OptimizationWizard.this, "Select references");
          init();
       }
 
@@ -1518,14 +1421,12 @@ public class OptimizationWizard
          final ReferenceDatabase rd = ReferenceDatabase.getInstance(mSession);
          mQuantOutline.applySuggestedReferences(rd.getDatabase());
          jTable_Reference.setModel(new ReferenceTableModel());
-         setNextPanel(jWizardPanel_SpecifyUnknown, "Specify the unknown");
+         setNextPanel(jWizardPanel_SpecifyUnknown);
          OptimizationWizard.this.setMessageText("You have the option to change the default references.");
       }
    }
 
-   private class SpecifyUnknownExpPanel
-      extends
-      JWizardPanel {
+   private class SpecifyUnknownExpPanel extends JWizardPanel {
 
       private final JTable jTable_Composition = new JTable();
       private final JButton jButton_Composition = new JButton("Composition");
@@ -1533,9 +1434,7 @@ public class OptimizationWizard
 
       private static final long serialVersionUID = 428817610436442636L;
 
-      private class CompositionAction
-         extends
-         AbstractAction {
+      private class CompositionAction extends AbstractAction {
 
          private static final long serialVersionUID = 4501086633662345776L;
 
@@ -1545,17 +1444,15 @@ public class OptimizationWizard
 
          @Override
          public void actionPerformed(ActionEvent arg0) {
-            if(mEstComposition != null)
+            if (mEstComposition != null)
                updateComposition(MaterialsCreator.editMaterial(OptimizationWizard.this, mEstComposition, mSession, false));
             else
                updateComposition(MaterialsCreator.createMaterial(OptimizationWizard.this, mSession, false));
             update();
          }
-      };
+      }
 
-      private class ApproxAction
-         extends
-         AbstractAction {
+      private class ApproxAction extends AbstractAction {
 
          private static final long serialVersionUID = 7614164549696653340L;
 
@@ -1567,7 +1464,7 @@ public class OptimizationWizard
          public void actionPerformed(ActionEvent e) {
             final MajorMinorTraceEditor mmt = new MajorMinorTraceEditor(OptimizationWizard.this);
             mmt.setLocationRelativeTo(OptimizationWizard.this);
-            if(mEstComposition != null)
+            if (mEstComposition != null)
                mmt.setComposition(mEstComposition);
             mmt.setVisible(true);
             updateComposition(mmt.getComposition());
@@ -1581,7 +1478,7 @@ public class OptimizationWizard
       }
 
       public SpecifyUnknownExpPanel() {
-         super(OptimizationWizard.this);
+         super(OptimizationWizard.this, "Specify unknown");
          init();
       }
 
@@ -1598,34 +1495,31 @@ public class OptimizationWizard
 
       @Override
       public void onShow() {
-         setNextPanel(jWizardPanel_SelectTransitionExp, "Select transitions");
+         setNextPanel(jWizardPanel_SelectTransitionExp);
          update();
       }
 
       @Override
       public boolean permitNext() {
-         final Set<Element> extraElms = new TreeSet<Element>(mEstComposition.getElementSet());
+         final Set<Element> extraElms = new TreeSet<>(mEstComposition.getElementSet());
          extraElms.removeAll(mQuantOutline.getUnknownElements());
-         if(extraElms.size() > 0) {
-            JOptionPane.showMessageDialog(OptimizationWizard.this, "The elements " + extraElms.toString()
-                  + " in the unknown are not quantified.\nGo back and add a standard.", "Missing elements", JOptionPane.ERROR_MESSAGE);
+         if (extraElms.size() > 0) {
+            JOptionPane.showMessageDialog(OptimizationWizard.this,
+                  "The elements " + extraElms.toString() + " in the unknown are not quantified.\nGo back and add a standard.", "Missing elements",
+                  JOptionPane.ERROR_MESSAGE);
             return false;
          }
          return true;
       }
    }
 
-   private class SelectTransitionPanel
-      extends
-      JWizardPanel {
+   private class SelectTransitionPanel extends JWizardPanel {
 
       private static final long serialVersionUID = 7585401016139902190L;
 
       private static final int NUM_COLS = 6;
 
-      private class ROIItemListener
-         implements
-         ItemListener {
+      private class ROIItemListener implements ItemListener {
 
          private final Element mElement;
 
@@ -1637,7 +1531,7 @@ public class OptimizationWizard
          public void itemStateChanged(ItemEvent e) {
             assert e.getItem() instanceof RegionOfInterest;
             final RegionOfInterest roi = (RegionOfInterest) e.getItem();
-            if((roi != null) && (!roi.equals(mSelected.get(mElement)))) {
+            if ((roi != null) && (!roi.equals(mSelected.get(mElement)))) {
                mSelected.put(mElement, roi);
                updateTable();
             }
@@ -1645,19 +1539,19 @@ public class OptimizationWizard
       }
 
       private Object[][] getData() {
-         if(mEstComposition != null)
+         if (mEstComposition != null)
             try {
                // Initialize mSelected
-               if(mSelected == null)
-                  mSelected = new TreeMap<Element, RegionOfInterest>();
-               for(final Element elm : mQuantOutline.getMeasuredElements())
-                  if((!mSelected.containsKey(elm)) && mEstComposition.containsElement(elm)) {
+               if (mSelected == null)
+                  mSelected = new TreeMap<>();
+               for (final Element elm : mQuantOutline.getMeasuredElements())
+                  if ((!mSelected.containsKey(elm)) && mEstComposition.containsElement(elm)) {
                      double bestU = Double.MAX_VALUE;
                      final RegionOfInterestSet srois = mQuantOutline.getStandardROIS(elm);
-                     if(srois.size() > 1)
-                        for(final RegionOfInterest roi : srois) {
+                     if (srois.size() > 1)
+                        for (final RegionOfInterest roi : srois) {
                            final UncertainValue2 uv = mQuantOutline.massFraction(mEstComposition, roi);
-                           if(uv.uncertainty() < bestU) {
+                           if (uv.uncertainty() < bestU) {
                               mSelected.put(elm, roi);
                               bestU = uv.uncertainty();
                            }
@@ -1666,9 +1560,9 @@ public class OptimizationWizard
                         mSelected.put(elm, srois.iterator().next());
                   }
                // Use mSelected to set preferred rois
-               for(final Element elm : mQuantOutline.getMeasuredElements()) {
+               for (final Element elm : mQuantOutline.getMeasuredElements()) {
                   final RegionOfInterest roi = mSelected.get(elm);
-                  if(roi != null)
+                  if (roi != null)
                      mQuantOutline.setPreferredROI(roi);
                }
                // Optimize the measurement
@@ -1679,7 +1573,7 @@ public class OptimizationWizard
                int i = 0;
                final NumberFormat pct = new HalfUpFormat("0.0 %");
                final NumberFormat nf = new HalfUpFormat("0.0");
-               for(final Element elm : mQuantOutline.getMeasuredElements()) {
+               for (final Element elm : mQuantOutline.getMeasuredElements()) {
                   final RegionOfInterest selected = mSelected.get(elm);
                   final QuantificationPlan.Acquisition std = mQuantPlan.find(mQuantOutline.getStandard(elm));
                   final QuantificationPlan.Acquisition unk = mQuantPlan.find(mEstComposition);
@@ -1691,11 +1585,10 @@ public class OptimizationWizard
                   res[i][4] = nf.format(unk != null ? unk.getDose() : Double.NaN) + " nA\u00B7s";
                   ++i;
                }
-               setNextPanel(jWizardPanel_ExpertReport, "View summary report");
+               setNextPanel(jWizardPanel_ExpertReport);
                enableNext(mSelected != null);
                return res;
-            }
-            catch(final EPQException e) {
+            } catch (final EPQException e) {
                enableNext(false);
                OptimizationWizard.this.setExceptionText(e.getMessage(), e);
                return nullRows();
@@ -1708,10 +1601,10 @@ public class OptimizationWizard
          jTable_Transitions.setModel(new TransitionTableModel());
          jTable_Transitions.getColumnModel().getColumn(1).setCellEditor(eachRowEditor_ROI);
          int i = 0;
-         for(final Element elm : mQuantOutline.getMeasuredElements()) {
+         for (final Element elm : mQuantOutline.getMeasuredElements()) {
             final RegionOfInterest selected = mSelected.get(elm);
-            final JComboBox<RegionOfInterest> rcb = new JComboBox<RegionOfInterestSet.RegionOfInterest>();
-            for(final RegionOfInterest roi : mQuantOutline.getStandardROIS(elm))
+            final JComboBox<RegionOfInterest> rcb = new JComboBox<>();
+            for (final RegionOfInterest roi : mQuantOutline.getStandardROIS(elm))
                rcb.addItem(roi);
             rcb.setSelectedItem(selected);
             rcb.addItemListener(new ROIItemListener(elm));
@@ -1723,14 +1616,12 @@ public class OptimizationWizard
 
       private Object[][] nullRows() {
          final Object[][] res = new Object[1][5];
-         for(int i = 0; i < res[0].length; ++i)
+         for (int i = 0; i < res[0].length; ++i)
             res[0][i] = "";
          return res;
       }
 
-      private class SelectUnknownAction
-         extends
-         AbstractAction {
+      private class SelectUnknownAction extends AbstractAction {
 
          private static final long serialVersionUID = -1297266875866064784L;
 
@@ -1755,26 +1646,18 @@ public class OptimizationWizard
 
       private Map<Element, RegionOfInterest> mSelected;
 
-      private class TransitionTableModel
-         extends
-         DefaultTableModel {
+      private class TransitionTableModel extends DefaultTableModel {
 
          private static final long serialVersionUID = 5575164758592228404L;
 
          private TransitionTableModel() {
-            super(getData(), new String[] {
-               "Element",
-               "ROI",
-               "U[combined]",
-               "Dose[std]",
-               "Dose[unk]"
-            });
+            super(getData(), new String[]{"Element", "ROI", "U[combined]", "Dose[std]", "Dose[unk]"});
          }
 
-      };
+      }
 
       public SelectTransitionPanel() {
-         super(OptimizationWizard.this);
+         super(OptimizationWizard.this, "Select transitions");
          init();
       }
 
@@ -1786,7 +1669,7 @@ public class OptimizationWizard
          jTextField_Unknown.setEditable(false);
          pb.add(jButton_Unknown, CC.xy(5, 1));
          pb.add(new JScrollPane(jTable_Transitions), CC.xyw(1, 3, 6));
-         setNextPanel(jWizardPanel_ExpertReport, "View summary report");
+         setNextPanel(jWizardPanel_ExpertReport);
          OptimizationWizard.this.setMessageText("Provide an estimate of the composition of the unknown.");
       }
 
@@ -1797,13 +1680,9 @@ public class OptimizationWizard
       }
    }
 
-   private class ExpertReportPanel
-      extends
-      JWizardPanel {
+   private class ExpertReportPanel extends JWizardPanel {
 
-      private class PrintAction
-         extends
-         AbstractAction {
+      private class PrintAction extends AbstractAction {
 
          private static final long serialVersionUID = -5459854505150885133L;
 
@@ -1815,11 +1694,9 @@ public class OptimizationWizard
          public void actionPerformed(final ActionEvent arg0) {
             PrintUtilities.printComponent(jTextPane_Report);
          }
-      };
+      }
 
-      private class OpenAction
-         extends
-         AbstractAction {
+      private class OpenAction extends AbstractAction {
 
          private static final long serialVersionUID = 7080933027302649656L;
 
@@ -1831,16 +1708,13 @@ public class OptimizationWizard
          public void actionPerformed(final ActionEvent arg0) {
             try {
                Desktop.getDesktop().browse(mReportFile.toURI());
-            }
-            catch(IOException e) {
+            } catch (IOException e) {
                e.printStackTrace();
             }
          }
       }
 
-      private class SimulateAction
-         extends
-         AbstractAction {
+      private class SimulateAction extends AbstractAction {
 
          private static final long serialVersionUID = -8182315668545728886L;
 
@@ -1850,23 +1724,22 @@ public class OptimizationWizard
 
          @Override
          public void actionPerformed(final ActionEvent arg0) {
-            if(mQuantPlan != null) {
+            if (mQuantPlan != null) {
                final SpectrumSimulator ss = new SpectrumSimulator.BasicSpectrumSimulator();
                try {
                   final Map<Acquisition, ISpectrumData> res = mQuantPlan.simulate(ss);
-                  for(final ISpectrumData spec : res.values())
+                  for (final ISpectrumData spec : res.values())
                      DataManager.getInstance().addSpectrum(spec, true);
                   QuantifyUsingStandards qus = mQuantPlan.buildQuantifyUsingStandards(res);
-                  ArrayList<QuantifyUsingStandards.Result> results = new ArrayList<QuantifyUsingStandards.Result>();
+                  ArrayList<QuantifyUsingStandards.Result> results = new ArrayList<>();
                   List<ISpectrumData> unknowns = mQuantPlan.simulateUnknown(ss, 9);
-                  for(final ISpectrumData spec : unknowns) {
+                  for (final ISpectrumData spec : unknowns) {
                      DataManager.getInstance().addSpectrum(spec, true);
                      results.add(qus.compute(spec));
                   }
                   mQuantResults = "<h3>Simulated Optimized Spectrum Quantification Results</h3>\n"
                         + qus.tabulateResults(unknowns, DTSA2.getReport().getFile().getParentFile(), null);
-               }
-               catch(final EPQException e) {
+               } catch (final EPQException e) {
                   // TODO Auto-generated catch block
                   e.printStackTrace();
                }
@@ -1889,7 +1762,7 @@ public class OptimizationWizard
       }
 
       private ExpertReportPanel() {
-         super(OptimizationWizard.this);
+         super(OptimizationWizard.this, "View summary report");
          init();
       }
 
@@ -1916,23 +1789,21 @@ public class OptimizationWizard
             try (final FileWriter fw = new FileWriter(mReportFile, false)) {
                fw.write(html);
             }
-         }
-         catch(final IOException e1) {
+         } catch (final IOException e1) {
             e1.printStackTrace();
          }
-         if(mReportFile != null) {
+         if (mReportFile != null) {
             final File cssFile = new File(mReportFile.getParentFile(), "style.css");
-            if(!cssFile.exists())
+            if (!cssFile.exists())
                // Write the style sheet
                try {
                   try (final PrintWriter osw = new PrintWriter(cssFile)) {
                      try (final BufferedReader isr = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("style.css")))) {
-                        for(String str = isr.readLine(); str != null; str = isr.readLine())
+                        for (String str = isr.readLine(); str != null; str = isr.readLine())
                            osw.println(str);
                      }
                   }
-               }
-               catch(final Exception e) {
+               } catch (final Exception e) {
                   // Ignore it...
                }
             try {
@@ -1941,14 +1812,13 @@ public class OptimizationWizard
                ((HTMLDocument) jTextPane_Report.getDocument()).setAsynchronousLoadPriority(-1);
 
                final URI uri = mReportFile.toURI();
-               if(uri != null) {
+               if (uri != null) {
                   final URL url = uri.toURL();
-                  if(url != null)
+                  if (url != null)
                      jTextPane_Report.setPage(url);
                }
                OptimizationWizard.this.setMessageText("This report is saved as " + mReportFile.getName());
-            }
-            catch(final Exception e) {
+            } catch (final Exception e) {
                e.printStackTrace();
             }
          }
@@ -1959,7 +1829,7 @@ public class OptimizationWizard
       public boolean permitNext() {
          return true;
       }
-   };
+   }
 
    enum Mode {
       OptimizeEDS, OptimizeWDS, OptimizeMixed, OptimizeExpert, FindStandards;
@@ -1999,7 +1869,7 @@ public class OptimizationWizard
    private Mode mMode = Mode.OptimizeExpert;
 
    private void updateComposition(Composition c) {
-      if(c != null) {
+      if (c != null) {
          c.setName(UNKNOWN);
          final Preferences prefs = Preferences.userNodeForPackage(OptimizationWizard.class);
          prefs.put(UNKNOWN, EPQXStream.getInstance().toXML(c));
@@ -2009,14 +1879,14 @@ public class OptimizationWizard
 
    /**
     * Constructs a ExperimentOptimizationWIzard
-    * 
+    *
     * @param owner
     * @param detector
     * @param session
     */
    public OptimizationWizard(final Frame owner, final EDSDetector detector, final Session session) {
       super(owner, "Optimize a measurement", true);
-      this.setActivePanel(jWizardPanel_Introduction, "Select an optimization");
+      this.setActivePanel(jWizardPanel_Introduction);
       this.enableFinish(false);
       this.enableNext(true);
       mDetector = detector;
@@ -2024,25 +1894,25 @@ public class OptimizationWizard
       final Preferences prefs = Preferences.userNodeForPackage(OptimizationWizard.class);
       final String unk = prefs.get(UNKNOWN, null);
       Composition tmp = null;
-      if(unk != null) {
+      if (unk != null) {
          final Object obj = EPQXStream.getInstance().fromXML(unk);
-         if(obj instanceof Composition)
+         if (obj instanceof Composition)
             tmp = (Composition) obj;
       }
-      if(tmp != null)
+      if (tmp != null)
          mEstComposition = tmp;
-      setNextPanel(jWizardPanel_Instrument, "Initialize EDS");
+      setNextPanel(jWizardPanel_Instrument);
    }
 
    public String toHTML(File path) {
-      switch(mMode) {
-         case OptimizeEDS:
+      switch (mMode) {
+         case OptimizeEDS :
             return mOptimizer.toHTML();
-         case OptimizeExpert:
+         case OptimizeExpert :
             return mQuantPlan.toHTML(path, true) + "\n" + jWizardPanel_ExpertReport.getQuantResults();
-         case FindStandards:
+         case FindStandards :
             return jWizardPanel_SelectMaterials.toHTML();
-         default:
+         default :
             assert false;
             return "";
       }
@@ -2051,21 +1921,19 @@ public class OptimizationWizard
 
    private Composition strToComp(final String compStr) {
       Composition comp = null;
-      if(mSession != null)
+      if (mSession != null)
          try {
             comp = mSession.findStandard(compStr.trim());
-         }
-         catch(final SQLException e1) {
+         } catch (final SQLException e1) {
             // assume it isn't in the database...
          }
-      if(comp == null)
+      if (comp == null)
          try {
             comp = MaterialFactory.createCompound(compStr);
-         }
-         catch(final EPQException ex) {
+         } catch (final EPQException ex) {
             // Assume that it is a name not a compound
          }
-      if(comp == null) {
+      if (comp == null) {
          final Composition tmp = new Composition();
          tmp.setName(compStr);
          comp = MaterialsCreator.editMaterial(OptimizationWizard.this, tmp, mSession, false);

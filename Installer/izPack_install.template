@@ -3,8 +3,9 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://izpack.org/schema/installation http://izpack.org/schema/5.0/izpack-installation-5.0.xsd">
     <!-- The script doesn't work within Eclipse but can be build from the command line 
-    > cd  C:\Users\nritchie\git\nist-dtsa-ii\Installer
-    > "C:\Program Files (x86)\IzPack\bin\compile.bat" -h ${IZPACK_HOME} izPack_install.xml -b . -o dtsa2_microscopium.jar -k standard 
+    > c:
+    > cd C:\Users\nritchie\git\nist-dtsa-ii\Installer
+    >"C:\Program Files (x86)\IzPack\bin\compile.bat" -h ${IZPACK_HOME} izPack_install_full.xml -b . -o dtsa2_neptune_full.jar -k standard 
     -->
     <variables>
         <variable name="TargetPanel.dir.windows" value="$USER_HOME\AppData\Local\NIST\$APP_NAME $APP_VER"/>
@@ -19,8 +20,8 @@
         <property name="info.appName" value="DTSA-II"/>
         <property name="info.url" value="http://www.cstl.nist.gov/div837/837.02/epq/dtsa2/index.html"/>
         <property name="info.company.name" value="NIST"/>
-        <property name="info.version" value="Microscopium KR"/>
-        <property name="info.release-date" value="2022-09-16"/>
+        <property name="info.version" value="Neptune"/>
+        <property name="info.release-date" value="DATE_VERSION"/>
     </properties>
     <info>
         <appname>@{info.company.name} @{info.appName}</appname>
@@ -65,31 +66,37 @@
         <panel classname="PacksPanel"/>
         <panel classname="InstallPanel"/>
         <panel classname="ShortcutPanel"/>        
-        <panel classname="SimpleFinishPanel"/>
+        <panel classname="FinishPanel"/>
     </panels>
     <packs>
         <pack name="Core Libraries" preselected="yes" required="yes">
             <description>The core libraries required for all installations.</description>
-            <file override="update" src="$JARPATH/org/apache/derby/derby/10.14.1.0/derby-10.14.1.0.jar" targetdir="$INSTALL_PATH/"/>
-            <file override="update" src="$JARPATH/org/apache/derby/derbynet/10.14.1.0/derbynet-10.14.1.0.jar" targetdir="$INSTALL_PATH/"/>
-            <file override="update" src="$JARPATH/org/apache/derby/derbyclient/10.14.1.0/derbyclient-10.14.1.0.jar" targetdir="$INSTALL_PATH/"/>
-            <file override="update" src="$JARPATH/junit/junit/4.13/junit-4.13.jar" targetdir="$INSTALL_PATH/"/>
+            <!-- EPQ -->
+            <file override="update" src="$JARPATH/org/apache/derby/derby/10.16.1.1/derby-10.16.1.1.jar" targetdir="$INSTALL_PATH/"/>
+            <file override="update" src="$JARPATH/org/apache/derby/derbynet/10.16.1.1/derbynet-10.16.1.1.jar" targetdir="$INSTALL_PATH/"/>
+            <file override="update" src="$JARPATH/org/apache/derby/derbyclient/10.16.1.1/derbyclient-10.16.1.1.jar" targetdir="$INSTALL_PATH/"/>
+            <file override="update" src="$JARPATH/org/apache/derby/derbyshared/10.16.1.1/derbyshared-10.16.1.1.jar" targetdir="$INSTALL_PATH/"/>
+            <file override="update" src="$JARPATH/org/apache/derby/derbytools/10.16.1.1/derbytools-10.16.1.1.jar" targetdir="$INSTALL_PATH/"/>
             <file override="update" src="$JARPATH/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar" targetdir="$INSTALL_PATH/"/>
-            <file override="update" src="$JARPATH/com/thoughtworks/xstream/xstream/1.4.19/xstream-1.4.19.jar" targetdir="$INSTALL_PATH/"/>
-            <file override="update" src="$JARPATH/xmlpull/xmlpull/1.1.3.1/xmlpull-1.1.3.1.jar" targetdir="$INSTALL_PATH/"/>
-            <file override="update" src="$JARPATH/xpp3/xpp3_min/1.1.4c/xpp3_min-1.1.4c.jar" targetdir="$INSTALL_PATH/"/>
-            <file override="update" src="$JARPATH/gov/nist/math/jama/1.0.3/jama-1.0.3.jar" targetdir="$INSTALL_PATH/"/>
-            <file override="update" src="$JARPATH/com/jgoodies/jgoodies-forms/1.8.0/jgoodies-forms-1.8.0.jar" targetdir="$INSTALL_PATH/"/>
-            <file override="update" src="$JARPATH/com/jgoodies/jgoodies-common/1.8.0/jgoodies-common-1.8.0.jar" targetdir="$INSTALL_PATH/"/>
-            <file override="update" src="$JARPATH/com/sun/jna/jna/3.0.9/jna-3.0.9.jar" targetdir="$INSTALL_PATH/"/>
             <file override="update" src="$JARPATH/com/github/jai-imageio/jai-imageio-core/1.4.0/jai-imageio-core-1.4.0.jar" targetdir="$INSTALL_PATH/"/>
+            <file override="update" src="$JARPATH/gov/nist/math/jama/1.0.3/jama-1.0.3.jar" targetdir="$INSTALL_PATH/"/>
+            <file override="update" src="$JARPATH/com/jgoodies/jgoodies-common/1.8.0/jgoodies-common-1.8.0.jar" targetdir="$INSTALL_PATH/"/>
+            <file override="update" src="$JARPATH/com/jgoodies/jgoodies-forms/1.8.0/jgoodies-forms-1.8.0.jar" targetdir="$INSTALL_PATH/"/>
+            <file override="update" src="$JARPATH/net/java/dev/jna/jna/5.12.1/jna-5.12.1.jar" targetdir="$INSTALL_PATH/"/>
+            <file override="update" src="$JARPATH/junit/junit/4.13.2/junit-4.13.2.jar" targetdir="$INSTALL_PATH/"/>
+            <file override="update" src="$JARPATH/org/python/jython-standalone/2.7.3/jython-standalone-2.7.3.jar" targetdir="$INSTALL_PATH/"/>
+            <file override="update" src="$JARPATH/io/github/x-stream/mxparser/1.2.2/mxparser-1.2.2.jar" targetdir="$INSTALL_PATH"/>
+            <file override="update" src="$JARPATH/xmlpull/xmlpull/1.1.3.1/xmlpull-1.1.3.1.jar" targetdir="$INSTALL_PATH/"/>
+            <file override="update" src="$JARPATH/com/thoughtworks/xstream/xstream/1.4.19/xstream-1.4.19.jar" targetdir="$INSTALL_PATH/"/>
+            <!-- Not in EPQ but in DTSA-II -->
             <file override="update" src="$JARPATH/com/toedter/jcalendar/1.4/jcalendar-1.4.jar" targetdir="$INSTALL_PATH/"/>
-            <file override="update" src="$JARPATH/org/python/jython-standalone/2.7.2/jython-standalone-2.7.2.jar" targetdir="$INSTALL_PATH/"/>
+            <file override="update" src="$JARPATH/com/formdev/flatlaf/3.0/flatlaf-3.0.jar" targetdir="$INSTALL_PATH/"/>
+            <!-- My EPQ and DTSA-II jars -->
             <file override="update" src="$BUILDPATH/epq.jar" targetdir="$INSTALL_PATH/"/>
             <fileset dir="$BUILDPATH/../../Lib/dtsa2" targetdir="${INSTALL_PATH}/Lib/dtsa2" excludes="*/.class"/>
         </pack>
         <pack name="Java Runtime for Windows" preselected="yes" required="no">
-            <description>An integrated Java 15.0 JRE (run-time environment) for MS Windows only!!.</description>
+            <description>An integrated Java 18.0 JRE (run-time environment) for MS Windows only!!.</description>
             <fileset dir="$BUILDPATH/java-runtime" targetdir="${INSTALL_PATH}/java-runtime"/>
         </pack>
         <pack name="NIST DTSA-II Application" preselected="yes" required="no">
@@ -116,27 +123,6 @@
             <file override="update" src="$BUILDPATH/NISTGlassDB.jar" targetdir="$INSTALL_PATH/"/>
             <file override="update" src="$BUILDPATH/GlassDatabase.exe" targetdir="$INSTALL_PATH/"/>
         </pack>
-        <!--
-        <pack name="NIST Graf Application" preselected="no" required="no">
-            <description>Data analysis for RJ Lee Group / ASPEX automated particle analysis data files.  DON'T INSTALL THIS UNLESS YOU KNOW YOU NEED IT!</description>
-            <file override="update" src="$BUILDPATH/graf.jar" targetdir="$INSTALL_PATH/"/>
-            <file override="update" src="$BUILDPATH/Graf.exe" targetdir="$INSTALL_PATH/"/>
-            <file override="update" src="$JARPATH/org/apache/poi/poi/3.17/poi-3.17.jar" targetdir="$INSTALL_PATH/"/>
-            <file override="update" src="$JARPATH/commons-codec\commons-codec\1.10\commons-codec-1.10.jar" targetdir="$INSTALL_PATH/"/>
-            <file override="update" src="$JARPATH/org/apache/commons/commons-collections4/4.1/commons-collections4-4.1.jar" targetdir="$INSTALL_PATH/"/>
-            <file override="update" src="$JARPATH/org/apache/commons/commons-math3/3.6.1/commons-math3-3.6.1.jar" targetdir="$INSTALL_PATH/"/>
-        </pack> 
-        <pack name="SEMantics" preselected="no" required="no">
-            <description>An application for automating a TESCAN SEM through DTSA-II.</description>
-            <file override="update" src="$BUILDPATH/semantics.jar" targetdir="$INSTALL_PATH/"/>
-            <file override="update" src="$BUILDPATH/graf.jar" targetdir="$INSTALL_PATH/"/>
-            <file override="update" src="$BUILDPATH/Graf.exe" targetdir="$INSTALL_PATH/"/>
-            <file override="update" src="$BUILDPATH/startUp.py" targetdir="$INSTALL_PATH/"/>
-            <file override="update" src="$BUILDPATH/multiRCA.py" targetdir="$INSTALL_PATH/"/>
-            <file override="update" src="$BUILDPATH/bbb.py" targetdir="$INSTALL_PATH/"/>
-            <file override="update" src="$BUILDPATH/TESCAN_backdrop theme.themepack" targetdir="$INSTALL_PATH/"/>
-        </pack>
-        -->
     </packs>
     <listeners>
         <listener classname="RegistryInstallerListener" stage="install" >

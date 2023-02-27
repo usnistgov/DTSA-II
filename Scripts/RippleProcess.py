@@ -7,7 +7,7 @@
 sp=epq.SpectrumProperties()
 sp.setDetector(d1)
 sp.setNumericProperty(epq.SpectrumProperties.BeamEnergy,20.0)
-sp.setNumericProperty(epq.SpectrumProperties.FaradayBegin,1.0)
+sp.setNumericProperty(epq.SpectrumProperties.ProbeCurrent,1.0)
 sp.setNumericProperty(epq.SpectrumProperties.LiveTime,0.001)
 rr=ept.RippleSpectrum("U:/SMSDEx/JeffDavis/Soil Phase/2711 Soil Phase Map/Area2_300x.rpl",sp)
 

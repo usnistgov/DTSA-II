@@ -1,2 +1,16 @@
 /target/
 /derby.log
+
+Installer/izPack_install.xml
+
+Installer/izPack_install_full.xml
+
+Installer/izPack_install_nojre.xml
+
+Installer/Launch4j_config.xml
+
+Installer/Launch4j_relocate.xml
+
+Installer/icons.pptx
+
+src/gov/nist/microanalysis/dtsa2/revision

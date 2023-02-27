@@ -1,7 +1,5 @@
 package gov.nist.microanalysis.dtsa2;
 
-import gov.nist.microanalysis.Utility.HalfUpFormat;
-
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
@@ -29,6 +27,8 @@ import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
 
+import gov.nist.microanalysis.Utility.HalfUpFormat;
+
 /**
  * <p>
  * Title: Trixy
@@ -42,7 +42,7 @@ import com.jgoodies.forms.layout.FormLayout;
  * <p>
  * Company: National Institute of Standards and Technology
  * </p>
- * 
+ *
  * @author Nicholas W. M. Ritchie
  * @version 1.0
  */

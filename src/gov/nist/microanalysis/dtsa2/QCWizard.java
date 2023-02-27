@@ -1,29 +1,5 @@
 package gov.nist.microanalysis.dtsa2;
 
-import gov.nist.microanalysis.EPQDatabase.Session;
-import gov.nist.microanalysis.EPQDatabase.Session.QCNormalizeMode;
-import gov.nist.microanalysis.EPQDatabase.Session.QCProject;
-import gov.nist.microanalysis.EPQLibrary.Composition;
-import gov.nist.microanalysis.EPQLibrary.EPQException;
-import gov.nist.microanalysis.EPQLibrary.Element;
-import gov.nist.microanalysis.EPQLibrary.ISpectrumData;
-import gov.nist.microanalysis.EPQLibrary.MaterialFactory;
-import gov.nist.microanalysis.EPQLibrary.SpectrumProperties;
-import gov.nist.microanalysis.EPQLibrary.SpectrumUtils;
-import gov.nist.microanalysis.EPQLibrary.Detector.DetectorCalibration;
-import gov.nist.microanalysis.EPQLibrary.Detector.DetectorProperties;
-import gov.nist.microanalysis.EPQLibrary.Detector.EDSCalibration;
-import gov.nist.microanalysis.EPQLibrary.Detector.EDSDetector;
-import gov.nist.microanalysis.EPQTools.ErrorDialog;
-import gov.nist.microanalysis.EPQTools.JWizardDialog;
-import gov.nist.microanalysis.EPQTools.MaterialsCreator;
-import gov.nist.microanalysis.EPQTools.SimpleFileFilter;
-import gov.nist.microanalysis.EPQTools.SpectrumFileChooser;
-import gov.nist.microanalysis.EPQTools.SpectrumPropertyPanel;
-import gov.nist.microanalysis.Utility.DescriptiveStatistics;
-import gov.nist.microanalysis.Utility.HalfUpFormat;
-import gov.nist.microanalysis.Utility.UncertainValue2;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Desktop;
@@ -69,6 +45,30 @@ import com.jgoodies.forms.layout.ConstantSize;
 import com.jgoodies.forms.layout.FormLayout;
 import com.toedter.calendar.JDateChooser;
 
+import gov.nist.microanalysis.EPQDatabase.Session;
+import gov.nist.microanalysis.EPQDatabase.Session.QCNormalizeMode;
+import gov.nist.microanalysis.EPQDatabase.Session.QCProject;
+import gov.nist.microanalysis.EPQLibrary.Composition;
+import gov.nist.microanalysis.EPQLibrary.EPQException;
+import gov.nist.microanalysis.EPQLibrary.Element;
+import gov.nist.microanalysis.EPQLibrary.ISpectrumData;
+import gov.nist.microanalysis.EPQLibrary.MaterialFactory;
+import gov.nist.microanalysis.EPQLibrary.SpectrumProperties;
+import gov.nist.microanalysis.EPQLibrary.SpectrumUtils;
+import gov.nist.microanalysis.EPQLibrary.Detector.DetectorCalibration;
+import gov.nist.microanalysis.EPQLibrary.Detector.DetectorProperties;
+import gov.nist.microanalysis.EPQLibrary.Detector.EDSCalibration;
+import gov.nist.microanalysis.EPQLibrary.Detector.EDSDetector;
+import gov.nist.microanalysis.EPQTools.ErrorDialog;
+import gov.nist.microanalysis.EPQTools.JWizardDialog;
+import gov.nist.microanalysis.EPQTools.MaterialsCreator;
+import gov.nist.microanalysis.EPQTools.SimpleFileFilter;
+import gov.nist.microanalysis.EPQTools.SpectrumFileChooser;
+import gov.nist.microanalysis.EPQTools.SpectrumPropertyPanel;
+import gov.nist.microanalysis.Utility.DescriptiveStatistics;
+import gov.nist.microanalysis.Utility.HalfUpFormat;
+import gov.nist.microanalysis.Utility.UncertainValue2;
+
 /**
  * @author nicholas
  */
@@ -94,7 +94,7 @@ public class QCWizard
 
    private static enum Mode {
       NEW_PROJECT, MEASUREMENT, REPORT, SPECTRA, LIMITS, EXPORT
-   };
+   }
 
    private final StringBuffer mHTMLResult = new StringBuffer();
 
@@ -111,7 +111,7 @@ public class QCWizard
       private final JRadioButton jRadioButton_Export = new JRadioButton("Export the data from a QC project");
 
       public WelcomePanel(JWizardDialog wiz) {
-         super(wiz);
+         super(wiz, "Welcome");
          initialize();
       }
 
@@ -166,9 +166,9 @@ public class QCWizard
          else if(jRadioButton_Spectra.isSelected())
             mMode = Mode.SPECTRA;
          if(mMode == Mode.NEW_PROJECT)
-            setNextPanel(jWizardPanel_NewProject, "Configure a new QCproject");
+            setNextPanel(jWizardPanel_NewProject);
          else
-            setNextPanel(jWizardPanel_SelectProject, "Select a QC project");
+            setNextPanel(jWizardPanel_SelectProject);
       }
 
       @Override
@@ -184,7 +184,7 @@ public class QCWizard
 
       private static final long serialVersionUID = 7315979072518760442L;
 
-      private final JComboBox<DetectorProperties> jComboBox_Detector = new JComboBox<DetectorProperties>();
+      private final JComboBox<DetectorProperties> jComboBox_Detector = new JComboBox<>();
       private final JTextField jTextField_Material = new JTextField();
       private final JTextField jTextField_BeamEnergy = new JTextField();
       private final JTextField jTextField_NominalI = new JTextField();
@@ -201,7 +201,7 @@ public class QCWizard
       private boolean mCreateQCProject = false;
 
       public NewProjectPanel(JWizardDialog wiz) {
-         super(wiz);
+         super(wiz, "Configure a new QCproject");
          init();
       }
 
@@ -317,7 +317,7 @@ public class QCWizard
          jTextField_NominalI.setEditable(true);
          jTextField_NominalWD.setEditable(true);
          final Set<DetectorProperties> dp = mSession.getAllDetectors();
-         final DefaultComboBoxModel<DetectorProperties> cbm = new DefaultComboBoxModel<DetectorProperties>(dp.toArray(new DetectorProperties[0]));
+         final DefaultComboBoxModel<DetectorProperties> cbm = new DefaultComboBoxModel<>(dp.toArray(new DetectorProperties[0]));
          jComboBox_Detector.setModel(cbm);
          final DetectorProperties sel = dp.iterator().next();
          cbm.setSelectedItem(sel);
@@ -327,13 +327,13 @@ public class QCWizard
          QCWizard.this.enableFinish(true);
       }
 
-   };
+   }
 
    private class SelectProjectPanel
       extends JWizardPanel {
 
-      private final JComboBox<DetectorProperties> jComboBox_Detector = new JComboBox<DetectorProperties>();
-      private final JComboBox<QCProject> jComboBox_Project = new JComboBox<QCProject>();
+      private final JComboBox<DetectorProperties> jComboBox_Detector = new JComboBox<>();
+      private final JComboBox<QCProject> jComboBox_Project = new JComboBox<>();
       private final JTextField jTextField_Material = new JTextField();
       private final JTextField jTextField_BeamEnergy = new JTextField();
       private final JTextField jTextField_NominalI = new JTextField();
@@ -343,7 +343,7 @@ public class QCWizard
       private static final long serialVersionUID = -1090276644792187234L;
 
       public SelectProjectPanel(JWizardDialog wiz) {
-         super(wiz);
+         super(wiz, "Select a QC project");
          init();
       }
 
@@ -392,12 +392,12 @@ public class QCWizard
             DefaultComboBoxModel<QCProject> cbm;
             try {
                final Set<QCProject> proj = mSession.findQCProjects(mDetectorProperties);
-               cbm = new DefaultComboBoxModel<QCProject>(proj.toArray(new QCProject[0]));
+               cbm = new DefaultComboBoxModel<>(proj.toArray(new QCProject[0]));
                if((mProject == null) || (!mProject.getDetector().getDetectorProperties().equals(mDetectorProperties)))
                   mProject = (proj.size() > 0 ? proj.iterator().next() : null);
             }
             catch(final SQLException e) {
-               cbm = new DefaultComboBoxModel<QCProject>();
+               cbm = new DefaultComboBoxModel<>();
             }
             if(mProject != null)
                cbm.setSelectedItem(mProject);
@@ -435,7 +435,7 @@ public class QCWizard
       public void onShow() {
          try {
             final Set<DetectorProperties> dps = mSession.findDetectorsWithQCProjects();
-            final DefaultComboBoxModel<DetectorProperties> cbm = new DefaultComboBoxModel<DetectorProperties>(dps.toArray(new DetectorProperties[0]));
+            final DefaultComboBoxModel<DetectorProperties> cbm = new DefaultComboBoxModel<>(dps.toArray(new DetectorProperties[0]));
             if((mDetectorProperties == null) || (!dps.contains(mDetectorProperties)))
                mDetectorProperties = dps.iterator().next();
             if(dps.size() > 0)
@@ -449,23 +449,23 @@ public class QCWizard
          }
          switch(mMode) {
             case MEASUREMENT:
-               setNextPanel(jWizardPanel_Measurement, "Select a measured spectrum");
+               setNextPanel(jWizardPanel_Measurement);
                enableFinish(false);
                enableNext(true);
                break;
             case EXPORT:
-               setNextPanel(jWizardPanel_Export, "Specify where to export results");
+               setNextPanel(jWizardPanel_Export);
                enableFinish(false);
                enableNext(true);
             case LIMITS:
                break;
             case REPORT:
-               setNextPanel(jWizardPanel_Report, "Configure a report");
+               setNextPanel(jWizardPanel_Report);
                enableFinish(false);
                enableNext(true);
                break;
             case SPECTRA:
-               setNextPanel(null, "Finish");
+               setNextPanel(null);
                enableFinish(true);
                enableNext(false);
                break;
@@ -473,7 +473,7 @@ public class QCWizard
                assert false;
          }
       }
-   };
+   }
 
    private class MeasurementPanel
       extends JWizardPanel {
@@ -488,7 +488,7 @@ public class QCWizard
       private final JTextField jTextField_Livetime = new JTextField();
 
       private MeasurementPanel(JWizardDialog wiz) {
-         super(wiz);
+         super(wiz, "Select a measured spectrum");
          init();
       }
 
@@ -583,7 +583,7 @@ public class QCWizard
 
       @Override
       public void onShow() {
-         setNextPanel(jWizardPanel_Results, "Review the results");
+         setNextPanel(jWizardPanel_Results);
          updateSpectrum();
          QCWizard.this.enableNext(true);
          QCWizard.this.enableFinish(false);
@@ -629,7 +629,7 @@ public class QCWizard
          }
          permitNext();
       }
-   };
+   }
 
    private class ResultPanel
       extends JWizardPanel {
@@ -726,10 +726,10 @@ public class QCWizard
                   e.printStackTrace();
                }
          }
-      };
+      }
 
       private ResultPanel(JWizardDialog wiz) {
-         super(wiz);
+         super(wiz, "Review the results");
          init();
       }
 
@@ -772,7 +772,7 @@ public class QCWizard
       private File mFile = null;
 
       private ExportPanel(JWizardDialog wd) {
-         super(wd);
+         super(wd, "Specify where to export results");
          init();
       }
 
@@ -816,7 +816,7 @@ public class QCWizard
          }
       }
 
-   };
+   }
 
    private class ReportPanel
       extends JWizardPanel {
@@ -827,7 +827,7 @@ public class QCWizard
       private JScrollPane jScrollPane_ReportItems = new JScrollPane();
 
       public ReportPanel(QCWizard wiz) {
-         super(wiz);
+         super(wiz, "Configure a report");
          init();
       }
 
@@ -841,7 +841,7 @@ public class QCWizard
             QCWizard.this.setErrorText("");
             final PanelBuilder pb = new PanelBuilder(new FormLayout("fill:200dlu", "fill:120dlu"));
             final Set<String> items = mProject.getItemNames();
-            mItems = new ArrayList<JCheckBox>();
+            mItems = new ArrayList<>();
             final DefaultFormBuilder dfb = new DefaultFormBuilder(new FormLayout("pref", ""));
             dfb.lineGapSize(new ConstantSize(0, ConstantSize.PIXEL));
             final Preferences pref = Preferences.userNodeForPackage(QCWizard.class);
@@ -879,7 +879,7 @@ public class QCWizard
       public void onHide() {
          if(QCWizard.this.isFinished()) {
             final Preferences pref = Preferences.userNodeForPackage(QCWizard.class);
-            final ArrayList<String> items = new ArrayList<String>();
+            final ArrayList<String> items = new ArrayList<>();
             for(final JCheckBox cb : mItems) {
                if(cb.isSelected())
                   items.add(cb.getText());
@@ -906,7 +906,7 @@ public class QCWizard
       super(owner, "Quality control alien", true);
       mSession = session;
       mMode = Mode.MEASUREMENT;
-      setActivePanel(jWizardPanel_Welcome, "Welcome");
+      setActivePanel(jWizardPanel_Welcome);
    }
 
    /**
@@ -917,7 +917,7 @@ public class QCWizard
       super(owner, "Quality control alien", true);
       mSession = session;
       mMode = Mode.MEASUREMENT;
-      setActivePanel(jWizardPanel_Welcome, "Welcome");
+      setActivePanel(jWizardPanel_Welcome);
    }
 
    public String getHTMLResults() {

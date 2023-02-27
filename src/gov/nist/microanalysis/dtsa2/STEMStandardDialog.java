@@ -54,7 +54,7 @@ import gov.nist.microanalysis.Utility.Math2;
  * <p>
  * Institution: National Institute of Standards and Technology
  * </p>
- * 
+ *
  * @author nritchie @version 1.0
  */
 public class STEMStandardDialog extends JDialog {
@@ -83,7 +83,7 @@ public class STEMStandardDialog extends JDialog {
 
    private final Session          mSession;
    private ISpectrumData          mSpectrum;
-   private final Set<Element>     mAlreadyHaveStandards    = new TreeSet<Element>();
+   private final Set<Element>     mAlreadyHaveStandards    = new TreeSet<>();
 
    private String buildRows(int n) {
       String SPACER = ", 2dlu, ";
@@ -118,8 +118,7 @@ public class STEMStandardDialog extends JDialog {
          // Live time in seconds
          props.setNumericProperty(SpectrumProperties.LiveTime, jTextField_LiveTime.getValue());
          // Current in pA
-         props.setNumericProperty(SpectrumProperties.FaradayBegin, jTextField_Current.getValue() / 1000.0);
-         props.setNumericProperty(SpectrumProperties.FaradayEnd, jTextField_Current.getValue() / 1000.0);
+         props.setNumericProperty(SpectrumProperties.ProbeCurrent, jTextField_Current.getValue() / 1000.0);
          // Density in g/cm3
          mat.setDensity(ToSI.gPerCC(jTextField_Density.getValue()));
          // Thickness in meters
@@ -288,10 +287,10 @@ public class STEMStandardDialog extends JDialog {
             if (comp != null) {
                final Material mat = comp instanceof Material ? (Material) comp : new Material(comp, ToSI.gPerCC(1.0));
                jPanel_Material.setComposition(mat);
-               final Set<Element> avail = new TreeSet<Element>(comp.getElementSet());
+               final Set<Element> avail = new TreeSet<>(comp.getElementSet());
                avail.removeAll(mAlreadyHaveStandards);
                jPanel_Elements.setAvailableElements(avail);
-               final Set<Element> stdized = new TreeSet<Element>(sp.getStandardizedElements());
+               final Set<Element> stdized = new TreeSet<>(sp.getStandardizedElements());
                stdized.removeAll(mAlreadyHaveStandards);
                if ((stdized.size() == 0) && (avail.size() == 1))
                   stdized.addAll(avail);

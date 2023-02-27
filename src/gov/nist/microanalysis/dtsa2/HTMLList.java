@@ -20,13 +20,13 @@ import javax.swing.text.html.HTML;
  * <p>
  * Institution: National Institute of Standards and Technology
  * </p>
- * 
+ *
  * @author nritchie
  * @version 1.0
  */
 public class HTMLList {
 
-   private final ArrayList<String> mItems = new ArrayList<String>();
+   private final ArrayList<String> mItems = new ArrayList<>();
    private String mHeader;
    private String mErrorMsg;
 

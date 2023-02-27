@@ -4,8 +4,9 @@
 #	TESCAN SEM and provides a mechanism to control the SEM, collect data and process SEM data.
 # Modified: 11-July-2022
 # Set the SITE to account for site specific hardware variations
+from gov.nist.microanalysis.EPQLibrary import SpectrumProperties
 NIST, MCCRONE, PNNL, PAS, AEM, ORNL, SRNL, PLEASANTON, WARRENDALE = ( "NIST", "McCRONE", "PNNL", "PAS", "AEM", "ORNL", "SRNL", "PLEASANTON", "WARRENDALE" )
-SITE = MCCRONE
+SITE = NIST
 
 if (SITE == NIST) and (jl.System.getProperty('sun.java.command') == u'gov.nist.microanalysis.dtsa2.DTSA2'):
 	print "JAR paths based on workspace."
@@ -84,13 +85,15 @@ elif SITE==ORNL:
 elif SITE==PLEASANTON:
 	rootPath = "C:\\Users\\Tescan\\Documents\\DTSA-II Reports\\Data" 
 elif SITE==WARRENDALE:
-	rootPath = "C:\\Users\\EdaxAdmin\\Documents\\DTSA-II Reports\\Data"
+	rootPath = "C:\\Users\\Tescan\\Documents\\DTSA-II Reports\\Data"
+elif SITE==SRNL:
+	rootPath = "C:\\Users\\Tescan\\SEMantics Data"
 else:  # SITE==MCCRONE:
 	rootPath = "C:\\Data"
 
 
 BLANKER_INDEX = 0
-if SITE == WARRENDALE:
+if SITE == WARRENDALE or SITE == SRNL:
 	BLANKER_INDEX = 1
 
 # Configure this to determine which field images to save.
@@ -101,17 +104,6 @@ elif (SITE==AEM) or (SITE==PAS):
 	SAVE_FIELD_MASK = 0x0
 else:
 	SAVE_FIELD_MASK = 0x3
-
-# Default images to save using collectImages(...)
-
-if SITE==PLEASANTON:
-	DEF_IMAGE_MASK = 0x2F
-elif SITE==WARRENDALE:
-	DEF_IMAGE_MASK = 0x9 # 0x2F
-else:
-	DEF_IMAGE_MASK = 0x3
-# Mask to use for other functions that save images
-SAVE_IMAGE_MASK = 0x3
 
 DEFAULT_E0 = 25
 if (SITE == NIST) or (SITE==WARRENDALE):
@@ -126,7 +118,7 @@ if SITE<>PNNL:
 else:
 	setDefaultPath("%s\\Daily\\%s" % (rootPath, jtext.SimpleDateFormat("dd-MMM-yyyy").format(ju.Date())))
 	defaultRulePath = "%s\\Standards\\Rule" % rootPath
-	defaultVecPath = "%s\\Standards\\Combined\\25 keV" % rootPath
+	defaultVecPath = "%s\\Standards\\Combined\\% keV" % ( rootPath, DEFAULT_E0 )
 	nullImagePath = "%s\\NullImages" % base
 	keyPath = nullImagePath
 
@@ -138,26 +130,31 @@ defaultStds = { "C": "C std.msa", "Al": "Al std.msa", "Na": "NaCl std.msa", "Cl"
 #		 "Ag" : "Ag std.msa", "Au" : "Au std.msa", "La" : "LaF3 std.msa", "Pb" : "K227 std.msa"
 }
 
-if (SITE==MCCRONE) or (SITE==ORNL) or (SITE==NIST):
+if (SITE==ORNL) or (SITE==NIST):
 	availableDets = ( True, )*4 # False, False, False )
 elif (SITE==PLEASANTON) or (SITE==WARRENDALE):
 	availableDets = ( True, )
+elif (SITE==SRNL) or (SITE==MCCRONE):
+	availableDets = ( True, )*3
 else:
 	availableDets = ( True, )*2 # False, False, False )
-
 defaultDetCount = len(availableDets)
 defaultDetMask = 0
 for i in range(0, defaultDetCount):
 	if availableDets[i]:
 		defaultDetMask = defaultDetMask + (1 << i)
-_edsResolution="Medium"
+_edsResolution="MediumLE"
 
 defLED = True
 
 pt_det = []
+if SITE==SRNL:
+	det_off=0
+else:
+	det_off=1
 for i in range(0, defaultDetCount):
 	if availableDets[i]:
-		pt_det.append(findDetector("EDAX Det %d" % (i+1, )))
+		pt_det.append(findDetector("EDAX Det %d" % (i+det_off, )))
 pt_det_all = findDetector("EDAX All")
 
 _saverize = semantics.Saverize()
@@ -169,6 +166,8 @@ connect = (jop.showConfirmDialog(MainFrame, "Connect to the TESCAN?", "Start-up 
 # Location of the Image Magick executables 'convert' and 'montage'
 if SITE==ORNL:
 	IMAGE_MAGICK = "C:\\Program Files\\ImageMagick-6.9.9-Q16"
+elif SITE==NIST:
+	IMAGE_MAGICK = "C:\Program Files\ImageMagick-6.9.12-Q8"
 else:
 	IMAGE_MAGICK = "C:\\Program Files\\ImageMagick-6.9.6-Q16"
 
@@ -235,7 +234,24 @@ if connect:
 		print "Unable to find a detector named: %s" % name
 		return None
 
-	if SITE==MCCRONE:
+	# Default images to save using collectImages(...)
+	if SITE==PLEASANTON:
+		DEF_IMAGE_MASK = 0x2F
+	elif SITE==WARRENDALE:
+		DEF_IMAGE_MASK = 0x9 # 0x2F
+	elif SITE==SRNL:
+		DEF_IMAGE_MASK = (1 << findEDet("BSE").getIndex())+(1 << findEDet("SE").getIndex()) # 0x300 - All detectors is 0x328
+	else:
+		DEF_IMAGE_MASK = 0x3
+
+	# Mask to use for other functions that save images
+	SAVE_IMAGE_MASK = (1 << findEDet("BSE").getIndex())+(1 << findEDet("SE").getIndex())
+
+	# Mask to use for other functions that save images
+	SAVE_IMAGE_MASK = 0x300
+	if SITE==SRNL:
+		_apaDet = findEDet("BSE")
+	elif SITE==MCCRONE:
 		_apaDet = findEDet("BSED")
 	elif SITE==WARRENDALE:
 		_apaDet = findEDet("LE BSE")
@@ -243,6 +259,11 @@ if connect:
 		_apaDet = findEDet("BSE Q4")
 	else:
 		_apaDet = findEDet("BSE")
+
+	if SITE==SRNL:
+		_apaWrite = ( (epq.SpectrumProperties.MicroImage, 3), (epq.SpectrumProperties.MicroImage2, 2) )
+	else:
+		_apaWrite = ( (epq.SpectrumProperties.MicroImage, 1), (epq.SpectrumProperties.MicroImage2, 0) )
 
 	# Initialize the PulseTor detectors
 
@@ -257,7 +278,8 @@ if connect:
 
 	def setResolution(res, mask=defaultDetMask):
 		"""setResolution(res, mask=defaultDetMask)
-		Set the EDS detector resolution to one of 'Best', 'Medium', 'Fast', 'VeryFast', 'Adaptive'"""
+		Set the EDS detector resolution to one of 'Best', 'Medium', 'Fast', 'VeryFast', 'Adaptive', 'MediumLE', 'BestLE', 'LowEnergy'"""
+		global _edsResolution
 		if _pt:
 			_pt.setResolutionMode(_pt.ResolutionMode.valueOf(res), mask)
 			_edsResolution = res
@@ -346,7 +368,7 @@ if connect:
 		finally:
 			fos.close()
 
-	def collectSI(name, fov, frameCount=1, dwell=9, dims=(1024, 1024), vectorSet=None, subRaster=None, path=None, rotation=0.0):
+	def collectSI(name, fov, frameCount=1, dwell=9, dims=(1024, 1024), vectorSet=None, subRaster=None, path=None, rotation=0.0, off=False):
 		"""collectSI(name, fov, frameCount=1, dwell=9, dims=(1024, 1024), subRaster=None, path=defaultPath, rotation=0.0)
 		Collect x-ray spectrum image data, write the results to a directory called 'name' in 'path'.
 		fov is the horizontal field-of-view in mm,
@@ -395,12 +417,16 @@ if connect:
 		_ts.chamberLed(defLED)
 		logImage((path if path else defaultPath), name, "SI", fov, dims, dwell, sem.beamEnergy, frameCount)
 		report("<p>Collected SI <i>%s</i> %0.1f &mu;m FOV %d &times; %d with %d frames at dwell %d </p>" % (name, 1000.0*fov, dims[0], dims[1], frameCount, dwell ))
+		if off:
+			turnOff()
 
 
 	def collectSIs(pts, dwell=6, dims=(1024, 1024)):
 		"""Collects a sequence of spectrum images.	Each item in 'pts' is a list containing
 	[ 'name', stgPos, fieldOfView, workingDistance ].
-	The algorithm moves to "stgPos", sets the image width to fieldOfView (in mm), sets the focal distance to "workingDistance". The resulting spectrum image is recorded in a directory named "name"."""
+	The algorithm moves to "stgPos", sets the image width to fieldOfView (in mm), sets the focal distance to "workingDistance". 
+	The resulting spectrum image is recorded in a directory named "name".  You are encouraged to maintain the same working distance
+	throughout."""
 		try:
 			for name, pos, fov, wd in pts:
 				if terminated:
@@ -483,7 +509,7 @@ is moved to the StagePosition associated with the spectrum."""
 			time.sleep(0.01)
 		return _stg.getPosition()
 
-	def collect2(acqTime=60, name=None, pc=True, mode='L', disp=True, forcePC=False, comp=None, path=None, fov=None):
+	def collect2(acqTime=60, name=None, pc=True, mode='L', disp=True, forcePC=False, comp=None, path=None, fov=None, image=True):
 		"""collect2(acqTime=60, name=None, pc=True, mode='L', disp=True, forcePC=False, comp=None, path=None)
 	Collect a single combined EDS spectrum for the specified live time or real time.  Name the spectrum as specified and display.
 pc = True to collect the probe current from the stage position "faraday"
@@ -492,7 +518,8 @@ disp=True to display the spectrum as it is acquired
 forcePC = True to force the probe current to be measured with each spectrum rather than once every 5 minutes
 comp: If defined as a epq.Composition object then this composition is assigned to the "StandardMaterial" property of the spectrum.
 path: An alternative path into which to save the spectrum context data
-fov: An optional field of view width to which to set the SEM imaging while collecting the spectrum."""
+fov: An optional field of view width to which to set the SEM imaging while collecting the spectrum.
+image: Determines whether an image is collected after acquiring the spectrum (default dimensions=5*fov)"""
 		global terminated
 		if terminated:
 			return
@@ -512,14 +539,12 @@ fov: An optional field of view width to which to set the SEM imaging while colle
 		setResolution(_edsResolution)
 		stg_pos = _stg.getPosition()
 		time.sleep(0.1)
-		if pc:
-			fb = updatedPC(interval=(0 if forcePC else 300))
 		clear()
 		hv = _ts.hvGetVoltage() / 1000.0
+		oldVf = _ts.getViewField()
+		oldSp = _ts.scGetSpeed()
+		_ts.scSetSpeed(2)
 		if fov:
-			oldVf = _ts.getViewField()
-			oldSp = _ts.scGetSpeed()
-			_ts.scSetSpeed(2)
 			_ts.setViewField(fov)
 		if mode == 'R':
 			_eds.start(_eds.Mode.RealTime, acqTime)
@@ -542,9 +567,6 @@ fov: An optional field of view width to which to set the SEM imaging while colle
 						detCx=detCx+1
 						tmp = _eds.getSpectrum(det)
 						tmp.getProperties().setDetector(pt_det_all)
-						if pc and fb:
-							sp = tmp.getProperties()
-							sp.setNumericProperty(sp.FaradayBegin, fb.average())
 						if spec==None:
 							spec=epq.SpectrumMath(tmp)
 						else:
@@ -555,26 +577,32 @@ fov: An optional field of view width to which to set the SEM imaging while colle
 				else:
 					display(spec)
 				rep=spec
-		if pc:
-			fe = updatedPC(interval=(0 if forcePC else 300))
+		if fov:
+			_ts.setViewField(oldVf)
+			_ts.scSetSpeed(oldSp)
 		if spec:
 			sp = spec.getProperties()
 			sp.setTimestampProperty(epq.SpectrumProperties.AcquisitionTime, start_ts)
 			sp.setObjectProperty(epq.SpectrumProperties.StagePosition, stg_pos)
 			sp.setNumericProperty(epq.SpectrumProperties.WorkingDistance, _opt.getWorkingDistance())
+			sp.setDetector(pt_det_all)
+			sp.setTextProperty(sp.DetectorMode, "%s" % _pt.getResolutionMode(0))
 			if isinstance(comp, str):
 				comp = material(comp)
 			if isinstance(comp, epq.Composition):
 				sp.setCompositionProperty(epq.SpectrumProperties.StandardComposition, comp)
+			if image:
+				imageFOV = (fov if fov else oldVf)
+				imgs=collectImages(name, 5*imageFOV, (256,256), 4, rotation=0.0, markCenter=False, writeMask=0)
+				if imgs!=None:
+					for p, i in _apaWrite:
+						imgs[i].applyCenterBox(imageFOV*0.001)
+						sp.setObjectProperty(p, imgs[i])
 			if pc:
-				if fb:
-					sp.setNumericProperty(sp.FaradayBegin, fb.average())
+				fe = updatedPC(interval=(0 if forcePC else 300))
 				if fe:
-					sp.setNumericProperty(sp.FaradayEnd, fe.average())
+					sp.setNumericProperty(sp.ProbeCurrent, fe.average())
 		_ts.chamberLed(defLED)
-		if fov:
-			_ts.setViewField(oldVf)
-			_ts.scSetSpeed(oldSp)
 		logSpectrum((path if path else defaultPath), acqTime, name, mode)
 		if isinstance(comp, epq.Composition):
 			report("<p>Collected spectrum <i>%s</i> from %s for %0.1f s %s at %0.1f keV</p>" % (name, comp, acqTime, mode, hv))
@@ -582,6 +610,8 @@ fov: An optional field of view width to which to set the SEM imaging while colle
 			report("<p>Collected spectrum <i>%s</i> for %0.1f s %s at %0.1f keV</p>" % (name, acqTime, mode, hv))
 		wspec=wrap(spec)
 		DataManager.replaceSpectrum(rep, wspec)
+		if terminated:
+			print "Acqisition terminated prematurely."
 		return wspec
 
 	def collect2ts(acqTime=60, name=None, pc=True, mode='L', disp=True, forcePC=False, comp=None, path=None, fov=None):
@@ -613,17 +643,12 @@ fov: An optional field of view width to which to set the SEM imaging while colle
 		setResolution(_edsResolution)
 		stg_pos = _stg.getPosition()
 		time.sleep(0.1)
-		if pc:
-			fb = updatedPC(interval=0)
-			msg = "Is the analysis point centered in the image?"
-			if jop.showConfirmDialog(MainFrame, msg, "Restoring analysis position", jop.YES_NO_OPTION) <> jop.YES_OPTION:
-				return
 		clear()
 		hv = _ts.hvGetVoltage() / 1000.0
+		oldVf = _ts.getViewField()
+		oldSp = _ts.scGetSpeed()
+		_ts.scSetSpeed(2)
 		if fov:
-			oldVf = _ts.getViewField()
-			oldSp = _ts.scGetSpeed()
-			_ts.scSetSpeed(2)
 			_ts.setViewField(fov)
 		if mode == 'R':
 			_eds.start(_eds.Mode.RealTime, acqTime)
@@ -646,9 +671,6 @@ fov: An optional field of view width to which to set the SEM imaging while colle
 					detCx=detCx+1
 					tmp = _eds.getSpectrum(det)
 					tmp.getProperties().setDetector(pt_det_all)
-					if pc and fb:
-						sp = tmp.getProperties()
-						sp.setNumericProperty(sp.FaradayBegin, fb.average())
 					if spec==None:
 						spec=epq.SpectrumMath(tmp)
 					else:
@@ -658,12 +680,12 @@ fov: An optional field of view width to which to set the SEM imaging while colle
 			sp.setTimestampProperty(epq.SpectrumProperties.AcquisitionTime, start_ts)
 			sp.setObjectProperty(epq.SpectrumProperties.StagePosition, stg_pos)
 			sp.setNumericProperty(epq.SpectrumProperties.WorkingDistance, _opt.getWorkingDistance())
+			sp.setDetector(pt_det_all)
+			sp.setTextProperty(sp.DetectorMode, "%s" % _pt.getResolutionMode(0))
 			if isinstance(comp, str):
 				comp = material(comp)
 			if isinstance(comp, epq.Composition):
 				sp.setCompositionProperty(epq.SpectrumProperties.StandardComposition, comp)
-			if pc and fb:
-				sp.setNumericProperty(sp.FaradayBegin, fb.average())
 			tsIdx=tsIdx+1
 			dup=epq.SpectrumUtils.copy(spec)
 			if tsIdx % 10 == 0:
@@ -672,20 +694,23 @@ fov: An optional field of view width to which to set the SEM imaging while colle
 			specs.append(wrap(dup))
 		if pc:
 			fe = updatedPC(interval=(0 if forcePC else 300))
-			for spec in specs:
-				sp.setNumericProperty(sp.FaradayEnd, fe.average())
+			if fe:
+				for spec in specs:
+					sp.setNumericProperty(sp.ProbeCurrent, fe.average())
 		_ts.chamberLed(defLED)
 		if fov:
 			_ts.setViewField(oldVf)
-			_ts.scSetSpeed(oldSp)
+		_ts.scSetSpeed(oldSp)
 		logSpectrum((path if path else defaultPath), acqTime, name, mode)
 		if isinstance(comp, epq.Composition):
 			report("<p>Collected %d time series spectra <i>%s</i> from %s for %0.1f s %s at %0.1f keV</p>" % (len(specs), name, comp, acqTime, mode, hv))
 		else:
 			report("<p>Collected %d time series spectra <i>%s</i> for %0.1f s %s at %0.1f keV</p>" % (len(specs), name, acqTime, mode, hv))
+		if terminated:
+			print "Acqisition terminated prematurely."
 		return tuple(specs)
 
-	def collect(acqTime=60, name=None, pc=True, mode='L', disp=True, forcePC=False, comp=None, path=None, fov=None):
+	def collect(acqTime=60, name=None, pc=True, mode='L', disp=True, forcePC=False, comp=None, path=None, fov=None, image=True):
 		"""collect(acqTime=60, name=None, pc=True, mode="L", disp=True, forcePC=False, comp=None, path=None)
 	Simultaneously collect an EDS spectrum from each detector for the specified live time or real time.	 Name the spectra as specified and display.
 pc = True to collect the probe current from the stage position "faraday"
@@ -694,7 +719,8 @@ disp=True to display the spectrum as it is acquired
 forcePC = True to force the probe current to be measured with each spectrum rather than once every 5 minutes
 comp: If defined as a epq.Composition object then this composition is assigned to the "StandardMaterial" property of the spectrum.
 path: An alternative path into which to save the spectrum context data
-fov: An optional field of view width to which to set the SEM imaging while collecting the spectrum."""
+fov: An optional field of view width to which to set the SEM imaging while collecting the spectrum.
+image: Determines whether an image is collected after acquiring the spectrum (default dimensions=5*fov)"""
 		global terminated
 		if terminated:
 			return ()
@@ -713,15 +739,13 @@ fov: An optional field of view width to which to set the SEM imaging while colle
 		_ts.chamberLed(False)
 		stg_pos = _stg.getPosition()
 		setResolution(_edsResolution)
-		if pc:
-			fb = updatedPC(interval=(0 if forcePC else 300))
 		clear()
 		specs = [None] * defaultDetCount
 		hv = _ts.hvGetVoltage() / 1000.0
+		oldVf = _ts.getViewField()
+		oldSp = _ts.scGetSpeed()
+		_ts.scSetSpeed(2)
 		if fov:
-			oldVf = _ts.getViewField()
-			oldSp = _ts.scGetSpeed()
-			_ts.scSetSpeed(2)
 			_ts.setViewField(fov)
 		if mode == 'R':
 			_eds.start(_eds.Mode.RealTime, acqTime)
@@ -741,9 +765,9 @@ fov: An optional field of view width to which to set the SEM imaging while colle
 					if availableDets[det]:
 						tmp = _eds.getSpectrum(det)
 						epq.SpectrumUtils.rename(tmp, "%s[%d]" % (name, det))
-						if pc and fb:
-							sp = tmp.getProperties()
-							sp.setNumericProperty(sp.FaradayBegin, fb.average())
+						sp = tmp.getProperties()
+						sp.setDetector(pt_det[det])
+						sp.setTextProperty(sp.DetectorMode, "%s" % _pt.getResolutionMode(det))
 						if specs[det] and disp:
 							rep[specs[det]] = tmp
 							specs[det] = tmp
@@ -753,6 +777,17 @@ fov: An optional field of view width to which to set the SEM imaging while colle
 								display(tmp)
 				if len(rep) > 0:
 					DataManager.replaceSpectra(rep)
+		if image:
+			imageFOV = (fov if fov else oldVf)
+			imgs=collectImages(name, 5*imageFOV, (256,256), 4, rotation=0.0, markCenter=False, writeMask=0)
+			if imgs!=None:
+				for spec in specs:
+					for p, i in _apaWrite:
+						imgs[i].applyCenterBox(imageFOV*0.001)
+						spec.getProperties().setObjectProperty(p, imgs[i])
+		if fov:
+			_ts.setViewField(oldVf)
+		_ts.scSetSpeed(oldSp)
 		if pc:
 			fe = updatedPC(interval=(0 if forcePC else 300))
 		for spec in specs:
@@ -766,20 +801,16 @@ fov: An optional field of view width to which to set the SEM imaging while colle
 				comp = material(comp)
 			if isinstance(comp, epq.Composition):
 				sp.setCompositionProperty(epq.SpectrumProperties.StandardComposition, comp)
-			if pc:
-				if fb:
-					sp.setNumericProperty(sp.FaradayBegin, fb.average())
-				if fe:
-					sp.setNumericProperty(sp.FaradayEnd, fe.average())
+			if pc and fe:
+				sp.setNumericProperty(sp.ProbeCurrent, fe.average())
 		_ts.chamberLed(defLED)
-		if fov:
-			_ts.setViewField(oldVf)
-			_ts.scSetSpeed(oldSp)
 		logSpectrum((path if path else defaultPath), acqTime, name, mode)
 		if isinstance(comp, epq.Composition):
 			report("<p>Collected %d spectra <i>%s</i> from %s for %0.1f s %s at %0.1f keV</p>" % (len(specs), name, comp, acqTime, mode, hv))
 		else:
 			report("<p>Collected %d spectra <i>%s</i> for %0.1f s %s at %0.1f keV</p>" % (len(specs), name, acqTime, mode, hv))
+		if terminated:
+			print "Acqisition terminated prematurely."
 		return tuple(specs)
 
 	def collectPoints2(fov, pts, baseName, acqTime=60, pc=True, mode='L', disp=True, path=None):
@@ -798,10 +829,10 @@ fov: An optional field of view width to which to set the SEM imaging while colle
 			for i, pnt in enumerate(pts):
 				_ts.scSetBeamPosition(pnt[0],pnt[1])
 				time.sleep(0.1)
-				spec=collect2(acqTime, "%s[Pt %i](%0.3g,%0.3g)" % (baseName, i, pnt[0],pnt[1]), mode='L', pc=False, disp=disp, path=path, fov=None)
+				spec=collect2(acqTime, "%s[Pt %i](%0.3g,%0.3g)" % (baseName, i, pnt[0],pnt[1]), mode='L', pc=False, disp=disp, path=path, fov=None, image=False)
 				if pc and spec:
 					sp = spec.getProperties()
-					sp.setNumericProperty(sp.FaradayBegin, pcb.average())
+					sp.setNumericProperty(sp.ProbeCurrent, pcb.average())
 			if pc:
 				print updatedPC(interval=0)
 		finally:
@@ -857,8 +888,10 @@ fov: An optional field of view width to which to set the SEM imaging while colle
 			ds = epu.DescriptiveStatistics()
 			prevPos = _stg.getPosition()
 			prevVF = _ts.getViewField()
+			oldSp = _ts.scGetSpeed()
 			moveTo(faraday)
 			_ts.setViewField(0.0001)
+			_ts.scSetSpeed(2)
 			time.sleep(1.0)
 			for i in range(0, 10):
 				time.sleep(0.1)
@@ -866,6 +899,7 @@ fov: An optional field of view width to which to set the SEM imaging while colle
 			print u'Probe current: %f \u00B1 %f nA' % (ds.average(), ds.standardDeviation())
 			if restore:
 				moveTo(prevPos)
+			_ts.scSetSpeed(oldSp)
 			_ts.setViewField(prevVF)
 			return ds
 		else:
@@ -1061,7 +1095,7 @@ Get the spectrum associated with the specified row number"""
 			print "%s archived to %s" % (src, destF)
 			return
 
-	if connect and _ts.hasRCALicense():
+	if connect and (_ts.hasRCALicense() or SITE==SRNL): 
 		def updatePC(self):
 			"""z.updatePC()
 	Updates the probe current if necessary and then asks to recenter particle"""
@@ -1078,13 +1112,11 @@ Get the spectrum associated with the specified row number"""
 			fn = "%0.5d" % (partNum , )
 			self.updatePC()
 			imgs=collectImages(fn, fov=fov, dims=dims, dwell=dwell, path=rel, writeMask=SAVE_IMAGE_MASK)
-			spec=collect2(liveTime, name=fn, fov=edsFov)
+			spec=collect2(liveTime, name=fn, fov=edsFov, image=False)
 			if spec:
 				props = spec.getProperties()
-				if len(imgs) > 0:
-					props.setImageProperty(props.MicroImage, imgs[1])
-				if len(imgs) > 1:
-					props.setImageProperty(props.MicroImage2, imgs[0])
+				for prop, idx in _apaWrite:
+					props.setImageProperty(prop, imgs[idx])
 			write(spec, fn, rel )	# msa
 			write(spec, fn, rel, fmt="tif")
 
@@ -1094,7 +1126,7 @@ Get the spectrum associated with the specified row number"""
 			rel = self.getRelocated()
 			fn = "%0.5d%s" % (partNum , ("" if not postFix else " - "+postFix), )
 			self.updatePC()
-			spec=collect2(liveTime, name=fn, fov=fov)
+			spec=collect2(liveTime, name=fn, fov=fov, image=False)
 			write(spec, fn, rel.getAbsolutePath() )
 
 		def collectSI(self, partNum, fov, dwell=9, dims=(1024,1024), rotation=0.0, postFix=None):
@@ -1140,7 +1172,7 @@ Get the spectrum associated with the specified row number"""
 				self.getZ().setTranslation(res)
 
 
-if connect and _ts.hasRCALicense():
+if connect and (_ts.hasRCALicense() or SITE==SRNL):
 
 		POINT_MODE = "Point mode EDS"
 		FIXED_SPACING = "Fixed spacing EDS"
@@ -1199,6 +1231,10 @@ if connect and _ts.hasRCALicense():
 				self._ParticleCount = 0
 				self._debugPw = None
 				self._stageZ = None
+				self._pImgDwell = 4
+
+			def setParticleImageDwell(self, dwell):
+				self._pImgDwell = dwell
 
 			def setSearchThreshold(self, low, high=255, dwell=4000, maxPart=100000, maxPartPerField = 10000):
 				"""SetSearchThreshold(low,[high],[dwell],[maxPart])
@@ -1279,7 +1315,7 @@ if connect and _ts.hasRCALicense():
 			def configSI(self,	collectSIFunc, dwell=10, dim=64):
 				"""configSI(collectSIFunc, dwell=10, dims=64)
 	Configure the optional acquisition of a x-ray spectrum image. /
-	If the function collectSIFunc(tvm) evaluates true then a spectrum image with the specified dwell and max dimensions (dim) /
+	If the function collectSIFunc(tvm) evaluates True then a spectrum image with the specified dwell and max dimensions (dim) /
 	will be collected following the end-of-frame."""
 				self._collectSI = collectSIFunc
 				self._SIDwell = dwell
@@ -1570,7 +1606,7 @@ areaCriterion(...), maxCriterion(...) build common criteria."""
 					if self._collectImages:
 						ra = self._transform.rcaToSubraster(r, self._imgDim)
 						imgs = collectImages("%04d" % (fieldNumber, ), self._rcaFov, dims=ra.getImageDimensions(), dwell=3, path="%s/FIELDS" % self._path, subRaster=ra.getSubRaster(), rotation=0.0, writeMask = SAVE_FIELD_MASK)
-						ii = imgs[1]
+						ii = imgs[_apaWrite[0][1]]
 						mg.drawImage(ii, r.x, r.y, r.x + r.width, r.y + r.height, 0, 0, ii.getWidth(), ii.getHeight(), None)
 						_afafb.updateFieldImage(map)
 					_ts.rcaInit(rca)
@@ -1644,15 +1680,15 @@ areaCriterion(...), maxCriterion(...) build common criteria."""
 					self.debug("CollectField 06")
 					for pNum, rcaFov, pixDim, sr, spec in self._pImgStack:
 						self.debug("CollectField 07: Particle %d - dim = %s, sr = %s" % ( pNum, pixDim, sr ))
-						imgs = collectImages(None, fov=rcaFov, dims=pixDim, dwell=4, subRaster=sr, path="%s/mag0" % (self._path,))
+						imgs = collectImages(None, fov=rcaFov, dims=pixDim, dwell=self._pImgDwell, subRaster=sr, path="%s/mag0" % (self._path,), writeMask=0x0)
 						if imgs:
 							self.debug("CollectField 08: P%i imgs" % (pNum, ))
-							_afafb.updateParticleImage(imgs[0])
+							_afafb.updateParticleImage(imgs[_apaWrite[0][1]])
 							if spec:
 								props = spec.getProperties()
 								if len(imgs) > 1:
-									props.setImageProperty(props.MicroImage, imgs[1]) # BSED
-									props.setImageProperty(props.MicroImage2, imgs[0]) # SED
+									for prop, idx in _apaWrite:
+										props.setImageProperty(prop, imgs[idx])
 								else:
 									props.setImageProperty(props.MicroImage,imgs[0])
 								self._zep.writeSpectrum(spec, pNum)
@@ -2143,7 +2179,7 @@ def checkTiling(tiling, bounds=defaultBounds):
 
 def moveToTile(tile, xyOnly=False, bounds=defaultBounds):
 	"""moveToTile(tile, bounds=(-40.0, -30.0, 40.0, 30.0)):
-	Moves the stage to this tile and returns true if it is in bounds.  Returns false if the tile is out of bounds."""
+	Moves the stage to this tile and returns True if it is in bounds.  Returns false if the tile is out of bounds."""
 	c = tile.getCenter()
 	x, y = c.get(X_AXIS), c.get(Y_AXIS)
 	b = not ((x < bounds[0]) or (x > bounds[2]) or (y < bounds[1]) or (y > bounds[3]))
@@ -2539,7 +2575,7 @@ if connect:
 			pts.append(next)
 		next[1].append(_stg.getPosition())
 		if withImg:
-			imgLabel = "%s %s[%d]" % (sample, comp, len(next[1]))
+			imgLabel = "%s[%d]" % (comp, len(next[1]))
 			imgs = collectImages(imgLabel, fov=0.5, dims=(256, 256), markCenter=True, writeMask=SAVE_IMAGE_MASK)
 			for img in imgs:
 				img.applyCenterCrossHair()
@@ -2629,7 +2665,7 @@ results are written to the defaultDir."""
 			name = "%s Auto%d.msa" % (sample, i)
 			collectImages(name, 0.256, (1024, 1024), writeMask=SAVE_IMAGE_MASK)
 			_ts.setViewField(fov)
-			write(collect(liveTime, name), name, fmt="msa")
+			write(collect(liveTime, name, image=True), name, fmt="msa")
 
 	def collectStandards(sample, pts, liveTime=60.0, fov=0.005, disp = True, combine=True, offenze=True):
 		"""collectStandards(sample, pts, liveTime=60.0, fov=0.005, combine=True, offenze)
@@ -2666,13 +2702,15 @@ results are written to the defaultDir."""
 						newPt.set(R_AXIS, pnt.get(R_AXIS))
 						_stg.moveTo(newPt)
 						collectImages(name, 0.256, (512, 512), writeMask=SAVE_IMAGE_MASK)
-						specs = collect(liveTime, name=name, pc=True, mode='L', disp=disp, forcePC=False, fov=fov)
+						specs = collect(liveTime, name=name, pc=True, mode='L', disp=disp, forcePC=False, fov=fov, image=False)
 						if combine and len(specs)>1:
 							sum=epq.SpectrumMath(specs[0])
 							for sp in specs[1:]:
 								sum.add(sp,1.0)
 							epq.SpectrumUtils.rename(sum, "%s[all]" % (name))
-							sum.getProperties().setDetector(pt_det_all)
+							sps = sum.getProperties()
+							sps.setDetector(pt_det_all)
+							sps.setTextProperty(sps.DetectorMode, "%s" % _pt.getResolutionMode(0))
 							specs=list(specs)
 							specs.append(sum)
 						clear()
@@ -2876,7 +2914,7 @@ if connect:
 			return
 		print "Collecting %0.1f live time second spectra.\n   Please wait..." % lt
 		clear()
-		specs = collect(lt, std)
+		specs = collect(lt, std, image=False)
 		if terminated:
 			return
 		cals=readCalibrations()
@@ -2891,7 +2929,7 @@ if connect:
 				print "Not adding %s because the correct detector can not be found."
 				ok = False
 			print "\nDetector: %s" % det
-			spec.getProperties().setNumericProperty(epq.SpectrumProperties.FaradayBegin, i0.average())
+			spec.getProperties().setNumericProperty(epq.SpectrumProperties.ProbeCurrent, i0.average())
 			if ok:
 				qcp = Database.getQCProject(det, std, e0)
 				print "%s" % (qcp, )
@@ -3101,7 +3139,7 @@ def replicates(name, dur=1.0, reps=100, fov=0.010):
 			if terminated:
 				break
 			_ts.setViewField(fov)
-			tmp = collect(dur, name="%s[T%d]" % (name, i), pc=(i == 0), disp=False, forcePC=False)
+			tmp = collect(dur, name="%s[T%d]" % (name, i), pc=(i == 0), disp=False, forcePC=False, image=False)
 			res.append(tmp)
 			for j in range(0, len(tmp)):
 				if len(sumSpecs) <= j:
@@ -3150,10 +3188,10 @@ def collectMe(pts, lt=300, name="Spectrum", volatile=False, fov=0.2):
 		time.sleep(1.0)
 		collectImages("%s%d" % (name, i), fov, writeMask=SAVE_IMAGE_MASK)
 		if volatile:
-			res.append(collect(10.0, "%s%d_before" % (name, i), fov=0.005, forcePC=True))
-		res.append(collect(lt, "%s%d" % (name, i), fov=0.005, forcePC=(not volatile)))
+			res.append(collect(10.0, "%s%d_before" % (name, i), fov=0.005, forcePC=True, image=False))
+		res.append(collect(lt, "%s%d" % (name, i), fov=0.005, forcePC=(not volatile), image=False))
 		if volatile:
-			res.append(collect(10.0, "%s%d_after" % (name, i), fov=0.005))
+			res.append(collect(10.0, "%s%d_after" % (name, i), fov=0.005, image=False))
 		if terminated:
 			break
 	return tuple(res)

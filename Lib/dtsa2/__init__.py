@@ -280,9 +280,7 @@ class ScriptableSpectrum(epq.BaseSpectrum):
         """s.setProbeCurrent(0.5)
     Sets the probe current to the specified value in nA."""
         p = self.wrapped.getProperties()
-        p.setNumericProperty(epq.SpectrumProperties.FaradayBegin, pc)
-        if p.isDefined(epq.SpectrumProperties.FaradayEnd):
-            p.setNumericProperty(epq.SpectrumProperties.FaradayEnd, pc)
+        p.setNumericProperty(epq.SpectrumProperties.ProbeCurrent, pc)
             
     def beamEnergy(self):
         """s.beamEnergy()
@@ -1119,7 +1117,7 @@ Composition object'''
     sp = epq.SpectrumProperties()
     sp.setDetector(det)
     sp.setNumericProperty(epq.SpectrumProperties.BeamEnergy, keV)
-    sp.setNumericProperty(epq.SpectrumProperties.FaradayBegin, 1.0)
+    sp.setNumericProperty(epq.SpectrumProperties.ProbeCurrent, 1.0)
     sp.setNumericProperty(epq.SpectrumProperties.LiveTime, dose)
     sp.setDetector(det)
     res = wrap(epq.SpectrumSimulator.Basic.generateSpectrum(mat, sp, True))
@@ -1387,14 +1385,6 @@ unless density=None in which case the mat.getDensity() in g/cm^3 is used."""
     if density == None:
         density = epq.FromSI.gPerCC(mat.getDensity())
     return epq.ElectronRange.KanayaAndOkayama1972.compute(mat, epq.ToSI.keV(e0)) / epq.ToSI.gPerCC(density)
- 
-def xrayRange(mat, e0, sh, density=1.0):
-    """xrayRange(mat,e0, sh, [density = 1.0])
-    Computes the x-ray excitation range (in meters) for the specified shell and material at a beam energy of e0 keV.  The density is assumed to be 1.0 g/cm^3 \
-unless density=None in which case the mat.getDensity() in g/cm^3 is used."""
-    if isinstance(sh, epq.XRayTransition):
-       sh = sh.getDestination()
-    return electronRange(mat, e0, density) - electronRange(mat, epq.FromSI.keV(sh.getEdgeEnergy()), density) 
  
 
 def tabulateAsOxides(specs, withErrs=False, prop=epq.SpectrumProperties.MicroanalyticalComposition, precision=4, oxidizer=None):
@@ -1794,7 +1784,7 @@ additional decimal digits of precision. [massFrac->False for atomic fraction.] [
    return result
 
 
-def tabulateProperties(specs, props=(epq.SpectrumProperties.BeamEnergy, epq.SpectrumProperties.LiveTime, epq.SpectrumProperties.RealTime, epq.SpectrumProperties.FaradayBegin, epq.SpectrumProperties.FaradayEnd,)):
+def tabulateProperties(specs, props=(epq.SpectrumProperties.BeamEnergy, epq.SpectrumProperties.LiveTime, epq.SpectrumProperties.RealTime, epq.SpectrumProperties.ProbeCurrent, )):
     tmp = "Spectrum"
     for prop in props:
         tmp = "%s\t%s" % (tmp, str(prop))

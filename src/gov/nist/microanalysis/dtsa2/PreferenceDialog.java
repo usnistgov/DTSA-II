@@ -1,7 +1,5 @@
 package gov.nist.microanalysis.dtsa2;
 
-import gov.nist.microanalysis.EPQTools.JWizardDialog;
-
 import java.awt.Font;
 import java.awt.Frame;
 import java.awt.HeadlessException;
@@ -30,6 +28,8 @@ import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
 
+import gov.nist.microanalysis.EPQTools.JWizardDialog;
+
 /**
  * A mechanism for displaying user preferences in a unified fashion.
  * <p>
@@ -39,7 +39,7 @@ import com.jgoodies.forms.layout.FormLayout;
  * <p>
  * Institution: National Institute of Standards and Technology
  * </p>
- * 
+ *
  * @author Nicholas
  * @version 1.0
  */
@@ -56,7 +56,7 @@ public class PreferenceDialog
 
    /**
     * Constructs a PreferenceDialog
-    * 
+    *
     * @throws HeadlessException
     */
    public PreferenceDialog()
@@ -167,7 +167,7 @@ public class PreferenceDialog
    /**
     * Adds a new PreferencePanel to the parent TreeNode. If the PreferencePanel
     * has children then these children are added recursively.
-    * 
+    *
     * @param parent
     * @param pp
     * @return The DefaultMutableTreeNode representing the child PreferencePanel
@@ -197,7 +197,7 @@ public class PreferenceDialog
 
    /**
     * Adds a child PreferencePanel to the specified parent PreferencePanel.
-    * 
+    *
     * @param parent
     * @param child
     */
@@ -207,7 +207,7 @@ public class PreferenceDialog
 
    /**
     * Adds a preferences panel at the base level.
-    * 
+    *
     * @param pp
     */
    public void addPanel(PreferencePanel pp) {
@@ -226,7 +226,7 @@ public class PreferenceDialog
       private final PreferenceDialog mParent;
       private final String mDescription;
       private String mLabel;
-      private final ArrayList<PreferencePanel> mChildren = new ArrayList<PreferencePanel>();
+      private final ArrayList<PreferencePanel> mChildren = new ArrayList<>();
 
       PreferencePanel(PreferenceDialog pref, String label, String desc) {
          mParent = pref;
@@ -259,7 +259,7 @@ public class PreferenceDialog
       /**
        * Returns any child preference panels associated with this preference
        * panel. The child panels may too have child panels.
-       * 
+       *
        * @return PreferencePanel[]
        */
       public PreferencePanel[] getChildren() {
@@ -271,7 +271,7 @@ public class PreferenceDialog
        * Add a child PreferencePanel to this panel. Eventually this mechanism
        * will be made dynamic to allow children to be added while the user
        * modifies the PreferenceDialog.
-       * 
+       *
        * @param child
        */
       public void addChildPanel(PreferencePanel child) {
@@ -280,7 +280,7 @@ public class PreferenceDialog
 
       /**
        * Gets the current value assigned to description
-       * 
+       *
        * @return Returns the description.
        */
       public String getDescription() {
@@ -289,7 +289,7 @@ public class PreferenceDialog
 
       /**
        * Gets the current value assigned to name
-       * 
+       *
        * @return Returns the name.
        */
       @Override
@@ -299,7 +299,7 @@ public class PreferenceDialog
 
       /**
        * Gets the preference dialog to which this panel belongs
-       * 
+       *
        * @return Returns the parent.
        */
       protected PreferenceDialog getPreferenceDialog() {
@@ -309,7 +309,7 @@ public class PreferenceDialog
       /**
        * Provide a new label for this page. This label is used in the header and
        * in the tree view.
-       * 
+       *
        * @param label
        */
       public void relabel(String label) {
@@ -324,7 +324,7 @@ public class PreferenceDialog
 
    /**
     * Constructs a PreferenceDialog
-    * 
+    *
     * @param owner
     * @throws HeadlessException
     */
@@ -342,7 +342,7 @@ public class PreferenceDialog
 
    /**
     * Constructs a PreferenceDialog
-    * 
+    *
     * @param owner
     * @param modal
     * @throws HeadlessException
@@ -361,7 +361,7 @@ public class PreferenceDialog
 
    /**
     * Constructs a PreferenceDialog
-    * 
+    *
     * @param owner
     * @param title
     * @param modal
