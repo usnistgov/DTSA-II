@@ -111,7 +111,6 @@ import gov.nist.microanalysis.EPQTools.ErrorDialog;
 import gov.nist.microanalysis.EPQTools.JStoichiometryTable;
 import gov.nist.microanalysis.EPQTools.JTextFieldDouble;
 import gov.nist.microanalysis.EPQTools.JWizardDialog;
-import gov.nist.microanalysis.EPQTools.JWizardDialog.JWizardPanel;
 import gov.nist.microanalysis.EPQTools.MaterialsCreator;
 import gov.nist.microanalysis.EPQTools.SampleShapeDialog;
 import gov.nist.microanalysis.EPQTools.SelectElements;
@@ -223,7 +222,7 @@ public class QuantificationWizard extends JWizardDialog {
                jCheckBox_RefTilted.setSelected(true);
          }
 
-         KConditionsPanel(JWizardDialog wiz) {
+         protected KConditionsPanel(JWizardDialog wiz) {
             super(wiz, "Specify experimental conditions", new FormLayout("right:100dlu, 10dlu, 30dlu, 2dlu, 50dlu", "pref, 5dlu, pref, 5dlu, pref, 5dlu, pref, 5dlu, pref"));
             final CellConstraints cc = new CellConstraints();
             add(jLabel_Intro, cc.xyw(1, 1, 5));
@@ -268,7 +267,6 @@ public class QuantificationWizard extends JWizardDialog {
             // Select the text to facilitate editing
             {
                final FocusListener fl = new FocusAdapter() {
-
                   @Override
                   public void focusGained(FocusEvent e) {
                      final Component c = e.getComponent();
@@ -303,7 +301,6 @@ public class QuantificationWizard extends JWizardDialog {
             jTextField_TakeOff.setText(nf.format(Math.toDegrees(mTakeOffAngle)));
             validateRefTiltedCheck();
             jTextField_Energy.requestFocusInWindow();
-
          }
 
          @Override
@@ -4618,8 +4615,6 @@ public class QuantificationWizard extends JWizardDialog {
       }
    }
    
-   private class LLSQStandardPanel extends BaseStandardPanel {
-
    protected void initialize() throws Exception {
       setActivePanel(jWizardPanel_Intro.get());
       pack();
