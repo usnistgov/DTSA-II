@@ -116,7 +116,7 @@ public class MakeStandardDialog extends JWizardDialog {
 		private final JButton jButton_UpdateLT = new JButton("Update");
 
 		public DosePanel(JWizardDialog wiz) {
-			super(wiz);
+			super(wiz, "Specify probe dose");
 			initialize();
 		}
 
@@ -178,7 +178,7 @@ public class MakeStandardDialog extends JWizardDialog {
 		@Override
       public void onShow() {
 			update();
-			setNextPanel(mStandardPanel, "Standard Properties");
+			setNextPanel(mStandardPanel);
 			enableFinish(false);
 		}
 
@@ -228,7 +228,7 @@ public class MakeStandardDialog extends JWizardDialog {
 		private final JButton jButton_SpecProperties = new JButton("Properties");
 
 		public StandardPanel(JWizardDialog wiz) {
-			super(wiz);
+			super(wiz, "Specify standards");
 			initialize();
 		}
 
@@ -246,7 +246,7 @@ public class MakeStandardDialog extends JWizardDialog {
 			jTextField_Detector.setText(mDetector != null ? mDetector.getName() : "--------");
 			jTextField_Material.requestFocus();
 
-			setNextPanel(mFilterPanel, "Select Spectra");
+			setNextPanel(mFilterPanel);
 			enableFinish(false);
 		}
 
@@ -450,7 +450,7 @@ public class MakeStandardDialog extends JWizardDialog {
 		};
 
 		public FilterPanel(JWizardDialog wiz) {
-			super(wiz);
+			super(wiz, "Select spectra");
 			initialize();
 		}
 
@@ -473,7 +473,7 @@ public class MakeStandardDialog extends JWizardDialog {
 		@Override
       public void onShow() {
 			setMessageText("Select which spectra to include in the bundle.");
-			setNextPanel(mSpecialPanel, "Special Options");
+			setNextPanel(mSpecialPanel);
 			updateSelected();
 			enableFinish(false);
 		}
@@ -609,7 +609,7 @@ public class MakeStandardDialog extends JWizardDialog {
 		}
 
 		public SpecialPanel(JWizardDialog wiz) {
-			super(wiz);
+			super(wiz, "Special options");
 			initialize();
 		}
 
@@ -620,7 +620,7 @@ public class MakeStandardDialog extends JWizardDialog {
 			updateThicknessCheckBox();
 			updateCoatingCheckBox();
 
-			setNextPanel(mReferencePanel, "Specify References");
+			setNextPanel(mReferencePanel);
 			enableFinish(true);
 			mSave = true;
 		}
@@ -751,7 +751,7 @@ public class MakeStandardDialog extends JWizardDialog {
 		private final JButton jButton_Clear = new JButton("Clear");
 
 		public ReferencePanel(JWizardDialog wiz) {
-			super(wiz);
+			super(wiz, "Specify references");
 			initialize();
 		}
 
@@ -999,7 +999,7 @@ public class MakeStandardDialog extends JWizardDialog {
 	}
 
 	private void initialize() {
-		setActivePanel(mDosePanel, "Standard Dose");
+		setActivePanel(mDosePanel);
 		enableFinish(false);
 	}
 
@@ -1042,7 +1042,7 @@ public class MakeStandardDialog extends JWizardDialog {
 			mCoatingMaterial = Material.Null;
 		}
 		mStandardPanel.jPanel_Element.setAvailableElements(mMaterial.getElementSet());
-		setActivePanel(mDosePanel, "Standard Dose");
+		setActivePanel(mDosePanel);
 	}
 
 	private double getProbeDose() {

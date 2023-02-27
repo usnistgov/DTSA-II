@@ -89,7 +89,7 @@ public class MicrocalFitDialog
       private final NumberFormat mParse = NumberFormat.getInstance();
 
       SetupPanel(JWizardDialog wiz) {
-         super(wiz, new BorderLayout());
+         super(wiz, "Setup", new BorderLayout());
          try {
             initialize();
          }
@@ -203,7 +203,7 @@ public class MicrocalFitDialog
          columnModel.getColumn(WIDTH_COL).setCellEditor(new DefaultCellEditor(jTextField_Width));
          columnModel.getColumn(ROI_COL).setCellEditor(jEachRowEditor_Lines);
          columnModel.getColumn(FIT_E_COL).setCellEditor(new DefaultCellEditor(jComboBox_FitE));
-         getWizard().setNextPanel(jWizardPanel_FirstEnergyFit, "Preliminary Energy Fit");
+         getWizard().setNextPanel(jWizardPanel_FirstEnergyFit);
          getWizard().setBackEnabled(false);
          getWizard().enableFinish(false);
       }
@@ -268,8 +268,8 @@ public class MicrocalFitDialog
          add(pb.getPanel());
       }
 
-      public EnergyFitPanel(JWizardDialog wiz) {
-         super(wiz);
+      public EnergyFitPanel(JWizardDialog wiz, String banner) {
+         super(wiz, banner);
          try {
             initialize();
          }
@@ -291,7 +291,7 @@ public class MicrocalFitDialog
       private static final long serialVersionUID = -8973574065448312104L;
 
       private FirstEnergyFitPanel(JWizardDialog wiz) {
-         super(wiz);
+         super(wiz, "Preliminary Energy Fit");
       }
 
       @Override
@@ -314,7 +314,7 @@ public class MicrocalFitDialog
             jTextField_Quadratic.setText("?");
             jTextField_Quadratic.setEditable(true);
          }
-         getWizard().setNextPanel(jWizardPanel_Progress, "Fit Progress");
+         getWizard().setNextPanel(jWizardPanel_Progress);
          getWizard().setBackEnabled(true);
       }
 
@@ -348,7 +348,7 @@ public class MicrocalFitDialog
       private static final long serialVersionUID = -7309847525835541843L;
 
       private FinalEnergyFitPanel(JWizardDialog wiz) {
-         super(wiz);
+         super(wiz, "Final Energy Fit");
       }
 
       @Override
@@ -371,7 +371,7 @@ public class MicrocalFitDialog
             jTextField_Gain.setText("?");
             jTextField_Quadratic.setText("?");
          }
-         getWizard().setNextPanel(null, "Finish");
+         getWizard().setNextPanel(null);
          getWizard().enableFinish(true);
          getWizard().setBackEnabled(true);
       }
@@ -384,12 +384,12 @@ public class MicrocalFitDialog
       private static final long serialVersionUID = -6336154109886338830L;
 
       public ProgressPanel(JWizardDialog wiz) {
-         super(wiz);
+         super(wiz, "Fit Progress");
       }
 
       @Override
       public void onShow() {
-         getWizard().setNextPanel(jWizardPanel_FinalEnergyFit, "Peak Fit Results");
+         getWizard().setNextPanel(jWizardPanel_FinalEnergyFit);
          getWizard().setBackEnabled(false);
          getWizard().enableFinish(false);
          getWizard().enableNext(false);
@@ -414,7 +414,7 @@ public class MicrocalFitDialog
                      int progress = pe.getProgress();
                      publish(Integer.valueOf(progress));
                      if(progress == 100)
-                        getWizard().setNextPanel(jWizardPanel_FinalEnergyFit, "Final Energy Fit");
+                        getWizard().setNextPanel(jWizardPanel_FinalEnergyFit);
 
                   }
                };
@@ -446,7 +446,7 @@ public class MicrocalFitDialog
    public MicrocalFitDialog(Frame frame, ISpectrumData spec) {
       super(frame, "Microcalorimeter Spectrum Fitter");
       mFitter = new MicrocalSpectrumFitter(spec);
-      this.setActivePanel(jWizardPanel_Setup, "Setup");
+      this.setActivePanel(jWizardPanel_Setup);
       this.setModal(true);
    }
 

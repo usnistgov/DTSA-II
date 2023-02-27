@@ -86,9 +86,7 @@ import gov.nist.microanalysis.Utility.UtilException;
  * @author nicholas
  * @version 1.0
  */
-public class CalibrationWizard
-   extends
-   JWizardDialog {
+public class CalibrationWizard extends JWizardDialog {
 
    private static final long serialVersionUID = 3517408203501633898L;
 
@@ -96,29 +94,20 @@ public class CalibrationWizard
    private final DetectorPanel jWizardPanel_Detector = new DetectorPanel(this);
    private final ManualPanel jWizardPanel_Manual = new ManualPanel(this);
    private final FitPanel jWizardPanel_FitSpectrum = new FitPanel(this);
-   private final JWizardPanel jWizardPanel_BAM_CRM = new JWizardPanel(this);
+   private final JWizardPanel jWizardPanel_BAM_CRM = new JWizardPanel(this, "BAM CRM");
    private final FitResultPanel jWizardPanel_FitResult = new FitResultPanel(this);
    private final FitProgressPanel jProgressPanel_Progress = new FitProgressPanel(this);
    private final LimitsPanel jWizardPanel_Limits = new LimitsPanel(this);
 
-   private static final String[] STANDARDS = new String[] {
-      "Mn standard",
-      "Cu standard",
-      "Zn standard",
-      "Fe standard",
-      "BAM CRM standard",
-      "K3189",
-      "BAM EDS-TM002"
-   };
+   private static final String[] STANDARDS = new String[]{"Mn standard", "Cu standard", "Zn standard", "Fe standard", "BAM CRM standard", "K3189",
+         "BAM EDS-TM002"};
 
    private Session getSession() {
       return DTSA2.getSession();
 
    }
 
-   public class ModePanel
-      extends
-      JWizardPanel {
+   public class ModePanel extends JWizardPanel {
 
       private static final long serialVersionUID = 7994619405938718356L;
 
@@ -129,42 +118,44 @@ public class CalibrationWizard
       private final JRadioButton jRadioButton_Limits = new JRadioButton("Specify which element's lines are visible");
 
       public ModePanel(JWizardDialog wiz) {
-         super(wiz);
+         super(wiz, "Calibration method");
          initialize();
       }
 
       private void initialize() {
-         final PanelBuilder pb = new PanelBuilder(new FormLayout("5dlu, pref", "pref, 5dlu, pref, 5dlu, pref, 5dlu, pref, 5dlu, pref, 5dlu, pref, 5dlu, pref"), this);
+         final PanelBuilder pb = new PanelBuilder(
+               new FormLayout("5dlu, pref", "pref, 5dlu, pref, 5dlu, pref, 5dlu, pref, 5dlu, pref, 5dlu, pref, 5dlu, pref"), this);
          final CellConstraints cc = new CellConstraints();
          jRadioButton_Manual.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-               getWizard().setNextPanel(jWizardPanel_Manual, "Manual calibration");
+               getWizard().setNextPanel(jWizardPanel_Manual);
             }
          });
          jRadioButton_FitSpectrum.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-               getWizard().setNextPanel(jWizardPanel_FitSpectrum, "Measured spectrum");
+               getWizard().setNextPanel(jWizardPanel_FitSpectrum);
             }
          });
          jRadioButton_BAM_CRM.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-               getWizard().setNextPanel(jWizardPanel_BAM_CRM, "BAM CRM");
+               getWizard().setNextPanel(jWizardPanel_BAM_CRM);
             }
          });
          jRadioButton_Limits.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-               getWizard().setNextPanel(jWizardPanel_Limits, "Set element limits");
+               getWizard().setNextPanel(jWizardPanel_Limits);
             }
          });
 
          jRadioButton_BAM_CRM.setEnabled(false);
          jRadioButton_Administer.setEnabled(false);
          jRadioButton_Manual.setToolTipText("<HTML>Calibrate using nominal parameters entered by hand.");
-         jRadioButton_BAM_CRM.setToolTipText("<HTML>Calibrate using the EDS reference material created by<br>the BAM (Bundesanstalt f&uuml;r Materialforschung und -pr&uuml;fung)");
+         jRadioButton_BAM_CRM.setToolTipText(
+               "<HTML>Calibrate using the EDS reference material created by<br>the BAM (Bundesanstalt f&uuml;r Materialforschung und -pr&uuml;fung)");
          jRadioButton_FitSpectrum.setToolTipText("<HTML>Calibrate against a Mn or Cu pure elemental reference spectrum.");
          jRadioButton_Administer.setToolTipText("<HTML>Enable and disable instrument calibrations.");
          jRadioButton_Limits.setToolTipText("<HTML>Specify the minimum Z for each characteristic line family.");
@@ -187,18 +178,18 @@ public class CalibrationWizard
 
       @Override
       public void onShow() {
-         if(jWizardPanel_Detector.mDetector != null)
+         if (jWizardPanel_Detector.mDetector != null)
             jRadioButton_Limits.setEnabled(jWizardPanel_Detector.mDetector.getCalibration() instanceof SiLiCalibration);
          getWizard().setMessageText("Select a spectrum calibration method");
-         getWizard().setNextPanel(jWizardPanel_FitSpectrum, "Measured spectrum");
+         getWizard().setNextPanel(jWizardPanel_FitSpectrum);
          getWizard().enableFinish(false);
       }
 
       @Override
       public boolean permitNext() {
-         if(jRadioButton_Limits.isSelected()) {
+         if (jRadioButton_Limits.isSelected()) {
             final Object obj = jWizardPanel_Detector.jComboBox_Detector.getSelectedItem();
-            if(obj instanceof EDSDetector) {
+            if (obj instanceof EDSDetector) {
                final EDSDetector det = (EDSDetector) obj;
                mResultCalibration = det.getCalibration();
             }
@@ -212,9 +203,7 @@ public class CalibrationWizard
       }
    }
 
-   public class DetectorPanel
-      extends
-      JWizardPanel {
+   public class DetectorPanel extends JWizardPanel {
 
       private static final long serialVersionUID = 2996757631404932405L;
 
@@ -225,7 +214,7 @@ public class CalibrationWizard
       private DetectorProperties mDefaultDetector = null;
 
       public DetectorPanel(JWizardDialog wiz) {
-         super(wiz);
+         super(wiz, "Select a detector");
          initialize();
       }
 
@@ -251,16 +240,16 @@ public class CalibrationWizard
       private void updateDetectors() {
          final DetectorProperties dp = mDefaultDetector;
          mDefaultDetector = null;
-         if(dp != null)
+         if (dp != null)
             jComboBox_Instrument.setSelectedItem(dp.getOwner());
          final Object obj = jComboBox_Instrument.getSelectedItem();
-         if(obj instanceof ElectronProbe) {
+         if (obj instanceof ElectronProbe) {
             final EDSDetector[] dets = getSession().getCurrentEDSDetectors((ElectronProbe) obj).toArray(new EDSDetector[0]);
             final DefaultComboBoxModel<EDSDetector> dcbm = new DefaultComboBoxModel<>(dets);
             jComboBox_Detector.setModel(dcbm);
-            if(dp != null)
-               for(final EDSDetector det : dets)
-                  if(det.getDetectorProperties() == dp) {
+            if (dp != null)
+               for (final EDSDetector det : dets)
+                  if (det.getDetectorProperties() == dp) {
                      jComboBox_Detector.setSelectedItem(det);
                      break;
                   }
@@ -275,18 +264,18 @@ public class CalibrationWizard
       @Override
       public void onShow() {
          getWizard().setMessageText("Select a detector to calibrate");
-         getWizard().setNextPanel(jWizardPanel_Mode, "Calibration method");
+         getWizard().setNextPanel(jWizardPanel_Mode);
          getWizard().enableFinish(false);
       }
 
       @Override
       public boolean permitNext() {
          mDetector = null;
-         if(jComboBox_Detector.getSelectedItem() instanceof EDSDetector) {
+         if (jComboBox_Detector.getSelectedItem() instanceof EDSDetector) {
             final EDSDetector dp = (EDSDetector) jComboBox_Detector.getSelectedItem();
             mDetector = dp;
          }
-         if(mDetector == null)
+         if (mDetector == null)
             setMessageText("Please specify an x-ray detector.");
          return (mDetector != null);
       }
@@ -297,9 +286,7 @@ public class CalibrationWizard
       }
    }
 
-   public class FitPanel
-      extends
-      JWizardPanel {
+   public class FitPanel extends JWizardPanel {
 
       private JComboBox<Object> jComboBox_Material;
       private JTextField jTextField_Spectrum;
@@ -316,11 +303,8 @@ public class CalibrationWizard
 
       public SpectrumProperties editSpectrumProperties(SpectrumProperties sp, Session ses) {
          final SpectrumPropertyPanel.PropertyDialog dlg = new SpectrumPropertyPanel.PropertyDialog(CalibrationWizard.this, ses);
-         final SpectrumProperties.PropertyId[] required = new SpectrumProperties.PropertyId[] {
-            SpectrumProperties.BeamEnergy,
-            SpectrumProperties.ProbeCurrent,
-            SpectrumProperties.LiveTime
-         };
+         final SpectrumProperties.PropertyId[] required = new SpectrumProperties.PropertyId[]{SpectrumProperties.BeamEnergy,
+               SpectrumProperties.ProbeCurrent, SpectrumProperties.LiveTime};
          dlg.setRequiredProperties(Arrays.asList(required));
          dlg.addSpectrumProperties(sp);
          dlg.setLocationRelativeTo(this);
@@ -329,20 +313,19 @@ public class CalibrationWizard
       }
 
       public FitPanel(JWizardDialog wiz) {
-         super(wiz);
+         super(wiz, "Measured spectrum");
          initialize();
       }
 
       private void initialize() {
          final Session ses = getSession();
          final Vector<Object> standards = new Vector<>();
-         for(final String std : STANDARDS)
+         for (final String std : STANDARDS)
             try {
                final Composition c = ses.findStandard(std);
-               if(c != null)
+               if (c != null)
                   standards.add(c);
-            }
-            catch(final SQLException e) {
+            } catch (final SQLException e) {
                // Ignore it...
             }
          standards.add("New material");
@@ -351,9 +334,9 @@ public class CalibrationWizard
             @Override
             public void actionPerformed(ActionEvent e) {
                Object obj = jComboBox_Material.getSelectedItem();
-               if(!(obj instanceof Composition)) {
+               if (!(obj instanceof Composition)) {
                   obj = MaterialsCreator.createMaterial(CalibrationWizard.this, DTSA2.getSession(), false);
-                  if(obj instanceof Composition) {
+                  if (obj instanceof Composition) {
                      jComboBox_Material.addItem(obj);
                      jComboBox_Material.setSelectedItem(obj);
                   } else
@@ -366,14 +349,8 @@ public class CalibrationWizard
          {
             jComboBox_FitOrder = new JComboBox<>();
             final String def = "Linear (default)";
-            final ComboBoxModel<String> model = new DefaultComboBoxModel<>(new String[] {
-               def,
-               "Quadratic",
-               "Cubic",
-               "Quartic",
-               "Quintic",
-               "Square root"
-            });
+            final ComboBoxModel<String> model = new DefaultComboBoxModel<>(
+                  new String[]{def, "Quadratic", "Cubic", "Quartic", "Quintic", "Square root"});
             model.setSelectedItem(def);
             jComboBox_FitOrder.setModel(model);
          }
@@ -387,19 +364,20 @@ public class CalibrationWizard
                sfc.getFileChooser().setCurrentDirectory(dir);
                sfc.setLocationRelativeTo(CalibrationWizard.this);
                final int res = sfc.showOpenDialog();
-               if(res == JFileChooser.APPROVE_OPTION) {
+               if (res == JFileChooser.APPROVE_OPTION) {
                   final ISpectrumData ref = sfc.getSpectra()[0];
                   double e0 = ref.getProperties().getNumericWithDefault(SpectrumProperties.BeamEnergy, Double.NaN) * 1.0e3;
-                  while(Double.isNaN(e0)) {
+                  while (Double.isNaN(e0)) {
                      ref.getProperties().addAll(editSpectrumProperties(ref.getProperties(), getSession()));
                      e0 = ref.getProperties().getNumericWithDefault(SpectrumProperties.BeamEnergy, Double.NaN) * 1.0e3;
                   }
-                  final boolean ok = (e0 >= 1.5e4)
-                        || (JOptionPane.showConfirmDialog(CalibrationWizard.this, "<html>The beam energy on this spectrum is less than the suggested 15 keV.<br><br>Use it none the less?", "Calibration", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION);
-                  if(ok) {
+                  final boolean ok = (e0 >= 1.5e4) || (JOptionPane.showConfirmDialog(CalibrationWizard.this,
+                        "<html>The beam energy on this spectrum is less than the suggested 15 keV.<br><br>Use it none the less?", "Calibration",
+                        JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION);
+                  if (ok) {
                      mReference = SpectrumUtils.applyEDSDetector(jWizardPanel_Detector.mDetector, ref);
                      final Composition stdComp = mReference.getProperties().getCompositionWithDefault(SpectrumProperties.StandardComposition, null);
-                     if(stdComp != null) {
+                     if (stdComp != null) {
                         jComboBox_Material.addItem(stdComp);
                         jComboBox_Material.setSelectedItem(stdComp);
                      }
@@ -417,10 +395,10 @@ public class CalibrationWizard
                      }
                      final HalfUpFormat nf = new HalfUpFormat("0.0");
                      setMessageText("The reference beam energy is " + nf.format(e0 / 1000.0) + " keV.");
-                     setNextPanel(jProgressPanel_Progress, "Fit Results");
+                     setNextPanel(jProgressPanel_Progress);
                   } else {
                      setErrorText("Please select a spectrum collected at greater then 15 keV.");
-                     setNextPanel(null, "Finish");
+                     setNextPanel(null);
                   }
                   DTSA2.updateSpectrumDirectory(sfc.getFileChooser().getCurrentDirectory());
                }
@@ -429,7 +407,8 @@ public class CalibrationWizard
          jDateChoose_Effective = new JDateChooser();
          jTextField_LiveTime = new JTextField();
          jTextField_ProbeCurrent = new JTextField();
-         final PanelBuilder pb = new PanelBuilder(new FormLayout("5dlu, right:50dlu, 3dlu, fill:150dlu, 3dlu, 20dlu", "pref, 5dlu, pref, 5dlu, pref, 5dlu, pref, 5dlu, pref, 5dlu, pref, 5dlu, pref"), this);
+         final PanelBuilder pb = new PanelBuilder(new FormLayout("5dlu, right:50dlu, 3dlu, fill:150dlu, 3dlu, 20dlu",
+               "pref, 5dlu, pref, 5dlu, pref, 5dlu, pref, 5dlu, pref, 5dlu, pref, 5dlu, pref"), this);
          final CellConstraints cc = new CellConstraints();
          pb.addSeparator("Specify the material", cc.xyw(1, 5, 6));
          pb.addLabel("Material", cc.xy(2, 7));
@@ -440,7 +419,8 @@ public class CalibrationWizard
          pb.add(jTextField_Spectrum, cc.xy(4, 3));
          pb.add(jButton_SelectSpectrum, cc.xy(6, 3));
          {
-            final PanelBuilder param = new PanelBuilder(new FormLayout("right:50dlu, 3dlu, 30dlu, 3dlu, 17dlu, right:67dlu, 3dlu, 30dlu, 3dlu, 14dlu", "pref, 5dlu, pref"));
+            final PanelBuilder param = new PanelBuilder(
+                  new FormLayout("right:50dlu, 3dlu, 30dlu, 3dlu, 17dlu, right:67dlu, 3dlu, 30dlu, 3dlu, 14dlu", "pref, 5dlu, pref"));
             param.addLabel("Live time", cc.xy(1, 1));
             param.add(jTextField_LiveTime, cc.xy(3, 1));
             param.addLabel("sec.", cc.xy(5, 1));
@@ -459,7 +439,7 @@ public class CalibrationWizard
       @Override
       public boolean permitNext() {
          final boolean res = (mReference != null) && (jComboBox_Material.getSelectedItem() instanceof Composition);
-         if(res) {
+         if (res) {
             final SpectrumProperties sp = mReference.getProperties();
             sp.setCompositionProperty(SpectrumProperties.StandardComposition, (Composition) jComboBox_Material.getSelectedItem());
             jProgressPanel_Progress.setFitWorker(new FitWorker(mReference));
@@ -472,9 +452,7 @@ public class CalibrationWizard
 
    }
 
-   public class FitWorker
-      extends
-      SwingWorker<SpectrumFitter8, String> {
+   public class FitWorker extends SwingWorker<SpectrumFitter8, String> {
 
       final private ISpectrumData mSpectrum;
       private ISpectrumData mFitSpectrum;
@@ -489,8 +467,7 @@ public class CalibrationWizard
          try {
             jProgressPanel_Progress.setProgress(100);
             jWizardPanel_FitResult.setFit(get());
-         }
-         catch(final Exception e) {
+         } catch (final Exception e) {
             ErrorDialog.createErrorMessage(CalibrationWizard.this, "Calibration alien", e);
          }
       }
@@ -501,23 +478,21 @@ public class CalibrationWizard
        * @see javax.swing.SwingWorker#doInBackground()
        */
       @Override
-      protected SpectrumFitter8 doInBackground()
-            throws Exception {
+      protected SpectrumFitter8 doInBackground() throws Exception {
          final Strategy strat = new Strategy();
          strat.addAlgorithm(TransitionEnergy.class, TransitionEnergy.Default);
          AlgorithmUser.applyGlobalOverride(strat);
          try {
             final SpectrumProperties sp = mSpectrum.getProperties();
-            final SpectrumFitter8 sf = new SpectrumFitter8((EDSDetector) sp.getDetector(), sp.getCompositionProperty(SpectrumProperties.StandardComposition), mSpectrum);
+            final SpectrumFitter8 sf = new SpectrumFitter8((EDSDetector) sp.getDetector(),
+                  sp.getCompositionProperty(SpectrumProperties.StandardComposition), mSpectrum);
             final RegionOfInterestSet rois = sf.getROIS();
             final SpectrumProperties props = sp.getDetector().getCalibration().getProperties();
             // If there is an extended range of energies with characteristic
             // peaks, we should increase the number of fit parameters.
-            final double[] coeffs = new double[] {
-               props.getNumericWithDefault(SpectrumProperties.EnergyOffset, 0.0),
-               props.getNumericWithDefault(SpectrumProperties.EnergyScale, 10.0)
-            };
-            if(jWizardPanel_FitSpectrum.mFitOrderSelected < 5)
+            final double[] coeffs = new double[]{props.getNumericWithDefault(SpectrumProperties.EnergyOffset, 0.0),
+                  props.getNumericWithDefault(SpectrumProperties.EnergyScale, 10.0)};
+            if (jWizardPanel_FitSpectrum.mFitOrderSelected < 5)
                // 0->Linear, 1->Quadratic, 2->Cubic, 3->Quartic, 4->Quintic,
                // 5->Square root
                sf.setEnergyScale(new EnergyScaleFunction(coeffs, jWizardPanel_FitSpectrum.mFitOrderSelected + 2));
@@ -533,7 +508,7 @@ public class CalibrationWizard
                @Override
                public void actionPerformed(ActionEvent e) {
                   // We go through twice...
-                  if((mPrev == 100) && (e.getID() < 100))
+                  if ((mPrev == 100) && (e.getID() < 100))
                      ++mIteration;
                   jProgressPanel_Progress.setProgress((e.getID() / mIterations) + ((100 * mIteration) / mIterations));
                   mPrev = e.getID();
@@ -541,27 +516,25 @@ public class CalibrationWizard
             });
             FileWriter mrFitsFile = null;
             try {
-               if(System.getProperty("user.name").equals("nritchie")) {
+               if (System.getProperty("user.name").equals("nritchie")) {
                   final File elmFits = new File(HTMLReport.getBasePath(), "mostRecentFit.csv");
                   mrFitsFile = new FileWriter(elmFits, elmFits.exists());
                }
                SpectrumFitResult results = sf.compute();
-               if(mrFitsFile != null)
+               if (mrFitsFile != null)
                   mrFitsFile.write(results.tabulateResults());
-               for(int i = 1; i < mIterations; ++i) {
+               for (int i = 1; i < mIterations; ++i) {
                   results = sf.recompute(10.0, 0.3);
-                  if(mrFitsFile != null)
+                  if (mrFitsFile != null)
                      try {
                         mrFitsFile.write(results.tabulateResults());
                         mrFitsFile.flush();
-                     }
-                     catch(final Exception e1) {
+                     } catch (final Exception e1) {
                         e1.printStackTrace();
                      }
                }
-            }
-            finally {
-               if(mrFitsFile != null)
+            } finally {
+               if (mrFitsFile != null)
                   mrFitsFile.close();
             }
             mFitSpectrum = sf.getBestFit();
@@ -573,17 +546,14 @@ public class CalibrationWizard
             dm.addSpectrum(sf.getBremsstrahlungSpectrum(), true, mSpectrum);
             jProgressPanel_Progress.setProgress(100);
             return sf;
-         }
-         finally {
+         } finally {
             AlgorithmUser.clearGlobalOverride();
          }
 
       }
    }
 
-   public class FitProgressPanel
-      extends
-      JProgressPanel {
+   public class FitProgressPanel extends JProgressPanel {
 
       private static final long serialVersionUID = 1207417763604043955L;
 
@@ -595,7 +565,7 @@ public class CalibrationWizard
        * @param wiz
        */
       public FitProgressPanel(JWizardDialog wiz) {
-         super(wiz);
+         super(wiz, "Fit Results");
       }
 
       @Override
@@ -609,8 +579,8 @@ public class CalibrationWizard
       @Override
       public void setProgress(int pct) {
          super.setProgress(pct);
-         if(pct == 100)
-            setNextPanel(jWizardPanel_FitResult, "Fit results");
+         if (pct == 100)
+            setNextPanel(jWizardPanel_FitResult);
       }
 
       public void setFitWorker(FitWorker fw) {
@@ -622,9 +592,7 @@ public class CalibrationWizard
       }
    }
 
-   public class FitResultPanel
-      extends
-      JWizardPanel {
+   public class FitResultPanel extends JWizardPanel {
 
       private static final long serialVersionUID = -3139178312592947721L;
 
@@ -642,12 +610,13 @@ public class CalibrationWizard
        * @param wiz
        */
       public FitResultPanel(JWizardDialog wiz) {
-         super(wiz);
+         super(wiz, "Fit results");
          initialize();
       }
 
       private void initialize() {
-         final PanelBuilder pb = new PanelBuilder(new FormLayout("right:50dlu, 5dlu, 100dlu, 5dlu, pref", "pref, 5dlu, pref, 5dlu, pref, 5dlu, pref, 5dlu, pref, 5dlu, pref, 5dlu, pref, 5dlu, pref"), this);
+         final PanelBuilder pb = new PanelBuilder(new FormLayout("right:50dlu, 5dlu, 100dlu, 5dlu, pref",
+               "pref, 5dlu, pref, 5dlu, pref, 5dlu, pref, 5dlu, pref, 5dlu, pref, 5dlu, pref, 5dlu, pref"), this);
          final CellConstraints cc = new CellConstraints();
          pb.addSeparator("Energy calibration", cc.xyw(1, 1, 5));
          pb.addLabel("Fano factor", cc.xy(1, 3));
@@ -680,17 +649,16 @@ public class CalibrationWizard
       }
 
       private void updateNextPanel() {
-         if(jCheckBox_AddToDB.isSelected()) {
-            CalibrationWizard.this.setNextPanel(jWizardPanel_Limits, "Specify element limits");
+         if (jCheckBox_AddToDB.isSelected()) {
+            CalibrationWizard.this.setNextPanel(jWizardPanel_Limits);
             enableFinish(false);
          } else {
-            CalibrationWizard.this.setNextPanel(null, "Finish");
+            CalibrationWizard.this.setNextPanel(null);
             enableFinish(true);
          }
       }
 
-      public void setFit(SpectrumFitter8 sf)
-            throws EPQException, UtilException {
+      public void setFit(SpectrumFitter8 sf) throws EPQException, UtilException {
          mFit = sf;
          final NumberFormat nf2 = new HalfUpFormat("0.00");
          final NumberFormat nf4 = new HalfUpFormat("0.0000");
@@ -707,8 +675,7 @@ public class CalibrationWizard
          try (final FileWriter fw = new FileWriter(elmFits, elmFits.exists())) {
             fw.write(results.tabulateResults());
             fw.flush();
-         }
-         catch(final IOException e) {
+         } catch (final IOException e) {
             e.printStackTrace();
          }
       }
@@ -722,25 +689,23 @@ public class CalibrationWizard
       public boolean permitNext() {
          assert jWizardPanel_Detector.mDetector != null;
          boolean result = true;
-         if(mFit != null) {
-            if(jCheckBox_AddToDB.isSelected()) {
+         if (mFit != null) {
+            if (jCheckBox_AddToDB.isSelected()) {
                try {
                   mResultCalibration = mFit.getLastResult().getCalibration();
-               }
-               catch(final Exception e) {
+               } catch (final Exception e) {
                   e.printStackTrace();
                   result = false;
                }
             } else {
                mResultCalibration = null;
             }
-            if(jWizardPanel_FitResult.jCheckBox_OutputIndividualElements.isSelected()) {
+            if (jWizardPanel_FitResult.jCheckBox_OutputIndividualElements.isSelected()) {
                final DataManager dm = DataManager.getInstance();
-               for(final Element elm : mFit.getElements())
+               for (final Element elm : mFit.getElements())
                   try {
                      dm.addSpectrum(mFit.getElementSpectrum(elm), true, mFit.getSpectrum());
-                  }
-                  catch(final Exception e) {
+                  } catch (final Exception e) {
                      e.printStackTrace();
                   }
             }
@@ -750,9 +715,7 @@ public class CalibrationWizard
 
    }
 
-   public class ManualPanel
-      extends
-      JWizardPanel {
+   public class ManualPanel extends JWizardPanel {
 
       private static final long serialVersionUID = -1890526644480564803L;
 
@@ -768,12 +731,13 @@ public class CalibrationWizard
       private final Date mStartDate = new Date();
 
       public ManualPanel(JWizardDialog wiz) {
-         super(wiz);
+         super(wiz, "Manual calibration");
          initialize();
       }
 
       private void initialize() {
-         final PanelBuilder pb = new PanelBuilder(new FormLayout("right:75dlu, 5dlu, 100dlu, 3dlu, pref", "pref, 5dlu, pref, 5dlu, pref, 5dlu, pref, 5dlu, pref, 5dlu, pref, 5dlu, pref"), this);
+         final PanelBuilder pb = new PanelBuilder(new FormLayout("right:75dlu, 5dlu, 100dlu, 3dlu, pref",
+               "pref, 5dlu, pref, 5dlu, pref, 5dlu, pref, 5dlu, pref, 5dlu, pref, 5dlu, pref"), this);
          final CellConstraints cc = new CellConstraints();
          pb.addSeparator("Detector resolution", cc.xyw(1, 1, 5));
          pb.addLabel("FWHM @ " + (new XRayTransition(Element.Mn, XRayTransition.KA1)).toString(), cc.xy(1, 3));
@@ -811,10 +775,10 @@ public class CalibrationWizard
          pb.add(jDateChoose_Date, cc.xy(3, 13));
          // Get last calibration as default...
          final Object obj = jWizardPanel_Detector.jComboBox_Detector.getSelectedItem();
-         if(obj instanceof DetectorProperties) {
+         if (obj instanceof DetectorProperties) {
             final DetectorProperties dp = (DetectorProperties) obj;
             final DetectorCalibration dc = getSession().getMostRecentCalibration(dp);
-            if(dc instanceof EDSCalibration) {
+            if (dc instanceof EDSCalibration) {
                final EDSCalibration ec = (EDSCalibration) dc;
                mFWHM = ec.getLineshape().getFWHMatMnKa();
                mChannelWidth = ec.getChannelWidth();
@@ -826,10 +790,10 @@ public class CalibrationWizard
       @Override
       public void onShow() {
          getWizard().setMessageText("Enter the calibration data");
-         getWizard().setNextPanel(jWizardPanel_Limits, "Specify element limits");
+         getWizard().setNextPanel(jWizardPanel_Limits);
          getWizard().enableFinish(true);
          final Object obj = jWizardPanel_Detector.jComboBox_Detector.getSelectedItem();
-         if(obj instanceof EDSDetector) {
+         if (obj instanceof EDSDetector) {
             final EDSDetector det = (EDSDetector) obj;
             final EDSCalibration ec = det.getCalibration();
             mChannelWidth = ec.getChannelWidth();
@@ -849,13 +813,12 @@ public class CalibrationWizard
             CalibrationWizard.this.setErrorText("");
             dbl.setBackground(SystemColor.text);
             res = mFormat.parse(dbl.getText()).doubleValue();
-            if(res < min)
+            if (res < min)
                res = def;
-            if(res > max)
+            if (res > max)
                res = def;
             dbl.setText(nf.format(res));
-         }
-         catch(final ParseException e) {
+         } catch (final ParseException e) {
             dbl.setBackground(Color.pink);
             CalibrationWizard.this.setErrorText("Invalid entry");
             dbl.setText(nf.format(res));
@@ -892,9 +855,7 @@ public class CalibrationWizard
       }
    }
 
-   private class LimitsPanel
-      extends
-      JWizardPanel {
+   private class LimitsPanel extends JWizardPanel {
 
       private final JComboBox<Element> jComboBox_KLine = new JComboBox<>();
       private final JComboBox<Element> jComboBox_LLine = new JComboBox<>();
@@ -904,7 +865,7 @@ public class CalibrationWizard
       private static final long serialVersionUID = -8281440631161048625L;
 
       public LimitsPanel(JWizardDialog wiz) {
-         super(wiz);
+         super(wiz, "Set element limits");
          init();
       }
 
@@ -921,7 +882,7 @@ public class CalibrationWizard
 
       @Override
       public void onShow() {
-         if(mResultCalibration instanceof SiLiCalibration) {
+         if (mResultCalibration instanceof SiLiCalibration) {
             final EDSCalibration cal = mResultCalibration;
             final SiLiCalibration sili = (SiLiCalibration) cal;
             {
@@ -956,16 +917,16 @@ public class CalibrationWizard
             jComboBox_NLine.setEnabled(false);
          }
          getWizard().setMessageText("Enter the visible line data");
-         getWizard().setNextPanel(null, "Finish");
+         getWizard().setNextPanel(null);
          getWizard().enableFinish(true);
       }
 
       @Override
       public void onHide() {
-         if(isFinished()) {
+         if (isFinished()) {
             final EDSCalibration cal = mResultCalibration;
             StringBuffer sb = new StringBuffer();
-            if(cal instanceof SiLiCalibration) {
+            if (cal instanceof SiLiCalibration) {
                final SiLiCalibration sili = (SiLiCalibration) cal.clone();
                sili.setFirstVisible(AtomicShell.KFamily, (Element) jComboBox_KLine.getSelectedItem());
                sili.setFirstVisible(AtomicShell.LFamily, (Element) jComboBox_LLine.getSelectedItem());
@@ -985,12 +946,11 @@ public class CalibrationWizard
                c.set(Calendar.MILLISECOND, 0);
                Session sess = DTSA2.getSession();
                // Increment each calibration on any given day by one hour...
-               for(DetectorCalibration calib : sess.getCalibrations(dp)) {
+               for (DetectorCalibration calib : sess.getCalibrations(dp)) {
                   final Calendar c2 = Calendar.getInstance();
                   c2.setTime(calib.getActiveDate());
-                  if((c.get(Calendar.YEAR) == c2.get(Calendar.YEAR))
-                        && (c.get(Calendar.DAY_OF_YEAR) == c2.get(Calendar.DAY_OF_YEAR))) {
-                     if(c.get(Calendar.HOUR) <= c2.get(Calendar.HOUR))
+                  if ((c.get(Calendar.YEAR) == c2.get(Calendar.YEAR)) && (c.get(Calendar.DAY_OF_YEAR) == c2.get(Calendar.DAY_OF_YEAR))) {
+                     if (c.get(Calendar.HOUR) <= c2.get(Calendar.HOUR))
                         c.set(Calendar.HOUR, c2.get(Calendar.HOUR) + 1);
                   }
                }
@@ -1018,7 +978,7 @@ public class CalibrationWizard
    }
 
    private void initialize() {
-      setActivePanel(jWizardPanel_Detector, "Select a detector");
+      setActivePanel(jWizardPanel_Detector);
       pack();
    }
 

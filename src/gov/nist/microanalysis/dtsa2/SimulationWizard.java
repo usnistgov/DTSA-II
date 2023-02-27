@@ -1370,7 +1370,7 @@ public class SimulationWizard extends JWizardDialog {
 		private final JRadioButton mMCBuriedLayer = new JRadioButton("Monte Carlo model of a buried layer of material");
 
 		private SimMode(SimulationWizard wiz) {
-			super(wiz);
+			super(wiz, "Specify the simulation mode");
 			initialize();
 			mSession = DTSA2.getSession();
 		}
@@ -1446,7 +1446,7 @@ public class SimulationWizard extends JWizardDialog {
 		@Override
 		public void onShow() {
 			getWizard().setMessageText("Select the type of spectrum simulation to perform.");
-			getWizard().setNextPanel(mGeometry, "Configure sample");
+			getWizard().setNextPanel(mGeometry);
 			getWizard().enableFinish(false);
 		}
 
@@ -1553,7 +1553,7 @@ public class SimulationWizard extends JWizardDialog {
 		private final NumberFormat mFormatter = new HalfUpFormat("0.0");
 
 		private SimConfiguration(SimulationWizard sw) {
-			super(sw);
+			super(sw, "Instrument configuration");
 			initialize();
 		}
 
@@ -1755,7 +1755,7 @@ public class SimulationWizard extends JWizardDialog {
 			jTextField_IncidentAngle.setText(mFormatter.format(Math.toDegrees(mThread.mIncidentAngle)));
 			updateDetectors(mThread.mDetector);
 			updateCalibrations(mThread.mDetector);
-			getWizard().setNextPanel(mOther, "Other options");
+			getWizard().setNextPanel(mOther);
 			getWizard().enableFinish(false);
 		}
 	}
@@ -1769,7 +1769,7 @@ public class SimulationWizard extends JWizardDialog {
 		private JPanel jPanel_VP = null;
 
 		public SimVP(JWizardDialog wiz) {
-			super(wiz);
+			super(wiz,"Specify variable-pressure options");
 			initialize();
 		}
 
@@ -1840,7 +1840,7 @@ public class SimulationWizard extends JWizardDialog {
 			final NumberFormat df = new HalfUpFormat("0.000");
 			jTextField_Length.setText(df.format(userPref.getDouble("Path Length", 10.0)));
 			jTextField_Pressure.setText(df.format(userPref.getDouble("Pressure", 100.0)));
-			getWizard().setNextPanel(mProgress, "Perform Simulation");
+			getWizard().setNextPanel(mProgress);
 			getWizard().enableFinish(false);
 		}
 
@@ -1890,7 +1890,7 @@ public class SimulationWizard extends JWizardDialog {
 		private int mReplicas = 1;
 
 		public SimOther(SimulationWizard wiz) {
-			super(wiz);
+			super(wiz, "Other options");
 			initialize();
 		}
 
@@ -1967,9 +1967,9 @@ public class SimulationWizard extends JWizardDialog {
 			jTextField_Count.setEnabled(jCheckBox_AddNoise.isSelected());
 			jComboBox_Extra.setSelectedIndex(Integer.highestOneBit(mThread.mExtraElectrons) / 2);
 			if (mThread.mMode == SimulationMode.AnalyticalBulk)
-				getWizard().setNextPanel(mProgress, "Perform Simulation");
+				getWizard().setNextPanel(mProgress);
 			else
-				getWizard().setNextPanel(mVariablePressure, "Configure VP");
+				getWizard().setNextPanel(mVariablePressure);
 			getWizard().enableFinish(false);
 		}
 
@@ -2019,7 +2019,7 @@ public class SimulationWizard extends JWizardDialog {
 		private final NumberFormat mFormatter = new HalfUpFormat("0.000");
 
 		private SimGeometry(SimulationWizard sw) {
-			super(sw);
+			super(sw, "Specify geometry");
 			initialize();
 		}
 
@@ -2439,7 +2439,7 @@ public class SimulationWizard extends JWizardDialog {
 				break;
 			}
 			getWizard().setMessageText("Specify the sample material and scale.");
-			getWizard().setNextPanel(mConfig, "Instrument configuration");
+			getWizard().setNextPanel(mConfig);
 			getWizard().enableFinish(false);
 		}
 	}
@@ -2461,7 +2461,7 @@ public class SimulationWizard extends JWizardDialog {
 	}
 
 	private void initialize() {
-		setActivePanel(mSimMode, "Simulation Mode");
+		setActivePanel(mSimMode);
 		pack();
 	}
 

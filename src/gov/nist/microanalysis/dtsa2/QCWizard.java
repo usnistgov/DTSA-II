@@ -111,7 +111,7 @@ public class QCWizard
       private final JRadioButton jRadioButton_Export = new JRadioButton("Export the data from a QC project");
 
       public WelcomePanel(JWizardDialog wiz) {
-         super(wiz);
+         super(wiz, "Welcome");
          initialize();
       }
 
@@ -166,9 +166,9 @@ public class QCWizard
          else if(jRadioButton_Spectra.isSelected())
             mMode = Mode.SPECTRA;
          if(mMode == Mode.NEW_PROJECT)
-            setNextPanel(jWizardPanel_NewProject, "Configure a new QCproject");
+            setNextPanel(jWizardPanel_NewProject);
          else
-            setNextPanel(jWizardPanel_SelectProject, "Select a QC project");
+            setNextPanel(jWizardPanel_SelectProject);
       }
 
       @Override
@@ -201,7 +201,7 @@ public class QCWizard
       private boolean mCreateQCProject = false;
 
       public NewProjectPanel(JWizardDialog wiz) {
-         super(wiz);
+         super(wiz, "Configure a new QCproject");
          init();
       }
 
@@ -343,7 +343,7 @@ public class QCWizard
       private static final long serialVersionUID = -1090276644792187234L;
 
       public SelectProjectPanel(JWizardDialog wiz) {
-         super(wiz);
+         super(wiz, "Select a QC project");
          init();
       }
 
@@ -449,23 +449,23 @@ public class QCWizard
          }
          switch(mMode) {
             case MEASUREMENT:
-               setNextPanel(jWizardPanel_Measurement, "Select a measured spectrum");
+               setNextPanel(jWizardPanel_Measurement);
                enableFinish(false);
                enableNext(true);
                break;
             case EXPORT:
-               setNextPanel(jWizardPanel_Export, "Specify where to export results");
+               setNextPanel(jWizardPanel_Export);
                enableFinish(false);
                enableNext(true);
             case LIMITS:
                break;
             case REPORT:
-               setNextPanel(jWizardPanel_Report, "Configure a report");
+               setNextPanel(jWizardPanel_Report);
                enableFinish(false);
                enableNext(true);
                break;
             case SPECTRA:
-               setNextPanel(null, "Finish");
+               setNextPanel(null);
                enableFinish(true);
                enableNext(false);
                break;
@@ -488,7 +488,7 @@ public class QCWizard
       private final JTextField jTextField_Livetime = new JTextField();
 
       private MeasurementPanel(JWizardDialog wiz) {
-         super(wiz);
+         super(wiz, "Select a measured spectrum");
          init();
       }
 
@@ -583,7 +583,7 @@ public class QCWizard
 
       @Override
       public void onShow() {
-         setNextPanel(jWizardPanel_Results, "Review the results");
+         setNextPanel(jWizardPanel_Results);
          updateSpectrum();
          QCWizard.this.enableNext(true);
          QCWizard.this.enableFinish(false);
@@ -729,7 +729,7 @@ public class QCWizard
       }
 
       private ResultPanel(JWizardDialog wiz) {
-         super(wiz);
+         super(wiz, "Review the results");
          init();
       }
 
@@ -772,7 +772,7 @@ public class QCWizard
       private File mFile = null;
 
       private ExportPanel(JWizardDialog wd) {
-         super(wd);
+         super(wd, "Specify where to export results");
          init();
       }
 
@@ -827,7 +827,7 @@ public class QCWizard
       private JScrollPane jScrollPane_ReportItems = new JScrollPane();
 
       public ReportPanel(QCWizard wiz) {
-         super(wiz);
+         super(wiz, "Configure a report");
          init();
       }
 
@@ -906,7 +906,7 @@ public class QCWizard
       super(owner, "Quality control alien", true);
       mSession = session;
       mMode = Mode.MEASUREMENT;
-      setActivePanel(jWizardPanel_Welcome, "Welcome");
+      setActivePanel(jWizardPanel_Welcome);
    }
 
    /**
@@ -917,7 +917,7 @@ public class QCWizard
       super(owner, "Quality control alien", true);
       mSession = session;
       mMode = Mode.MEASUREMENT;
-      setActivePanel(jWizardPanel_Welcome, "Welcome");
+      setActivePanel(jWizardPanel_Welcome);
    }
 
    public String getHTMLResults() {

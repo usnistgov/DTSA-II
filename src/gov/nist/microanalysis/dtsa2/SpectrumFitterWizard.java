@@ -60,8 +60,8 @@ public class SpectrumFitterWizard extends JWizardDialog {
 	}
 
 	private void initialize() {
-		setActivePanel(jWizardPanel_Intro, "Non-linear spectrum fitter");
-		setNextPanel(jWizardPanel_Element, "Select elements to fit");
+		setActivePanel(jWizardPanel_Intro);
+		setNextPanel(jWizardPanel_Element);
 		pack();
 		enableFinish(false);
 	}
@@ -77,7 +77,7 @@ public class SpectrumFitterWizard extends JWizardDialog {
 		private JButton jButton_Composition;
 
 		private IntroPanel(JWizardDialog parent) {
-			super(parent);
+			super(parent, "Non-linear spectrum fitter");
 			initialize();
 		}
 
@@ -126,7 +126,7 @@ public class SpectrumFitterWizard extends JWizardDialog {
 		public JPeriodicTable jPeriodicTable_Elements;
 
 		public ElementPanel(JWizardDialog parent) {
-			super(parent);
+			super(parent, "Select elements to fit");
 			jPeriodicTable_Elements = new JPeriodicTable();
 			for (int z = 1; z < 4; ++z)
 				jPeriodicTable_Elements.setEnabled(Element.byAtomicNumber(z), false);
@@ -137,9 +137,9 @@ public class SpectrumFitterWizard extends JWizardDialog {
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
 					if (jPeriodicTable_Elements.getSelected().size() > 0)
-						setNextPanel(jWizardPanel_Options, "Fit options");
+						setNextPanel(jWizardPanel_Options);
 					else
-						setNextPanel(null, "Fit options");
+						setNextPanel(null);
 				}
 
 			});
@@ -149,9 +149,9 @@ public class SpectrumFitterWizard extends JWizardDialog {
 		@Override
 		public void onShow() {
 			if (jPeriodicTable_Elements.getSelected().size() > 0)
-				setNextPanel(jWizardPanel_Options, "Fit options");
+				setNextPanel(jWizardPanel_Options);
 			else
-				setNextPanel(null, "Fit options");
+				setNextPanel(null);
 			setMessageText("Specify all the elements represented in this spectrum.");
 			enableFinish(false);
 		}
@@ -182,7 +182,7 @@ public class SpectrumFitterWizard extends JWizardDialog {
 		private JRadioButton jRadioButton_DefaultLineWeights;
 
 		OptionsPanel(JWizardDialog parent) {
-			super(parent);
+			super(parent, "Fit options");
 			initialize();
 		}
 
