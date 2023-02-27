@@ -264,7 +264,9 @@ public class DTSA2 {
 			System.exit(1);
 		}
 		final String os = System.getProperty("os.name").toLowerCase();
-		if ((os.indexOf("mac") >= 0) || (os.indexOf("os x") >= 0)) {
+		final boolean isMac=((os.indexOf("mac") >= 0) || (os.indexOf("os x") >= 0));
+		final boolean isWindows = System.getProperty("os.name").startsWith("Windows"); 
+		if (isMac) {
 			System.setProperty("apple.laf.useScreenMenuBar", "true");
 			System.setProperty("apple.laf.smallTabs", "true");
 			System.setProperty("com.apple.mrj.application.apple.menu.about.name", "NIST DTSA-II");
@@ -274,7 +276,7 @@ public class DTSA2 {
 		// java.nio.charset.UnsupportedCharsetException: cp0"
 		System.setProperty("python.console.encoding", "UTF-8");
 		try {
-			if(System.getProperty("os.name").startsWith("Windows"))
+			if(isWindows)
 				AppPreferences.getInstance().applyAppearance();
 			else
 				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
