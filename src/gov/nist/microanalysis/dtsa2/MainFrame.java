@@ -2638,7 +2638,7 @@ public class MainFrame extends JFrame {
 		final Runnable r = new Runnable() {
 			@Override
 			public void run() {
-				final QuantificationWizard wiz = new QuantificationWizard(MainFrame.this);
+				final QuantificationWizard wiz = new QuantificationWizard(MainFrame.this, DataManager.getInstance().getSelected());
 				wiz.setLocationRelativeTo(MainFrame.this);
 				wiz.setSession(DTSA2.getSession());
 				if (wiz.showWizard() == JWizardDialog.FINISHED) {

@@ -83,7 +83,7 @@
                   description="Coordinate translation tool">
             <createForPack name="NIST Relocation Application"/>
         </shortcut>
-        <shortcut name="NIST Glass Database 1.3" 
+        <shortcut name="NIST Glass Database $APP_VER" 
                   target="$INSTALL_PATH/GlassDatabase.exe"
                   workingDirectory="$INSTALL_PATH"
                   startMenu="true"

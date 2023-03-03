@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -67,6 +68,8 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 
+import org.python.core.stringlib.InternalFormat.Spec;
+
 import com.jgoodies.forms.builder.ButtonStackBuilder;
 import com.jgoodies.forms.builder.PanelBuilder;
 import com.jgoodies.forms.factories.CC;
@@ -90,6 +93,7 @@ import gov.nist.microanalysis.EPQLibrary.MassAbsorptionCoefficient;
 import gov.nist.microanalysis.EPQLibrary.Material;
 import gov.nist.microanalysis.EPQLibrary.MaterialFactory;
 import gov.nist.microanalysis.EPQLibrary.QuantifyUsingSTEMinSEM;
+import gov.nist.microanalysis.EPQLibrary.QuantifyUsingSTEMinSEM.Result;
 import gov.nist.microanalysis.EPQLibrary.QuantifyUsingStandards;
 import gov.nist.microanalysis.EPQLibrary.QuantifyUsingZetaFactors;
 import gov.nist.microanalysis.EPQLibrary.RegionOfInterestSet;
@@ -124,6 +128,7 @@ import gov.nist.microanalysis.Utility.ElementComboBoxModel;
 import gov.nist.microanalysis.Utility.HalfUpFormat;
 import gov.nist.microanalysis.Utility.LazyEvaluate;
 import gov.nist.microanalysis.Utility.Math2;
+import gov.nist.microanalysis.Utility.Pair;
 import gov.nist.microanalysis.Utility.Transform3D;
 import gov.nist.microanalysis.Utility.UncertainValue2;
 
@@ -166,9 +171,9 @@ public class QuantificationWizard extends JWizardDialog {
       public EDSDetector getDetector() {
          return mDetector;
       }
-      
+
       public ElectronProbe getProbe() {
-         return mDetector!=null ? mDetector.getOwner() : null;
+         return mDetector != null ? mDetector.getOwner() : null;
       }
    }
 
@@ -223,7 +228,8 @@ public class QuantificationWizard extends JWizardDialog {
          }
 
          protected KConditionsPanel(JWizardDialog wiz) {
-            super(wiz, "Specify experimental conditions", new FormLayout("right:100dlu, 10dlu, 30dlu, 2dlu, 50dlu", "pref, 5dlu, pref, 5dlu, pref, 5dlu, pref, 5dlu, pref"));
+            super(wiz, "Specify experimental conditions",
+                  new FormLayout("right:100dlu, 10dlu, 30dlu, 2dlu, 50dlu", "pref, 5dlu, pref, 5dlu, pref, 5dlu, pref, 5dlu, pref"));
             final CellConstraints cc = new CellConstraints();
             add(jLabel_Intro, cc.xyw(1, 1, 5));
             add(jLabel_Energy, cc.xy(1, 3));
@@ -1242,9 +1248,7 @@ public class QuantificationWizard extends JWizardDialog {
          protected EDSDetector getDetector() {
             return LLSQPath.this.getDetector();
          }
-         
-         
-         
+
       }
 
       private class LLSQStandardPanel extends BaseStandardPanel {
@@ -2156,7 +2160,7 @@ public class QuantificationWizard extends JWizardDialog {
             if (mFirstShow) {
                // First time around add the spectra selected in the DataManager
                // (main screen)
-               for (final ISpectrumData spec : DataManager.getInstance().getSelected())
+               for (final ISpectrumData spec : mInputSpectra)
                   if (Math.abs(ToSI.eV(SpectrumUtils.getBeamEnergy(spec)) - getBeamEnergy()) < (getBeamEnergy() / 100.0))
                      mSpectra.add(spec);
                jTable_Unknown.setModel(new SpectrumTable(mSpectra));
@@ -2761,8 +2765,8 @@ public class QuantificationWizard extends JWizardDialog {
                if ((mQuantUsingZetaFactors == null) || (!Math2.approxEquals(mQuantUsingZetaFactors.getBeamEnergy(), beamEnergy, 0.01))
                      || (det != mQuantUsingZetaFactors.getDetector()))
                   mQuantUsingZetaFactors = new QuantifyUsingZetaFactors(det, beamEnergy);
-                  STEMPath.this.mBeamEnergy = beamEnergy;
-                  STEMPath.this.mDetector = det;
+               STEMPath.this.mBeamEnergy = beamEnergy;
+               STEMPath.this.mDetector = det;
             }
             return res;
          }
@@ -3195,7 +3199,7 @@ public class QuantificationWizard extends JWizardDialog {
             if (mFirstShow) {
                // First time around add the spectra selected in the DataManager
                // (main screen)
-               for (final ISpectrumData spec : DataManager.getInstance().getSelected())
+               for (final ISpectrumData spec : mInputSpectra)
                   if (Math.abs(ToSI.eV(SpectrumUtils.getBeamEnergy(spec)) - getBeamEnergy()) < (getBeamEnergy() / 100.0))
                      mSpectra.add(spec);
                updateTable();
@@ -3756,29 +3760,487 @@ public class QuantificationWizard extends JWizardDialog {
 
       private QuantifyUsingSTEMinSEM mSTEMinSEMQuant;
 
-      private class STEMinSEMStandardPanel extends BaseStandardPanel {
-
-         private static final long serialVersionUID = 2782954389943655266L;
-
-         public STEMinSEMStandardPanel(QuantificationWizard parent) {
-            super(parent, STEMinSEMPath.this);
-         }
-         
-         
-         
-
-      };
+      private List<Result> mResults;
 
       /**
-       * Allows the user to specify an Instrument, Detector/Calibration and beam
-       * energy for the unknown spectrum.
+       * Allows the user to specify standard spectra for elements in the
+       * unknown.
        */
-      private final LazyEvaluate<STEMinSEMInstrumentPanel> jWizardPanel_STEMinSEMInstrument = new LazyEvaluate<>() {
-         @Override
-         protected STEMinSEMInstrumentPanel compute() {
-            return new STEMinSEMInstrumentPanel(QuantificationWizard.this);
+      private class SiSStandardPanel extends JWizardPanel {
+         static private final long serialVersionUID = 0x1286dea34234L;
+         static private final int SPECTRUM_COL = 0;
+         static private final int ELEMENT_COL = 1;
+         static private final int COMPOSITION_COL = 4;
+         private final double[] COL_WIDTHS = new double[]{0.20, 0.14, 0.16, 0.16, 0.17, 0.17};
+
+         private final class EditSpectrumPropertiesAction implements ActionListener {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+               editSpectrumProperties();
+            }
          }
-      };
+
+         private final class ClearPanelAction implements ActionListener {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+               clearPanel();
+            }
+         }
+
+         private final class RemoveRowAction implements ActionListener {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+               removeRow();
+            }
+         }
+
+         private final class AddRowFromDatabaseAction implements ActionListener {
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+               addRowFromDatabase();
+            }
+         }
+
+         private final class AddRowFromFileAction implements ActionListener {
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+               addRowFromSpectrumFile();
+            }
+         }
+
+         private final class AddRowFromStandardAction implements ActionListener {
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+               addRowFromStandard();
+            }
+         }
+
+         private final class EditMaterialAction extends AbstractAction {
+            final static private long serialVersionUID = 0x1;
+
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+               @SuppressWarnings("unchecked")
+               final JComboBox<Composition> src = (JComboBox<Composition>) ae.getSource();
+               // getWizard().clearMessageText();
+               final int r = jTable_Standards.getSelectedRow();
+               if (r == -1) {
+                  getWizard().setErrorText("No row selected.");
+                  return;
+               }
+               boolean isValid = (src.getSelectedIndex() < (src.getItemCount() - 1));
+               if (!isValid) {
+                  final Composition newMat = MaterialsCreator.createMaterial(getWizard(), DTSA2.getSession(), false);
+                  if (newMat != null) {
+                     final StringBuffer errs = null;
+                     isValid = newMat.containsElement(getElement(r));
+                     if (!isValid) {
+                        Toolkit.getDefaultToolkit().beep();
+                        getWizard().setExtendedError("Inappropriate standard.", "This material does not contain the specified element(s).");
+                        return;
+                     }
+                     final DefaultComboBoxModel<Composition> dcbm = (DefaultComboBoxModel<Composition>) src.getModel();
+                     dcbm.insertElementAt(newMat, src.getItemCount() - 1);
+                     jTableModel_Standards.setValueAt(newMat, r, COMPOSITION_COL);
+                     if (errs == null)
+                        getWizard().setMessageText("The composition has been set to " + newMat.toString());
+                  } else {
+                     final DefaultComboBoxModel<Composition> dcbm = (DefaultComboBoxModel<Composition>) src.getModel();
+                     jTableModel_Standards.setValueAt(dcbm.getElementAt(0), r, COMPOSITION_COL);
+                     getWizard().setMessageText("No material constructed.");
+                  }
+               }
+            }
+         }
+
+         DefaultTableModel jTableModel_Standards = new DefaultTableModel(
+               new Object[]{"Spectrum", "Element", "Probe Current", "Live time", "Composition", "Duane-Hunt"}, 0) {
+            static private final long serialVersionUID = 0xa34d643456L;
+
+            @Override
+            public boolean isCellEditable(int row, int col) {
+               return col == COMPOSITION_COL;
+            }
+         };
+         protected final JTable jTable_Standards = new JTable(jTableModel_Standards);
+         private EachRowEditor jEachRowEditor_Composition = new EachRowEditor(jTable_Standards);
+         protected JButton jButton_AddDatabase;
+         protected final Map<RegionOfInterest, ISpectrumData> mReferencePool = new TreeMap<>();
+
+         protected ISpectrumData getSpectrum(int r) {
+            return (ISpectrumData) jTableModel_Standards.getValueAt(r, SPECTRUM_COL);
+         }
+
+         protected Composition getComposition(int r) {
+            return (Composition) jTableModel_Standards.getValueAt(r, COMPOSITION_COL);
+         }
+
+         protected Element getElement(int r) {
+            return (Element) jTableModel_Standards.getValueAt(r, ELEMENT_COL);
+         }
+
+         protected Set<Element> usedElements() {
+            final Set<Element> elms = new HashSet<>();
+            for (int r = 0; r < jTableModel_Standards.getRowCount(); ++r)
+               elms.add(getElement(r));
+            return elms;
+         }
+
+         private void addRowFromSpectrumFile() {
+            final ISpectrumData[] specs = selectSpectra(true);
+            for (final ISpectrumData spec : specs) {
+               boolean open = true;
+               if (!SpectrumUtils.areCalibratedSimilar(STEMinSEMPath.this.getDetector().getProperties(), spec, AppPreferences.DEFAULT_TOLERANCE))
+                  open = (JOptionPane.showConfirmDialog(
+                        QuantificationWizard.this, "<html>The calibration of <i>" + spec.toString() + "</i><br>"
+                              + "does not seem to be similar to the unknown.<br><br>" + "Use it none the less?",
+                        "Spectrum open", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION);
+               if (open)
+                  addSpectrum(spec);
+            }
+         }
+
+         private void addRowFromStandard() {
+            final StandardBundle[] specs = selectStandardBundles(STEMinSEMPath.this.getDetector(), true);
+            for (final StandardBundle spec : specs) {
+               boolean open = true;
+               if (!SpectrumUtils.areCalibratedSimilar(STEMinSEMPath.this.getDetector().getProperties(), spec.getStandard(),
+                     AppPreferences.DEFAULT_TOLERANCE))
+                  open = (JOptionPane.showConfirmDialog(
+                        QuantificationWizard.this, "<html>The calibration of <i>" + spec.toString() + "</i><br>"
+                              + "does not seem to be similar to the unknown.<br><br>" + "Use it none the less?",
+                        "DTSA-II Standard Select", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION);
+               if (open)
+                  addSpectrum(spec);
+               mReferencePool.putAll(spec.getReferences());
+            }
+         }
+
+         protected RegionOfInterest bestMatch(RegionOfInterest roi, Set<RegionOfInterest> reqRefs) {
+            assert roi.getElementSet().size() == 1;
+            RegionOfInterest best = null;
+            double bestScore = 0.95;
+            for (RegionOfInterest reqRoi : reqRefs) {
+               assert reqRoi.getElementSet().size() == 1;
+               double score = score(reqRoi, roi);
+               if (score > bestScore) {
+                  bestScore = score;
+                  best = reqRoi;
+               }
+            }
+            return best;
+         }
+
+         private double score(RegionOfInterest roi1, RegionOfInterest roi2) {
+            final Set<XRayTransition> xrts1 = new TreeSet<>(roi1.getAllTransitions().getTransitions());
+            final XRayTransitionSet xrts2 = roi2.getAllTransitions();
+            double sum = 0.0, all = 0.0;
+            for (XRayTransition xrt : xrts2.getTransitions()) {
+               all += xrt.getNormalizedWeight();
+               if (xrts1.contains(xrt)) {
+                  sum += xrt.getNormalizedWeight();
+                  xrts1.remove(xrt);
+               }
+            }
+            for (XRayTransition xrt : xrts1)
+               all += xrt.getNormalizedWeight();
+            return sum / all;
+         }
+
+         private void addRowFromDatabase() {
+            if (mSession != null) {
+               final SelectElements se = new SelectElements(QuantificationWizard.this,
+                     "Select elements for which to select standards from the database");
+               se.setMultiSelect(true);
+               se.setLocationRelativeTo(QuantificationWizard.this);
+               se.setVisible(true);
+               final Collection<Element> elms = se.getElements();
+               final StringBuffer errs = new StringBuffer();
+               for (final Element elm : elms)
+                  try {
+                     final Collection<Session.SpectrumSummary> res = mSession.findStandards(STEMinSEMPath.this.getDetector().getDetectorProperties(),
+                           FromSI.keV(STEMinSEMPath.this.getBeamEnergy()), elm);
+                     final ResultDialog rd = new ResultDialog(QuantificationWizard.this, "Select a standard spectrum for " + elm.toString(), true);
+                     rd.setSingleSelect(true);
+                     rd.setLocationRelativeTo(QuantificationWizard.this);
+                     rd.setSpectra(res);
+                     if (rd.showDialog())
+                        addSpectrum(rd.getSpectra().get(0), elm, false);
+                     else
+                        errs.append("No standard selected for " + elm.toString() + "\n");
+                  } catch (final Exception e) {
+                     ErrorDialog.createErrorMessage(QuantificationWizard.this, "Select a standard spectrum for " + elm.toString(), e);
+                     errs.append(e.getMessage() + "\n");
+                  }
+               if (errs.length() > 0)
+                  getWizard().setExtendedError("There was at least one error while selecting standards", errs.toString());
+            }
+         }
+
+         private void addSpectrum(StandardBundle spec) {
+            addSpectrum(spec.getStandard(), spec.getElement(), true);
+         }
+
+         private void addSpectrum(ISpectrumData spec, Element stdElm, boolean isQuantified) {
+            final NumberFormat df = new HalfUpFormat("#0.0");
+            final SpectrumProperties sp = spec.getProperties();
+            // Check again to see whether the required properties are defined
+            if (!validateRequiredProperties(spec)) {
+               getWizard().setMessageText(spec + " is missing the probe current, live time and/or beam energy");
+               return;
+            }
+            final double e0 = ToSI.keV(sp.getNumericWithDefault(SpectrumProperties.BeamEnergy, Double.NaN));
+            assert !Double.isNaN(e0);
+            if (Math.abs(e0 - STEMinSEMPath.this.getBeamEnergy()) > ToSI.keV(0.1)) {
+               final String message = "The beam energy of the selected spectrum (" + df.format(FromSI.keV(e0)) + " keV) does\n"
+                     + "not match the beam energy of the previously selected spectra.  It is a bad\n"
+                     + "idea to mix beam energies. Use this spectrum none-the-less?";
+               final String title = "Beam energy mismatch";
+               final int answer = JOptionPane.showConfirmDialog(this, message, title, JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+               if (answer == JOptionPane.NO_OPTION)
+                  return;
+            }
+            final Composition comp = sp.getCompositionWithDefault(SpectrumProperties.StandardComposition, Material.Null);
+            addRow(spec, comp, stdElm);
+         }
+
+         private void addSpectrum(ISpectrumData spec) {
+            final SpectrumProperties sp = spec.getProperties();
+            final Composition comp = sp.getCompositionWithDefault(SpectrumProperties.StandardComposition, Material.Null);
+            // Get the element(s) for which this spectrum is a standard
+            final SelectElements se = new SelectElements(QuantificationWizard.this,
+                  "Select the element(s) for which " + spec.toString() + " is a standard.");
+            Set<Element> elms = null;
+            if (!comp.equals(Material.Null)) {
+               final Set<Element> used = usedElements();
+               final Set<Element> avail = new TreeSet<>(comp.getElementSet());
+               avail.removeAll(used);
+               if (avail.size() == 0) {
+                  JOptionPane.showMessageDialog(getWizard(), "The spectrum " + spec.toString() + " can not act as standard for any unused elements.",
+                        "Standard redundancy", JOptionPane.INFORMATION_MESSAGE);
+                  return;
+               } else if (avail.size() == 1) {
+                  elms = new TreeSet<>();
+                  elms.addAll(avail);
+               } else {
+                  se.enableAll(false);
+                  for (final Element elm : avail)
+                     se.setEnabled(elm, true);
+               }
+            } else {
+               se.enableAll(true);
+               for (final Element elm : usedElements())
+                  se.setEnabled(elm, false);
+            }
+            if (elms == null) {
+               getWizard().centerDialog(se);
+               se.setVisible(true);
+               elms = se.getElements();
+            }
+            for (Element elm : elms)
+               addSpectrum(spec, elm, true);
+         }
+
+         protected void addRow(ISpectrumData spec, Composition comp, Element elm) {
+            final SpectrumProperties sp = spec.getProperties();
+            final double fc = SpectrumUtils.getAverageFaradayCurrent(sp, Double.NaN);
+            final double lt = sp.getNumericWithDefault(SpectrumProperties.LiveTime, Double.NaN);
+            final NumberFormat nf1 = new HalfUpFormat("0.0");
+            final NumberFormat nf3 = new HalfUpFormat("0.000");
+            final double dh = FromSI.keV(DuaneHuntLimit.DefaultDuaneHunt.compute(spec));
+            final double e0 = sp.getNumericWithDefault(SpectrumProperties.BeamEnergy, Double.NaN);
+            sp.setNumericProperty(SpectrumProperties.DuaneHunt, dh);
+            jTableModel_Standards.addRow(new Object[]{spec, elm, nf3.format(fc), nf1.format(lt), comp,
+                  (duaneHuntThreshold(dh, e0) ? nf3.format(dh) : "<html><font color=red>" + nf3.format(dh) + "</font>")});
+            final int row = jTableModel_Standards.getRowCount() - 1;
+            final JComboBox<Composition> cb = new JComboBox<>();
+            Composition first = null;
+            if (!comp.equals(Material.Null)) {
+               cb.addItem(comp);
+               first = comp;
+            }
+            final ArrayList<Composition> refs = new ArrayList<>(MaterialFactory.getCommonStandards(elm));
+            if ((refs.size() == 0) && (first == null)) {
+               final Composition mat = MaterialsCreator.createMaterial(getWizard(), DTSA2.getSession(), false);
+               if ((mat != null) && (!mat.equals(Material.Null)))
+                  refs.add(mat);
+            }
+            for (final Composition ref : refs) {
+               cb.addItem(ref);
+               if (first == null)
+                  first = ref;
+            }
+            cb.addItem(NEW_MATERIAL);
+            cb.addActionListener(new EditMaterialAction());
+            if (first != null)
+               cb.setSelectedItem(first);
+            jEachRowEditor_Composition.setEditorAt(row, new DefaultCellEditor(cb));
+            jTableModel_Standards.setValueAt(first, row, COMPOSITION_COL);
+            jTable_Standards.setRowSelectionInterval(row, row);
+            getWizard().setMessageText(spec.toString() + " assigned as a standard for " + getElement(row));
+         }
+
+         private void removeRow() {
+            final int r = jTable_Standards.getSelectedRow();
+            if (r >= 0) {
+               jTableModel_Standards.removeRow(r);
+               jEachRowEditor_Composition.removeEditor(r);
+            }
+         }
+
+         private void editSpectrumProperties() {
+            final int r = jTable_Standards.getSelectedRow();
+            if (r >= 0) {
+               final Object obj = jTableModel_Standards.getValueAt(r, 0);
+               if (obj instanceof ISpectrumData) {
+                  final ISpectrumData spec = (ISpectrumData) obj;
+                  final SpectrumPropertyPanel.PropertyDialog pd = new SpectrumPropertyPanel.PropertyDialog(QuantificationWizard.this, mSession);
+                  pd.setLocationRelativeTo(QuantificationWizard.this);
+                  pd.addSpectrumProperties(spec.getProperties());
+                  pd.setVisible(true);
+                  if (pd.isOk()) {
+                     jTableModel_Standards.setValueAt(spec, r, 0);
+                     final SpectrumProperties newProps = pd.getSpectrumProperties();
+                     final SpectrumProperties sp = spec.getProperties();
+                     sp.addAll(pd.getSpectrumProperties());
+                     if (newProps.getDetector() instanceof EDSDetector)
+                        jTableModel_Standards.setValueAt(spec, r, 0);
+                     final double fc = SpectrumUtils.getAverageFaradayCurrent(sp, Double.NaN);
+                     final double lt = sp.getNumericWithDefault(SpectrumProperties.LiveTime, Double.NaN);
+                     final NumberFormat nf1 = new HalfUpFormat("0.0");
+                     final NumberFormat nf3 = new HalfUpFormat("0.000");
+                     jTableModel_Standards.setValueAt(nf3.format(fc), r, 2);
+                     jTableModel_Standards.setValueAt(nf1.format(lt), r, 3);
+                  }
+               }
+            }
+         }
+
+         private void clearPanel() {
+            getWizard().clearMessageText();
+            jTableModel_Standards.setRowCount(0);
+            jEachRowEditor_Composition = new EachRowEditor(jTable_Standards);
+         }
+
+         protected SiSStandardPanel(JWizardDialog wiz, JQuantPath path) {
+            super(wiz, "Select standards", new FormLayout("270dlu, 5dlu, pref", "top:140dlu"));
+            mPath = path;
+            try {
+               initialize();
+            } catch (final RuntimeException e) {
+            }
+         }
+
+         private void initialize() {
+            // jTable_Standards.setForeground(SystemColor.textText);
+            {
+               final TableColumnModel cm = jTable_Standards.getColumnModel();
+               final int total = cm.getTotalColumnWidth();
+               assert COL_WIDTHS.length == cm.getColumnCount();
+               for (int i = 0; i < COL_WIDTHS.length; ++i)
+                  cm.getColumn(i).setPreferredWidth((int) Math.round(COL_WIDTHS[i] * total));
+            }
+            // jTable_Standards.getColumnModel().getColumn(0).
+            final JScrollPane pane = new JScrollPane(jTable_Standards);
+            jTable_Standards.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+            jTable_Standards.getColumnModel().getColumn(COMPOSITION_COL).setCellEditor(jEachRowEditor_Composition);
+            final CellConstraints cc = new CellConstraints();
+            add(pane, cc.xy(1, 1));
+            {
+               final JPanel btnPanel = new JPanel(new FormLayout("pref", "pref, 3dlu, pref, 3dlu, pref, 15dlu, pref, 3dlu, pref, 15dlu, pref"));
+
+               final JButton std = new JButton("Standard..");
+               std.setToolTipText("Select a \"Standard Bundle\" from which to load an elemental standard and references.");
+               std.addActionListener(new AddRowFromStandardAction());
+               btnPanel.add(std, cc.xy(1, 1));
+
+               final JButton add = new JButton("Spectrum..");
+               add.setToolTipText("Select a spectrum from a file to serve as an elemental standard.");
+               add.addActionListener(new AddRowFromFileAction());
+               btnPanel.add(add, cc.xy(1, 3));
+
+               jButton_AddDatabase = new JButton("Database..");
+               jButton_AddDatabase.setToolTipText("Select a spectrum from the database to serve as an elemental standard.");
+               jButton_AddDatabase.addActionListener(new AddRowFromDatabaseAction());
+               btnPanel.add(jButton_AddDatabase, cc.xy(1, 5));
+
+               final JButton remove = new JButton("Remove");
+               remove.setToolTipText("Remove the selected spectrum or spectra from the list of elemental standards.");
+               remove.addActionListener(new RemoveRowAction());
+               btnPanel.add(remove, cc.xy(1, 7));
+
+               final JButton clear = new JButton("Clear");
+               clear.setToolTipText("Clear all spectra from the standards list.");
+               clear.addActionListener(new ClearPanelAction());
+               btnPanel.add(clear, cc.xy(1, 9));
+
+               final JButton edit = new JButton("Properties");
+               edit.setToolTipText("Edit the spectrum properties.");
+               edit.addActionListener(new EditSpectrumPropertiesAction());
+               btnPanel.add(edit, cc.xy(1, 11));
+
+               add(btnPanel, cc.xy(3, 1));
+            }
+         }
+
+         @Override
+         public boolean permitNext() {
+            try {
+               if (jTable_Standards.getRowCount() > 0) {
+                  final TableModel tm = jTable_Standards.getModel();
+                  mSTEMinSEMQuant = new QuantifyUsingSTEMinSEM(STEMinSEMPath.this.getDetector(), STEMinSEMPath.this.getBeamEnergy());
+                  for (int r = 0; r < tm.getRowCount(); ++r) {
+                     final Element elm = getElement(r);
+                     final ISpectrumData spec = getSpectrum(r);
+                     if (spec == null) {
+                        getWizard().setErrorText("Specify a spectrum in row " + Integer.toString(r + 1));
+                        return false;
+                     }
+                     final Composition comp = getComposition(r);
+                     final boolean valid = comp.containsElement(elm);
+                     if (!valid) {
+                        getWizard().setErrorText("The material in row " + Integer.toString(r + 1) + " does not contain " + elm.toString());
+                        return false;
+                     }
+                     try {
+                        mSTEMinSEMQuant.addStandard(elm, comp, spec);
+                     } catch (final EPQException e) {
+                        getWizard().setErrorText("ERROR: " + e.getMessage());
+                        return false;
+                     }
+                  }
+                  return true;
+               }
+            } catch (final Exception e) {
+               getWizard().setExceptionText("Fix the error in this table.", e);
+            }
+            return false;
+         }
+
+         @Override
+         public void onShow() {
+            assert QuantificationWizard.this.mQuantMode == QuantMode.STEMinSEM;
+            assert STEMinSEMPath.this.getBeamEnergy() > ToSI.keV(0.1);
+            assert STEMinSEMPath.this.getBeamEnergy() < ToSI.keV(500.0);
+            jButton_AddDatabase.setEnabled(mSession != null);
+            // Clear and reenter all data in this panel...
+            jTableModel_Standards.setRowCount(0);
+            final Map<Element, ISpectrumData> stds = mSTEMinSEMQuant.getStandardSpectra();
+            for (final ISpectrumData std : new TreeSet<>(stds.values())) {
+               final Set<Element> elms = new TreeSet<>();
+               for (final Map.Entry<Element, ISpectrumData> me : stds.entrySet())
+                  if (me.getValue() == std)
+                     elms.add(me.getKey());
+               final Composition comp = std.getProperties().getCompositionWithDefault(SpectrumProperties.StandardComposition, null);
+               assert comp != null : "Composition not set in onShow";
+               for (Element elm : elms)
+                  addRow(std, comp, elm);
+            }
+            setMessageText("Specify standard spectra and the associated elements and compositions.");
+            setNextPanel(jWizardPanel_LayerSelection.get());
+            enableFinish(false);
+         }
+      }
 
       public class STEMinSEMInstrumentPanel extends GenericInstrumentPanel {
 
@@ -3796,8 +4258,8 @@ public class QuantificationWizard extends JWizardDialog {
                   final EDSDetector det = buildDetector();
                   final double beamEnergy = ToSI.keV(getBeamEnergy_keV());
                   mSTEMinSEMQuant = new QuantifyUsingSTEMinSEM(det, beamEnergy);
-                  STEMinSEMPath.this.mBeamEnergy= beamEnergy;
-                  STEMinSEMPath.this.mDetector=det;
+                  STEMinSEMPath.this.mBeamEnergy = beamEnergy;
+                  STEMinSEMPath.this.mDetector = det;
                } catch (EPQException e) {
                   res = false;
                   e.printStackTrace();
@@ -3817,18 +4279,202 @@ public class QuantificationWizard extends JWizardDialog {
          }
       }
 
-      private final LazyEvaluate<STEMinSEMStandardPanel> jWizardPanel_STEMinSEMStandard = new LazyEvaluate<>() {
+      private class LayerSelectionPanel extends JWizardPanel {
+
+         private static final long serialVersionUID = -1078123954283293363L;
+
+         private final JTable jTable_Layer = new JTable();
+         private DefaultTableModel jTableModel_Layer;
+         private Map<Element, Integer> mLayers = null;
+         EachRowEditor mLayerEditor;
+
+         private final static String[] COLUMN_NAMES = new String[]{"Element", "Layer"};
+
+         public LayerSelectionPanel(JWizardDialog wiz) {
+            super(wiz, "Assign elements to layers");
+            mLayers = new HashMap<Element, Integer>();
+            mLayerEditor = new EachRowEditor(jTable_Layer);
+            PanelBuilder pb = new PanelBuilder(new FormLayout("150dlu", "150dlu"));
+            pb.add(new JScrollPane(jTable_Layer), CC.rc(1, 1));
+            this.add(pb.getPanel());
+         }
+
+         private String layerToString(int val) {
+            return val <= 0 ? "Stripped" : Integer.toString(val);
+         }
+
+         private int stringToLayer(String str) {
+            return str == "Stripped" ? 0 : Integer.parseInt(str);
+         }
 
          @Override
-         protected STEMinSEMStandardPanel compute() {
-            return new STEMinSEMStandardPanel(QuantificationWizard.this);
+         public void onShow() {
+            Set<Element> elms = STEMinSEMPath.this.mSTEMinSEMQuant.getFitSpectra().keySet();
+            for (Element elm : new HashSet<>(mLayers.keySet()))
+               if (!elms.contains(elm))
+                  mLayers.remove(elm);
+            for (Element elm : elms)
+               if (!mLayers.containsKey(elm))
+                  mLayers.put(elm, 1);
+            jTableModel_Layer = new DefaultTableModel(COLUMN_NAMES, 0);
+            for (Element elm : elms)
+               jTableModel_Layer.addRow(new Object[]{elm, layerToString(mLayers.get(elm))});
+            Vector<String> items = new Vector<>();
+            for (int i = 0; i <= mLayers.size(); ++i)
+               items.add(layerToString(i));
+            JComboBox<String> jcb = new JComboBox<>(items);
+            mLayerEditor.setDefaultEditor(jcb);
+            jTable_Layer.setModel(jTableModel_Layer);
+            jTable_Layer.getColumnModel().getColumn(1).setCellEditor(mLayerEditor);
+            getWizard().setNextPanel(jWizardPanel_Results.get());
+         }
+
+         @Override
+         public boolean permitNext() {
+            final int len = jTable_Layer.getRowCount();
+            final int[] assigned = new int[len + 1];
+            Map<Element, Integer> layers = new HashMap<>();
+            for (int row = 0; row < len; ++row) {
+               Element elm = (Element) jTableModel_Layer.getValueAt(row, 0);
+               int layer = stringToLayer((String) jTableModel_Layer.getValueAt(row, 1));
+               assigned[layer]++;
+               layers.put(elm, layer);
+            }
+            if (assigned[0] == len) {
+               getWizard().setErrorText("All elements are being stripped.");
+               return false; // All stripped
+            }
+            int sum = 0;
+            for (int i = assigned.length - 1; i >= 1; i--) {
+               if ((sum > 0) && (assigned[i] == 0)) {
+                  getWizard().setErrorText("Layer " + i + " is not assigned any elements. Don't skip a layer.");
+                  return false; // Missing layer
+               }
+               sum += assigned[i];
+            }
+            getWizard().setMessageText("");
+            mLayers.clear();
+            mLayers.putAll(layers);
+            STEMinSEMPath.this.mSTEMinSEMQuant.setLayers(mLayers);
+            return true;
+         }
+      };
+
+      private class ResultPanel extends JWizardPanel {
+
+         private static final long serialVersionUID = -5238531341629556061L;
+
+         private static final String[] COLUMN_NAMES = new String[]{"Spectrum", "Layer", "Mass-Thickness", "Element", "Mass-fraction"};
+         private static final double[] COLUMN_WIDTHS = new double[]{0.45, 0.10, 0.15, 0.15, 0.15};
+
+         private final JTable jTable_Results = new JTable();
+         private final DefaultTableModel jTableModel = new DefaultTableModel(COLUMN_NAMES, 0);
+
+         public ResultPanel(JWizardDialog wiz) {
+            super(wiz, "STEM-in-SEM results");
+            PanelBuilder pb = new PanelBuilder(new FormLayout("250dlu", "150dlu"));
+            pb.add(new JScrollPane(jTable_Results), CC.rc(1, 1));
+            jTable_Results.setModel(jTableModel);
+            this.add(pb.getPanel());
+            {
+               final TableColumnModel cm = jTable_Results.getColumnModel();
+               final int total = cm.getTotalColumnWidth();
+               assert COLUMN_WIDTHS.length == cm.getColumnCount();
+               for (int i = 0; i < COLUMN_WIDTHS.length; ++i)
+                  cm.getColumn(i).setPreferredWidth((int) Math.round(COLUMN_WIDTHS[i] * total));
+            }
+         }
+
+         @Override
+         public void onShow() {
+            StringBuilder sb = new StringBuilder();
+            mProcessedSpectra = new ArrayList<>(mInputSpectra);
+            jTableModel.setRowCount(0);
+            mResults = new ArrayList<>();
+            QuantificationWizard.this.mResultSpectra.clear();
+            DecimalFormat df1 = new DecimalFormat("0.0");
+            DecimalFormat df2 = new DecimalFormat("0.000");
+            setMessageText("Mass-thickness is in µg/cm² (1  µg/cm² = 10 nm/(g/cm³))");
+            for (ISpectrumData spec : QuantificationWizard.this.mProcessedSpectra)
+               try {
+                  Result res = mSTEMinSEMQuant.compute(spec);
+                  mResults.add(res);
+                  QuantificationWizard.this.mResultSpectra.add(res.getResidual());
+                  SpectrumProperties sp = spec.getProperties();
+                  List<Pair<Composition, Double>> lyrs = res.getLayers();
+                  if (lyrs.size() == 1) {
+                     sp.setObjectProperty(SpectrumProperties.MicroanalyticalComposition, lyrs.get(0).first);
+                     sp.setNumericProperty(SpectrumProperties.MassThickness, lyrs.get(0).second * 1.0e5);
+                  } else {
+                     sp.remove(SpectrumProperties.MicroanalyticalComposition);
+                     sp.remove(SpectrumProperties.MassThickness);
+                  }
+                  sp.setObjectProperty(SpectrumProperties.MultiLayerMeasurement, res);
+                  int layer = 1;
+                  for (Pair<Composition, Double> lyr : lyrs) {
+                     final Composition comp = lyr.first;
+                     for (Element elm : comp.getElementSet()) {
+                        jTableModel.addRow(new Object[]{ //
+                              spec.toString(), //
+                              Integer.valueOf(layer), //
+                              df1.format(lyr.second * 1.0e5), // µg/cm^2
+                              elm.toAbbrev(), //
+                              df2.format(comp.weightFraction(elm, false)) // mass-fraction
+                        });
+                        ++layer;
+                     }
+                  }
+               } catch (EPQException e) {
+                  sb.append(e.getMessage());
+               }
+            setNextPanel(null);
+            getWizard().enableFinish(true);
+         }
+
+         @Override
+         public boolean permitNext() {
+
+            return true;
+         }
+
+      };
+
+      /**
+       * Allows the user to specify an Instrument, Detector/Calibration and beam
+       * energy for the unknown spectrum.
+       */
+      private final LazyEvaluate<STEMinSEMInstrumentPanel> jWizardPanel_STEMinSEMInstrument = new LazyEvaluate<>() {
+         @Override
+         protected STEMinSEMInstrumentPanel compute() {
+            return new STEMinSEMInstrumentPanel(QuantificationWizard.this);
+         }
+      };
+
+      private final LazyEvaluate<SiSStandardPanel> jWizardPanel_STEMinSEMStandard = new LazyEvaluate<>() {
+
+         @Override
+         protected SiSStandardPanel compute() {
+            return new SiSStandardPanel(QuantificationWizard.this, STEMinSEMPath.this);
+         }
+      };
+
+      private final LazyEvaluate<LayerSelectionPanel> jWizardPanel_LayerSelection = new LazyEvaluate<>() {
+         protected LayerSelectionPanel compute() {
+            return new LayerSelectionPanel(QuantificationWizard.this);
+         }
+      };
+
+      private final LazyEvaluate<ResultPanel> jWizardPanel_Results = new LazyEvaluate<>() {
+         protected ResultPanel compute() {
+            return new ResultPanel(QuantificationWizard.this);
          }
       };
 
       @Override
       public String toHTML() {
-         // TODO Auto-generated method stub
-         return null;
+         return mSTEMinSEMQuant.toHTML() + //
+               "<h2>Results</h2>" + //
+               Result.toHTML(mResults);
       }
 
       @Override
@@ -3859,6 +4505,9 @@ public class QuantificationWizard extends JWizardDialog {
    private QuantMode mQuantMode = QuantMode.NONE;
    private JWizardPath mPath = null;
 
+   private final ArrayList<ISpectrumData> mInputSpectra;
+
+   private ArrayList<ISpectrumData> mProcessedSpectra;
    // Result data items
    private final ArrayList<ISpectrumData> mResultSpectra = new ArrayList<>();
 
@@ -3869,8 +4518,9 @@ public class QuantificationWizard extends JWizardDialog {
     *
     * @param owner
     */
-   public QuantificationWizard(Frame owner) {
+   public QuantificationWizard(Frame owner, Collection<ISpectrumData> spectra) {
       super(owner, "Quantification Alien", true);
+      mInputSpectra = new ArrayList<>(spectra);
       try {
          initialize();
          pack();
@@ -3964,7 +4614,7 @@ public class QuantificationWizard extends JWizardDialog {
             mPath = null;
             mQuantMode = QuantMode.NONE;
          }
-         if(mPath!=null)
+         if (mPath != null)
             getWizard().setNextPanel(mPath.firstPanel());
       }
 
@@ -3990,8 +4640,8 @@ public class QuantificationWizard extends JWizardDialog {
          group.add(jRadioButton_MLSQ);
          group.add(jRadioButton_STEM);
          group.add(jRadioButton_STEMinSEM);
-         
-         jRadioButton_STEMinSEM.setEnabled(false);
+
+         // jRadioButton_STEMinSEM.setEnabled(false);
 
          jRadioButton_KRatio.setToolTipText(
                "<html>You will be asked to manually enter the composition<br>of standard materials and the associated k-ratios.<br>The k-ratios will be corrected for matrix effects.");
@@ -4044,7 +4694,7 @@ public class QuantificationWizard extends JWizardDialog {
       private final JWizardPanel mNext;
 
       public GenericInstrumentPanel(JWizardDialog wiz, JWizardPanel next) {
-         super(wiz,"Specify instrumental paramters");
+         super(wiz, "Specify instrumental paramters");
          mNext = next;
          try {
             initialize();
@@ -4107,7 +4757,7 @@ public class QuantificationWizard extends JWizardDialog {
             DetectorCalibration defCal = null;
             if (defProps != null) {
                defCal = mSession.getMostRecentCalibration(defProps);
-               for (final ISpectrumData spec : DataManager.getInstance().getSelected())
+               for (final ISpectrumData spec : mInputSpectra)
                   if (spec.getProperties().getDetector() instanceof EDSDetector) {
                      final EDSDetector det = (EDSDetector) spec.getProperties().getDetector();
                      defProps = det.getDetectorProperties();
@@ -4482,7 +5132,7 @@ public class QuantificationWizard extends JWizardDialog {
          final double e0 = sp.getNumericWithDefault(SpectrumProperties.BeamEnergy, Double.NaN);
          sp.setNumericProperty(SpectrumProperties.DuaneHunt, dh);
          jTableModel_Standards.addRow(new Object[]{spec, elm, nf3.format(fc), nf1.format(lt), comp, new ElementSet(strip),
-               (duaneHuntThreshold(dh, e0) ?  nf3.format(dh) : "<html><font color=red>" + nf3.format(dh) + "</font>") });
+               (duaneHuntThreshold(dh, e0) ? nf3.format(dh) : "<html><font color=red>" + nf3.format(dh) + "</font>")});
          final int row = jTableModel_Standards.getRowCount() - 1;
          final JComboBox<Composition> cb = new JComboBox<>();
          Composition first = null;
@@ -4614,15 +5264,14 @@ public class QuantificationWizard extends JWizardDialog {
          }
       }
    }
-   
+
    protected void initialize() throws Exception {
       setActivePanel(jWizardPanel_Intro.get());
       pack();
       {
          mDefaultBeamEnergy = ToSI.keV(20.0);
-         final Iterator<ISpectrumData> i = DataManager.getInstance().getSelected().iterator();
-         if (i.hasNext())
-            mDefaultBeamEnergy = ToSI.eV(SpectrumUtils.getBeamEnergy(i.next()));
+         if (mInputSpectra.size() > 0)
+            mDefaultBeamEnergy = ToSI.eV(SpectrumUtils.getBeamEnergy(mInputSpectra.get(0)));
       }
    }
 

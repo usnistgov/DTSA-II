@@ -3,17 +3,17 @@
   <dontWrapJar>true</dontWrapJar>
   <headerType>gui</headerType>
   <jar>relocate.jar</jar>
-  <outfile>C:\Users\nritchie\git\nist-dtsa-ii\Installer\DTSA-II Build\Relocate.exe</outfile>
+  <outfile>C:\Users\nritchie\repositories\DTSA-II\Installer\DTSA-II Build\Relocate.exe</outfile>
   <errTitle></errTitle>
   <cmdLine></cmdLine>
   <chdir>.</chdir>
   <priority>normal</priority>
-  <downloadUrl>https://docs.aws.amazon.com/corretto/latest/corretto-11-ug/downloads-list.html</downloadUrl>
+  <downloadUrl>https://adoptium.net/temurin/releases/?version=JDK_VERSION</downloadUrl>
   <supportUrl></supportUrl>
   <stayAlive>false</stayAlive>
   <restartOnCrash>false</restartOnCrash>
   <manifest></manifest>
-  <icon>C:\Users\nritchie\git\epq\relocate.ico</icon>
+  <icon>C:\Users\nritchie\repositories\epq\relocate.ico</icon>
   <jre>
     <path>java-runtime</path>
     <bundledJre64Bit>true</bundledJre64Bit>

@@ -4,7 +4,7 @@
     xsi:schemaLocation="http://izpack.org/schema/installation http://izpack.org/schema/5.0/izpack-installation-5.0.xsd">
     <!-- The script doesn't work within Eclipse but can be build from the command line 
     > c:
-    > cd C:\Users\nritchie\git\nist-dtsa-ii\Installer
+    > cd C:\Users\nritchie\repositories\DTSA-II\Installer
     >"C:\Program Files (x86)\IzPack\bin\compile.bat" -h ${IZPACK_HOME} izPack_install_full.xml -b . -o dtsa2_neptune_full.jar -k standard 
     -->
     <variables>

@@ -69,7 +69,7 @@
                   description="Coordinate translation tool">
             <createForPack name="NIST Relocate Application"/>
         </shortcut>
-        <shortcut name="NIST Glass Database 1.2" 
+        <shortcut name="NIST Glass Database 1.4" 
                   target="java -jar $INSTALL_PATH/NISTGlassDB.jar"
                   workingDirectory="$INSTALL_PATH"
                   startMenu="true"
