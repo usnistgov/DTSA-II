@@ -68,8 +68,6 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 
-import org.python.core.stringlib.InternalFormat.Spec;
-
 import com.jgoodies.forms.builder.ButtonStackBuilder;
 import com.jgoodies.forms.builder.PanelBuilder;
 import com.jgoodies.forms.factories.CC;
@@ -1206,7 +1204,7 @@ public class QuantificationWizard extends JWizardDialog {
          return jWizardPanel_Conditions.get();
       }
 
-   };
+   }
 
    private class LLSQPath extends JQuantPath {
 
@@ -1332,7 +1330,7 @@ public class QuantificationWizard extends JWizardDialog {
             enableFinish(false);
          }
 
-      };
+      }
 
       /**
        * Allows the user to specify reference spectra for element in the
@@ -2735,7 +2733,7 @@ public class QuantificationWizard extends JWizardDialog {
       public JWizardPanel firstPanel() {
          return this.jWizardPanel_LLSQInstrument.get();
       }
-   };
+   }
 
    private class STEMPath extends JQuantPath {
 
@@ -4292,7 +4290,7 @@ public class QuantificationWizard extends JWizardDialog {
 
          public LayerSelectionPanel(JWizardDialog wiz) {
             super(wiz, "Assign elements to layers");
-            mLayers = new HashMap<Element, Integer>();
+            mLayers = new HashMap<>();
             mLayerEditor = new EachRowEditor(jTable_Layer);
             PanelBuilder pb = new PanelBuilder(new FormLayout("150dlu", "150dlu"));
             pb.add(new JScrollPane(jTable_Layer), CC.rc(1, 1));
@@ -4358,7 +4356,7 @@ public class QuantificationWizard extends JWizardDialog {
             STEMinSEMPath.this.mSTEMinSEMQuant.setLayers(mLayers);
             return true;
          }
-      };
+      }
 
       private class ResultPanel extends JWizardPanel {
 
@@ -4421,8 +4419,9 @@ public class QuantificationWizard extends JWizardDialog {
                               elm.toAbbrev(), //
                               df2.format(comp.weightFraction(elm, false)) // mass-fraction
                         });
-                        ++layer;
                      }
+
+                     ++layer;
                   }
                } catch (EPQException e) {
                   sb.append(e.getMessage());
@@ -4437,7 +4436,7 @@ public class QuantificationWizard extends JWizardDialog {
             return true;
          }
 
-      };
+      }
 
       /**
        * Allows the user to specify an Instrument, Detector/Calibration and beam
@@ -4482,7 +4481,7 @@ public class QuantificationWizard extends JWizardDialog {
          return jWizardPanel_STEMinSEMInstrument.get();
       }
 
-   };
+   }
 
    static private final Composition NEW_MATERIAL = createNewMaterial();
 
@@ -4500,7 +4499,7 @@ public class QuantificationWizard extends JWizardDialog {
 
    enum QuantMode {
       NONE, MLSQ, KRATIO, ZETAFACTOR, STEMinSEM
-   };
+   }
 
    private QuantMode mQuantMode = QuantMode.NONE;
    private JWizardPath mPath = null;
@@ -5287,7 +5286,7 @@ public class QuantificationWizard extends JWizardDialog {
    /**
     * Get the results of the quantitative analysis in HTML form suitable for
     * presenting in the report.
-    * 
+    *
     * @return String containing HTML
     */
    public String getResultHTML() {
