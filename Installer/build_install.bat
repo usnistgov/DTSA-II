@@ -1,5 +1,5 @@
-set "D2V=2023-03-10"
-set "NUM_VER=14.0.18.0"
+set "D2V=2023-03-21"
+set "NUM_VER=14.0.21.0"
 set "JDK_VER=19"
 set "BPATH=C:\Users\nritchie\repositories"
 set "NAME_VER=neptune"
@@ -65,5 +65,7 @@ del "%BPATH%\DTSA-II\Installer\izPack_install_nojre.xml"
 copy dtsa2_%NAME_VER%.jar "V:\internal\643_violet\DTSA-II Latest"
 copy dtsa2_%NAME_VER%_nojre.jar "V:\internal\643_violet\DTSA-II Latest"
 copy dtsa2_%NAME_VER%_full.jar "V:\internal\643_violet\DTSA-II Latest"
+copy dtsa2_%NAME_VER%.jar "V:\internal\643_violet\DTSA-II Latest\dtsa2_prerelease.jar"
+copy dtsa2_%NAME_VER%_nojre.jar "V:\internal\643_violet\DTSA-II Latest\dtsa2_prerelease_nojre.jar"
 
 cd %BPATH%\DTSA-II\Installer

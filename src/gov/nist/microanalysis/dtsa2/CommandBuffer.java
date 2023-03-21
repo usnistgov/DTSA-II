@@ -47,7 +47,7 @@ public class CommandBuffer {
       int idx = mBuffer.indexOf(cmd);
       if (idx == -1) {
          mBuffer.add(cmd);
-         idx = mBuffer.size();
+         mIndex = mBuffer.size();
       } else
          mIndex = idx;
    }

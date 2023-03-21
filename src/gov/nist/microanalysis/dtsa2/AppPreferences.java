@@ -1818,9 +1818,15 @@ public class AppPreferences {
 			break;
 		case FlatLight:
 			UIManager.setLookAndFeel(new FlatLightLaf());
+         UIManager.put("Table.showHorizontalLines", Boolean.TRUE);
+         UIManager.put("Table.showVerticalLines", Boolean.TRUE);
+         UIManager.put( "TabbedPane.selectedBackground", Color.white );
 			break;
 		case FlatMacLightLaf:
 		   UIManager.setLookAndFeel(new FlatMacLightLaf());
+         UIManager.put("Table.showHorizontalLines", Boolean.TRUE);
+         UIManager.put("Table.showVerticalLines", Boolean.TRUE);
+         UIManager.put( "TabbedPane.selectedBackground", Color.white );
 		   break;
 		case FlatMacDarkLaf:
          UIManager.setLookAndFeel(new FlatMacDarkLaf());
