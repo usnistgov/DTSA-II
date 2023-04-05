@@ -49,7 +49,7 @@ public class CommandBuffer {
          mBuffer.add(cmd);
          mIndex = mBuffer.size();
       } else
-         mIndex = idx;
+         mIndex = idx + 1;
    }
 
    public String previous() {
@@ -58,8 +58,9 @@ public class CommandBuffer {
    }
 
    public String next() {
+      final String res = current();
       mIndex = Math.min(mBuffer.size(), mIndex + 1);
-      return current();
+      return res;
    }
 
    public String current() {
