@@ -5,8 +5,19 @@
 # Modified: 11-July-2022
 # Set the SITE to account for site specific hardware variations
 from gov.nist.microanalysis.EPQLibrary import SpectrumProperties
-NIST, MCCRONE, PNNL, PAS, AEM, ORNL, SRNL, PLEASANTON, WARRENDALE = ( "NIST", "McCRONE", "PNNL", "PAS", "AEM", "ORNL", "SRNL", "PLEASANTON", "WARRENDALE" )
-SITE = NIST
+NIST, MCCRONE, PNNL, PAS, AEM, ORNL, SRNL, PLEASANTON, WARRENDALE, GRYPHON = ( "NIST", "McCRONE", "PNNL", "PAS", "AEM", "ORNL", "SRNL", "PLEASANTON", "WARRENDALE", "Gryphon" )
+SITE = GRYPHON # SET THE SITE!!!!!!
+
+if SITE==GRYPHON:
+	_COMPANY_ = "Valecitos Laboratory"
+	_INSTRUMENT_ = "TESCAN MIRA3 LMU S/N ?"
+elif SITE==NIST:
+	_COMPANY_ = "DOC NIST MML - 637.02"
+	_INSTRUMENT_ = "TESCAN MIRA3 LMU S/N MI 0791077US"
+else:
+	print "Please set the _COMPANY_ and _INSTRUMENT_ variables"
+	_COMPANY = "Unknown"
+	_INSTRUMENT_="TESCAN MIRA3 LMU S/N ?"
 
 if (SITE == NIST) and (jl.System.getProperty('sun.java.command') == u'gov.nist.microanalysis.dtsa2.DTSA2'):
 	print "JAR paths based on workspace."
@@ -78,7 +89,7 @@ defaultArchivePath = None
 if SITE==NIST:
 	rootPath = "D:"
 	defaultArchivePath = "P:"
-elif (SITE==PNNL) or (SITE==PAS) or (SITE==AEM):
+elif (SITE==PNNL) or (SITE==PAS) or (SITE==AEM) or (SITE==GRYPHON):
 	rootPath = "C:\\Users\\Tescan\\My Documents\\Data"
 elif SITE==ORNL:
 	rootPath = "C:\\Users\\Tescan\\Data"
@@ -122,19 +133,11 @@ else:
 	nullImagePath = "%s\\NullImages" % base
 	keyPath = nullImagePath
 
-defaultStds = { "C": "C std.msa", "Al": "Al std.msa", "Na": "NaCl std.msa", "Cl": "NaCl std.msa",
-		 "O": "MgO std.msa", "Si": "Si std.msa", "Fe": "Fe std.msa", "Ca": "CaF2 std.msa",
-		 "Cr": "Cr std.msa", "Ni":"Ni std.msa", "Cu": "Cu std.msa", "Ti": "Ti std.msa", "Mn":"Mn std.msa",
-		 "Mg": "Mg std.msa", "S": "FeS2 std.msa", "Zn" : "Zn std.msa", "Ba":"BaF2 std.msa",
-#		 "Co":"Co std.msa", "K": "KBr std.msa", "Zr":"Zr std.msa", "Mo":"Mo std.msa",
-#		 "Ag" : "Ag std.msa", "Au" : "Au std.msa", "La" : "LaF3 std.msa", "Pb" : "K227 std.msa"
-}
-
 if (SITE==ORNL) or (SITE==NIST):
 	availableDets = ( True, )*4 # False, False, False )
 elif (SITE==PLEASANTON) or (SITE==WARRENDALE):
 	availableDets = ( True, )
-elif (SITE==SRNL) or (SITE==MCCRONE):
+elif (SITE==SRNL) or (SITE==MCCRONE) or (SITE==GRYPHON):
 	availableDets = ( True, )*3
 else:
 	availableDets = ( True, )*2 # False, False, False )
@@ -154,8 +157,13 @@ else:
 	det_off=1
 for i in range(0, defaultDetCount):
 	if availableDets[i]:
-		pt_det.append(findDetector("EDAX Det %d" % (i+det_off, )))
+		d = findDetector("EDAX Det %d" % (i+det_off, ))
+		if d==None:
+			print("The `EDAX Det %d` is missing." % (i+det_off, ));
+		pt_det.append(d)
 pt_det_all = findDetector("EDAX All")
+if pt_det_all==None:
+	print("The 'EDAX All` detector is missing.")
 
 _saverize = semantics.Saverize()
 _saverizeTh = jl.Thread(_saverize)
@@ -234,24 +242,7 @@ if connect:
 		print "Unable to find a detector named: %s" % name
 		return None
 
-	# Default images to save using collectImages(...)
-	if SITE==PLEASANTON:
-		DEF_IMAGE_MASK = 0x2F
-	elif SITE==WARRENDALE:
-		DEF_IMAGE_MASK = 0x9 # 0x2F
-	elif SITE==SRNL:
-		DEF_IMAGE_MASK = (1 << findEDet("BSE").getIndex())+(1 << findEDet("SE").getIndex()) # 0x300 - All detectors is 0x328
-	else:
-		DEF_IMAGE_MASK = 0x3
-
-	# Mask to use for other functions that save images
-	SAVE_IMAGE_MASK = (1 << findEDet("BSE").getIndex())+(1 << findEDet("SE").getIndex())
-
-	# Mask to use for other functions that save images
-	SAVE_IMAGE_MASK = 0x300
-	if SITE==SRNL:
-		_apaDet = findEDet("BSE")
-	elif SITE==MCCRONE:
+	if SITE==MCCRONE:
 		_apaDet = findEDet("BSED")
 	elif SITE==WARRENDALE:
 		_apaDet = findEDet("LE BSE")
@@ -260,8 +251,15 @@ if connect:
 	else:
 		_apaDet = findEDet("BSE")
 
+	# Default images to save using collectImages(...)
+	DEF_IMAGE_MASK = (1 << _apaDet.getIndex())+(1 << findEDet("SE").getIndex())
+	# Mask to use for other functions that save images
+	SAVE_IMAGE_MASK = (1 << _apaDet.getIndex())+(1 << findEDet("SE").getIndex())
+
 	if SITE==SRNL:
 		_apaWrite = ( (epq.SpectrumProperties.MicroImage, 3), (epq.SpectrumProperties.MicroImage2, 2) )
+	elif SITE==GRYPHON:
+		_apaWrite = ( (epq.SpectrumProperties.MicroImage, 0), (epq.SpectrumProperties.MicroImage2, 1) )
 	else:
 		_apaWrite = ( (epq.SpectrumProperties.MicroImage, 1), (epq.SpectrumProperties.MicroImage2, 0) )
 
@@ -599,7 +597,7 @@ image: Determines whether an image is collected after acquiring the spectrum (de
 						imgs[i].applyCenterBox(imageFOV*0.001)
 						sp.setObjectProperty(p, imgs[i])
 			if pc:
-				fe = updatedPC(interval=(0 if forcePC else 300))
+				fe = updatedPC(force=forcePC)
 				if fe:
 					sp.setNumericProperty(sp.ProbeCurrent, fe.average())
 		_ts.chamberLed(defLED)
@@ -693,7 +691,7 @@ fov: An optional field of view width to which to set the SEM imaging while colle
 			display(dup)
 			specs.append(wrap(dup))
 		if pc:
-			fe = updatedPC(interval=(0 if forcePC else 300))
+			fe = updatedPC(force=forcePC)
 			if fe:
 				for spec in specs:
 					sp.setNumericProperty(sp.ProbeCurrent, fe.average())
@@ -789,7 +787,7 @@ image: Determines whether an image is collected after acquiring the spectrum (de
 			_ts.setViewField(oldVf)
 		_ts.scSetSpeed(oldSp)
 		if pc:
-			fe = updatedPC(interval=(0 if forcePC else 300))
+			fe = updatedPC(force=forcePC)
 		for spec in specs:
 			if not spec:
 				continue
@@ -801,7 +799,7 @@ image: Determines whether an image is collected after acquiring the spectrum (de
 				comp = material(comp)
 			if isinstance(comp, epq.Composition):
 				sp.setCompositionProperty(epq.SpectrumProperties.StandardComposition, comp)
-			if pc and fe:
+			if fe:
 				sp.setNumericProperty(sp.ProbeCurrent, fe.average())
 		_ts.chamberLed(defLED)
 		logSpectrum((path if path else defaultPath), acqTime, name, mode)
@@ -822,7 +820,7 @@ image: Determines whether an image is collected after acquiring the spectrum (de
 		oldSp = _ts.scGetSpeed()
 		try:
 			if pc:
-				pcb=updatedPC(interval=0)
+				pcb=updatedPC(force=True)
 			collectImages(baseName, fov, dims=(1024,1024),dwell=5,path=path, writeMask=SAVE_IMAGE_MASK)
 			_ts.setViewField(fov)
 			_ts.scStopScan()
@@ -830,11 +828,11 @@ image: Determines whether an image is collected after acquiring the spectrum (de
 				_ts.scSetBeamPosition(pnt[0],pnt[1])
 				time.sleep(0.1)
 				spec=collect2(acqTime, "%s[Pt %i](%0.3g,%0.3g)" % (baseName, i, pnt[0],pnt[1]), mode='L', pc=False, disp=disp, path=path, fov=None, image=False)
-				if pc and spec:
+				if pcb and spec:
 					sp = spec.getProperties()
 					sp.setNumericProperty(sp.ProbeCurrent, pcb.average())
 			if pc:
-				print updatedPC(interval=0)
+				print updatedPC(force=True)
 		finally:
 			_ts.setViewField(oldVf)
 			_ts.scSetSpeed(oldSp)
@@ -897,6 +895,8 @@ image: Determines whether an image is collected after acquiring the spectrum (de
 				time.sleep(0.1)
 				ds.add(0.001 * _ts.getIAbsorbed())
 			print u'Probe current: %f \u00B1 %f nA' % (ds.average(), ds.standardDeviation())
+			if ds.average() < 0.010:
+				print "Is the beam blanker enabled in the TESCAN software? (It should be disabled!)"
 			if restore:
 				moveTo(prevPos)
 			_ts.scSetSpeed(oldSp)
@@ -909,15 +909,15 @@ image: Determines whether an image is collected after acquiring the spectrum (de
 
 	def shouldUpdatePC(interval):
 		global lastPCUpdate, lastPCValue
-		return globals().has_key("faraday") and ((lastPCUpdate == None) or (abs(time.time() - lastPCUpdate) > interval))
+		return globals().has_key("faraday") and ((lastPCUpdate == None) or (abs(time.clock() - lastPCUpdate) > interval))
 
-	def updatedPC(interval=1800):
-		"""updatedPC([interval=1800]) - Works
+	def updatedPC(interval=1800, force=False):
+		"""updatedPC([interval=1800],[force=False]) - Works
 		Returns a measurement of the probe current, updating the measurement if more than 'interval' seconds have elapsed."""
 		global lastPCUpdate, lastPCValue
-		if shouldUpdatePC(interval):
+		if force or shouldUpdatePC(interval):
 			lastPCValue = measurePC()
-			lastPCUpdate = time.time()
+			lastPCUpdate = time.clock()
 		return lastPCValue
 
 	def trueRule(tvm):
@@ -1101,7 +1101,7 @@ Get the spectrum associated with the specified row number"""
 	Updates the probe current if necessary and then asks to recenter particle"""
 			if shouldUpdatePC(300):
 				lastPCUpdate = None
-				updatedPC(interval=300)
+				updatedPC()
 				if jop.showConfirmDialog(MainFrame, "Centered and focused?", "Relocate", jop.YES_NO_OPTION) <> jop.YES_OPTION:
 					return
 
@@ -1188,6 +1188,7 @@ if connect and (_ts.hasRCALicense() or SITE==SRNL):
 		project - The name of the project with which this analysis is associated
 		sample - The name of the sample on which this analysis is being performed
 		analysis - An optional name for the analysis (Otherwise a date stamp is used.)"""
+				assert globals().has_key("faraday"), "Please define the position of the Faraday cup and restart!"
 				self._project = project
 				self._sample = sample
 				self._analyst = analyst
@@ -1213,6 +1214,7 @@ if connect and (_ts.hasRCALicense() or SITE==SRNL):
 				self._measureDwell = 4000
 				self._measureStep = 8
 				self._beamIntensity = None
+				self._probeCurrent = updatedPC(force=True).average()
 				self.configEDS(None, None, 0.4)
 				self.setMorphologyCriterion(semtr.RcaTranslator.AreaCriterion(10.0, 1.0e6))
 				self.setFieldOfView(0.1, 9)
@@ -1426,9 +1428,9 @@ areaCriterion(...), maxCriterion(...) build common criteria."""
 				z.setHeaderItem("START_TIME", jtext.SimpleDateFormat("hh:mm:ss a z").format(dt))
 				z.setHeaderItem("SAMPLE", self._sample)
 				z.setHeaderItem("PROJECT", self._project)
-				z.setHeaderItem("COMPANY", "DOC NIST MML - 637.02")
-				z.setHeaderItem("INSTRUMENT", "NIST's TESCAN MIRA3 in 217 F101")
-				z.setHeaderItem("PROBE_CURRENT", "%g nA" % (updatedPC(0).average() , ) )
+				z.setHeaderItem("COMPANY", _COMPANY_)
+				z.setHeaderItem("INSTRUMENT", _INSTRUMENT_)
+				z.setHeaderItem("PROBE_CURRENT", "%g nA" % ( self._probeCurrent, ) )
 				z.setHeaderItem("RULE_FILE", u"%s" % ( self._rules, ))
 				z.setHeaderItem("VEC_FILE", u"%s"  % (self._vecs, ))
 				z.setHeaderItem("STAGE_FILE", "tiling.xml")
@@ -1495,6 +1497,12 @@ areaCriterion(...), maxCriterion(...) build common criteria."""
 						props.setParticleSignatureProperty(epq.SpectrumProperties.ParticleSignature, ps)
 						props.setImageProperty(epq.SpectrumProperties.MicroImage, ps.createBarGraph(256,0.01))
 						props.setNumericProperty(epq.SpectrumProperties.RealTime, self._edsRealTime)
+						if self._probeCurrent:
+							props.setNumericProperty(epq.SpectrumProperties.ProbeCurrent, self._probeCurrent)
+						if self._analyst:
+							props.setTextProperty(SpectrumProperties.InstrumentOperator, self._analyst)
+						props.setTextProperty(SpectrumProperties.SampleId, self._sample)
+						props.setTextProperty(SpectrumProperties.ProjectName, self._project)
 						elms = tuple(ps.getNthElement(i) for i in range(0, 4))
 						for i in range(0, 4):
 							vals.append(elms[i].getAtomicNumber())
@@ -1713,7 +1721,6 @@ areaCriterion(...), maxCriterion(...) build common criteria."""
 				"""Internal use only...
 	summarize(tiling)
 	Summarize the analysis configuration to the command output window."""
-				i0 = (updatedPC(300) if globals().has_key('faraday') else None)
 				tmp = u"Analysis Summary ================================\n"
 				tmp = tmp + u"       Project: %s\n" % self._project
 				tmp = tmp + u"        Sample: %s\n" % self._sample
@@ -1738,8 +1745,8 @@ areaCriterion(...), maxCriterion(...) build common criteria."""
 				tmp = tmp + u" Max per field: %d\n" % self._maxPartPerField
 				tmp = tmp + u"      Beam Int: %0.2f\n" % _ts.getPCContinual()
 				tmp = tmp + u"          Spot: %0.2f nm\n" % _ts.getSpotSize()
-				if i0:
-					tmp = tmp + u"       Faraday: %0.2f nA\n" % i0.average()
+				if self._probeCurrent:
+					tmp = tmp + u"       Faraday: %0.2f nA\n" % self._probeCurrent
 				else:
 					tmp = tmp + u"          IAbs: %0.2f nA\n" % (_ts.getIAbsorbed() / 1000.0)
 				tmp = tmp + u"        Beam E: %0.2f keV\n" % (_ts.hvGetVoltage() / 1000.0)
@@ -1786,7 +1793,6 @@ areaCriterion(...), maxCriterion(...) build common criteria."""
 				"""Internal use only...
 				toLatex(tiling)
 				Summarize the analysis configuration to the command output window."""
-				i0 = (updatedPC(300) if globals().has_key('faraday') else None)
 				tmp="\\begin{tabular}{rl}"
 				tmp=tmp + "\\colspan{2}{Analysis Summary}\\\\\n"
 				tmp = tmp + u"  Project & %s\\\\\n" % self._project
@@ -1812,8 +1818,8 @@ areaCriterion(...), maxCriterion(...) build common criteria."""
 				tmp = tmp + u"  Max per field & %d\\\\\n" % self._maxPartPerField
 				tmp = tmp + u"  Beam Intensity & \\num{%0.2f}\\\\\n" % _ts.getPCContinual()
 				tmp = tmp + u"  Spot & \\SI{%0.2f}{\\nano\\meter}\\\\\n" % _ts.getSpotSize()
-				if i0:
-					tmp = tmp + u"  Faraday & \\SI{%0.2f}{\\nano\\ampere}\\\\\n" % i0.average()
+				if self._probeCurrent:
+					tmp = tmp + u"  Faraday & \\SI{%0.2f}{\\nano\\ampere}\\\\\n" % self._probeCurrent
 				else:
 					tmp = tmp + u"  IAbs & \\SI{%0.2f}{\\nano\\ampere}\\\\\n" % (_ts.getIAbsorbed() / 1000.0)
 				tmp = tmp + u"  Beam Energy & \\SI{%0.2f}{\\keV}\\\\\n" % (_ts.hvGetVoltage() / 1000.0)
@@ -1876,7 +1882,9 @@ areaCriterion(...), maxCriterion(...) build common criteria."""
 						res = res+ u"Particles by Class\n"
 						for i in range(0, self._rules.ruleCount()):
 							cx = self._zep.getClassMemberCount(self._rules, i)
-							res = res + u"	%20s: %d particles\n" % (self._rules.ruleName(i), cx)
+							res = res + u"    %20s: %d particles\n" % (self._rules.ruleName(i), cx)
+					el = jl.Math.round(self._timer.totalElapseTime()+0.5)
+					res = res + u"Elapse time: %d:%02d:%02d (%d s)\n" % ( (el / 3600), (el / 60) % 60, (el % 60), el )
 					print res
 					tos.println(res)
 				else:
@@ -2019,6 +2027,7 @@ areaCriterion(...), maxCriterion(...) build common criteria."""
 					if self._processSIStack:
 						self._processSIStack.add( None, None, None )
 					self._debugPw = None
+					print self._timer.stop()
 
 
 		def buildRCA(project, sample, vecs, rules, fov = 0.512, morph = None, analyst = None, realTime=0.3, path = None):
@@ -2626,17 +2635,17 @@ class Elapse:
 
 	def __init__(self, nItems):
 		self._nItems = nItems
-		self._start = jl.System.currentTimeMillis()
+		self._start = time.clock()
+		self._stop = None
 
 	def inSeconds(self):
-		return 0.001 * (jl.System.currentTimeMillis() - self._start)
+		return time.clock() - self._start
 
 	def update(self, completed):
 		"""update(completed)
 		completed:	The number of items completed
 		Estimates the ETA based on the number of items completed since the Elapse object was constucted."""
 		print "Completed: %d of %d" % (completed, self._nItems)
-		now = jl.System.currentTimeMillis()
 		elapse = self.inSeconds()
 		print "	  Elapse: %d:%02d:%02d" % (int(elapse) / 3600, (int(elapse) / 60) % 60, int(elapse) % 60)
 		if completed > 0:
@@ -2644,14 +2653,20 @@ class Elapse:
 			print "		 ETA: %d:%02d:%02d" % (eta / 3600, (eta / 60) % 60, eta % 60)
 
 	def updateString(self, completed):
-		now = jl.System.currentTimeMillis()
-		elapse = 0.001 * (now - self._start)
+		elapse = self.inSeconds()
 		tmp = "TBD"
 		if completed > 0:
 			eta = int((elapse * (self._nItems - completed)) / completed)
 			tmp = "%d:%02d:%02d" % (eta / 3600, (eta / 60) % 60, eta % 60)
 		return "Elapse: %d:%02d:%02d  ETA: %s" % (int(elapse) / 3600, (int(elapse) / 60) % 60, int(elapse) % 60, tmp)
-
+		
+	def stop(self):
+		self._stop = time.clock()
+		s = self._stop - self._start
+		return "Total elapse time: %d:%02d:%02d" % (s / 3600, (s / 60) % 60, s % 60)
+	
+	def totalElapseTime(self):
+		return self._stop - self._start
 
 if connect:
 	def collectSpectra(sample, pts, liveTime=60.0, fov=0.005):
@@ -2734,6 +2749,7 @@ results are written to the defaultDir."""
 						done = True
 			completed = completed + 1
 			el.update(completed)
+		el.stop()
 		if offenze and (not terminated):
 			turnOff()
 
@@ -2908,7 +2924,7 @@ if connect:
 		if abs(_ts.hvGetVoltage() - e0 * 1.0e3) > 100.0:
 			print "Please set the beam energy to %0.1f keV" % e0
 			return
-		i0 = updatedPC(1.0)
+		i0 = updatedPC(force=True)
 		if (i0.average() < 0.4) or (i0.average() > 2.5):
 			print "The probe current (%0.3f nA) is out of range (0.4 nA to 2.5 nA)." % i0.average()
 			return
@@ -3044,7 +3060,7 @@ if connect:
 				write(semstg.TilingUtilities.createMap(tiling, 2048), "Tiling[MAG=%d]" % mag, path=path)
 		finally:
 			tf.close()
-		print elapse.updateString(tileCx)
+		print elapse.stop()
 
 
 	def collectTiledSIs(tiling, mags=((2.0, 0,), (0.5, 0,)), overlap=0.9, imgDim= 1024, imgDwell=9, seed=0xBADF00D):
@@ -3104,7 +3120,7 @@ if connect:
 				write(semstg.TilingUtilities.createMap(tiling, 2048), "Tiling[MAG=%d]" % mag, path=path)
 		finally:
 			tf.close()
-		print elapse.updateString(tileCx)
+		print elapse.stop()
 
 
 
