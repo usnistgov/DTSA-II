@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 /**
+ * Implements a command history with recall and search functions.
+ * 
  * @author nritchie
  *
  */
@@ -44,12 +46,9 @@ public class CommandBuffer {
    }
 
    public void add(String cmd) {
-      int idx = mBuffer.indexOf(cmd);
-      if (idx == -1) {
+      if(!mBuffer.get(mBuffer.size()-1).equals(cmd))
          mBuffer.add(cmd);
-         mIndex = mBuffer.size();
-      } else
-         mIndex = idx + 1;
+      mIndex = mBuffer.size();
    }
 
    public String previous() {
@@ -58,12 +57,11 @@ public class CommandBuffer {
    }
 
    public String next() {
-      final String res = current();
       mIndex = Math.min(mBuffer.size(), mIndex + 1);
-      return res;
+      return current();
    }
 
-   public String current() {
+   private String current() {
       if ((mIndex >= 0) && (mIndex < mBuffer.size()))
          return mBuffer.get(mIndex);
       else
@@ -71,21 +69,19 @@ public class CommandBuffer {
    }
 
    public String search(String cmd) {
-      int st = Math.min(mIndex - 1, mBuffer.size() - 1);
+      int st = (mIndex == -1 ? mBuffer.size() : Math.min(mIndex, mBuffer.size()))  - 1;
       // Search backwards
-      for (int i = st; i >= 0; --i) {
+      for (int i = st; i >= 0; --i) 
          if (mBuffer.get(i).startsWith(cmd)) {
             mIndex = i;
-            return mBuffer.get(mIndex);
+            return mBuffer.get(i);
          }
-      }
       // Search forwards
-      for (int i = mBuffer.size() - 1; i > st; --i) {
+      for (int i = mBuffer.size()-1; i>st; --i)
          if (mBuffer.get(i).startsWith(cmd)) {
             mIndex = i;
-            return mBuffer.get(mIndex);
+            return mBuffer.get(i);
          }
-      }
       return cmd;
    }
 
