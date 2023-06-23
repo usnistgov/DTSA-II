@@ -1252,3 +1252,45 @@ def bsed(mat, e0, angle, nTraj=100000, eFrac=0.9, scale=1.0e-6, filename=None, p
     finally:
         fos.close()
     return (bs0.backscatterFraction(), bs0.forwardscatterFraction())
+
+def bsedAngular(mat, e0, nTraj=100000, eFrac=0.9, filename=None, params={}):
+    """bsed(mat, e0, angle, nTraj=100000, eFrac=0.9, scale=1.0e-6, filename = None, params={})
+    mat = material("Si",2.33)
+    e0 = 20.0 # keV
+    angle = 3.1415926/4
+    nTraj = 100000
+    eFrac = 0.9
+    scale = 1.0e-6  Linear dimensions of the full detector area
+    filename = None - Define for a custom output filename like "backscatter - 55 deg.csv"
+    Constructs a histogram of scatter angles for scatter events for all backscattered and 
+    non-backscattered electron trajectories.  Outputs the result to 'filename'."""
+    defOut = (dtsa2.DefaultOutput if dtsa2.DefaultOutput else dtsa2.reportPath())
+    monte = nm.MonteCarloSS()
+    monte.setBeamEnergy(epq.ToSI.keV(e0))
+    origin = (0.0, 0.0, 0.0)
+    p = params.copy()
+    p["Tilt"] = 0.0
+    p["Material"] = mat
+    buildTilted(monte, monte.getChamber(), origin, p)
+    bs0 = nm.BackscatterAngleHistogram(eFrac*epq.ToSI.keV(e0), True)
+    monte.addActionListener(bs0)
+    bs1 = nm.BackscatterStats(monte, 100)
+    monte.addActionListener(bs1)
+    monte.runMultipleTrajectories(nTraj)
+    if not filename:
+        tmpFile=jio.File.createTempFile("angular", ".csv", jio.File(defOut))
+    else:
+        tmpFile = jio.File(jio.File(defOut), filename)
+    print u"%s" % tmpFile
+    pw = jio.PrintWriter(tmpFile)
+    try:
+        bs0.dump(pw)
+    finally:
+        pw.close()
+    print "Backscatter fraction: %g" % ( bs1.backscatterFraction(), )
+    print "Scatter angle statistics (in degrees)"
+    bsf, nbsf = bs0.getBackscatterDS(), bs0.getNonBackscatterDS()
+    print "      Avg, Max, StdDev"
+    print "  BS: %g, %g, %g" % ( jl.Math.toDegrees(bsf.average()), jl.Math.toDegrees(bsf.maximum()), jl.Math.toDegrees(bsf.standardDeviation()) ) 
+    print " NBS: %g, %g, %g" % ( jl.Math.toDegrees(nbsf.average()), jl.Math.toDegrees(nbsf.maximum()), jl.Math.toDegrees(nbsf.standardDeviation()) ) 
+    return ( bsf, nbsf )  
