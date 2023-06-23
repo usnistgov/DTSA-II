@@ -5,8 +5,8 @@
 # Modified: 11-July-2022
 # Set the SITE to account for site specific hardware variations
 from gov.nist.microanalysis.EPQLibrary import SpectrumProperties
-NIST, MCCRONE, PNNL, PAS, AEM, ORNL, SRNL, PLEASANTON, WARRENDALE, GRYPHON = ( "NIST", "McCRONE", "PNNL", "PAS", "AEM", "ORNL", "SRNL", "PLEASANTON", "WARRENDALE", "Gryphon" )
-SITE = GRYPHON # SET THE SITE!!!!!!
+NIST, MCCRONE, PNNL, PAS, PAS2, AEM, ORNL, SRNL, PLEASANTON, WARRENDALE, GRYPHON = ( "NIST", "McCRONE", "PNNL", "PAS", "PAS2", "AEM", "ORNL", "SRNL", "PLEASANTON", "WARRENDALE", "Gryphon" )
+SITE = PAS2 # SET THE SITE!!!!!!
 
 if SITE==GRYPHON:
 	_COMPANY_ = "Valecitos Laboratory"
@@ -14,8 +14,11 @@ if SITE==GRYPHON:
 elif SITE==NIST:
 	_COMPANY_ = "DOC NIST MML - 637.02"
 	_INSTRUMENT_ = "TESCAN MIRA3 LMU S/N MI 0791077US"
+elif SITE==PAS2:
+	_COMPANY_ =  "PAS"
+	_INSTRUMENT_ = "X CC 004"
 else:
-	print "Please set the _COMPANY_ and _INSTRUMENT_ variables"
+	print "Please set the _COMPANY_ and _INSTRUMENT_ variables in the setup.py script"
 	_COMPANY = "Unknown"
 	_INSTRUMENT_="TESCAN MIRA3 LMU S/N ?"
 
@@ -99,12 +102,16 @@ elif SITE==WARRENDALE:
 	rootPath = "C:\\Users\\Tescan\\Documents\\DTSA-II Reports\\Data"
 elif SITE==SRNL:
 	rootPath = "C:\\Users\\Tescan\\SEMantics Data"
-else:  # SITE==MCCRONE:
+elif SITE==PAS2:
+	rootPath = "C:\\Users\\Tescan\\Documents\\Data"
+elif SITE==MCCRONE:
+	rootPath = "C:\\Data"
+else:
+	print "WARNING: Unknown site"
 	rootPath = "C:\\Data"
 
-
 BLANKER_INDEX = 0
-if SITE == WARRENDALE or SITE == SRNL:
+if SITE == WARRENDALE or SITE == SRNL or SITE == PAS2:
 	BLANKER_INDEX = 1
 
 # Configure this to determine which field images to save.
@@ -112,6 +119,8 @@ if SITE == WARRENDALE or SITE == SRNL:
 if SITE==WARRENDALE:
 	SAVE_FIELD_MASK = 0x9
 elif (SITE==AEM) or (SITE==PAS):
+	SAVE_FIELD_MASK = 0x0
+elif (SITE==PAS2):
 	SAVE_FIELD_MASK = 0x0
 else:
 	SAVE_FIELD_MASK = 0x3
@@ -137,7 +146,7 @@ if (SITE==ORNL) or (SITE==NIST):
 	availableDets = ( True, )*4 # False, False, False )
 elif (SITE==PLEASANTON) or (SITE==WARRENDALE):
 	availableDets = ( True, )
-elif (SITE==SRNL) or (SITE==MCCRONE) or (SITE==GRYPHON):
+elif (SITE==SRNL) or (SITE==MCCRONE) or (SITE==GRYPHON) or (SITE==PAS2):
 	availableDets = ( True, )*3
 else:
 	availableDets = ( True, )*2 # False, False, False )
@@ -174,8 +183,8 @@ connect = (jop.showConfirmDialog(MainFrame, "Connect to the TESCAN?", "Start-up 
 # Location of the Image Magick executables 'convert' and 'montage'
 if SITE==ORNL:
 	IMAGE_MAGICK = "C:\\Program Files\\ImageMagick-6.9.9-Q16"
-elif SITE==NIST:
-	IMAGE_MAGICK = "C:\Program Files\ImageMagick-6.9.12-Q8"
+elif (SITE==NIST) or (SITE==PAS2):
+	IMAGE_MAGICK = "C:\\Program Files\\ImageMagick-6.9.12-Q8"
 else:
 	IMAGE_MAGICK = "C:\\Program Files\\ImageMagick-6.9.6-Q16"
 
@@ -242,24 +251,24 @@ if connect:
 		print "Unable to find a detector named: %s" % name
 		return None
 
+	sedName = "SE"
 	if SITE==MCCRONE:
-		_apaDet = findEDet("BSED")
+		bseName = "BSED"
 	elif SITE==WARRENDALE:
-		_apaDet = findEDet("LE BSE")
+		bseName ="LE BSE"
 	elif SITE==PLEASANTON:
-		_apaDet = findEDet("BSE Q4")
+		bseName = "BSE Q4"
 	else:
-		_apaDet = findEDet("BSE")
+		bseName = "BSE"
 
 	# Default images to save using collectImages(...)
-	DEF_IMAGE_MASK = (1 << _apaDet.getIndex())+(1 << findEDet("SE").getIndex())
+	DEF_IMAGE_MASK = (1 << findEDet(bseName).getIndex())+(1 << findEDet(sedName).getIndex()) # 0x300 - All detectors is 0x328
 	# Mask to use for other functions that save images
-	SAVE_IMAGE_MASK = (1 << _apaDet.getIndex())+(1 << findEDet("SE").getIndex())
+	SAVE_IMAGE_MASK = (1 << findEDet(bseName).getIndex())+(1 << findEDet(sedName).getIndex())
 
-	if SITE==SRNL:
+	_apaDet = findEDet(bseName)
+	if SITE==SRNL or SITE==PAS2:
 		_apaWrite = ( (epq.SpectrumProperties.MicroImage, 3), (epq.SpectrumProperties.MicroImage2, 2) )
-	elif SITE==GRYPHON:
-		_apaWrite = ( (epq.SpectrumProperties.MicroImage, 0), (epq.SpectrumProperties.MicroImage2, 1) )
 	else:
 		_apaWrite = ( (epq.SpectrumProperties.MicroImage, 1), (epq.SpectrumProperties.MicroImage2, 0) )
 
@@ -1734,7 +1743,7 @@ areaCriterion(...), maxCriterion(...) build common criteria."""
 				elif self._overlap<1.0:
 					tmp = tmp + u"       Overlap: %0.3g%% overlap of adjacent fields\n" % ( (1.0 - self._overlap)*100.0, )
 				tmp = tmp + u"      Detector: %s\n" % (self.getDetector())
-				sed, bsed = _ts.dtGetGainBlack(0), _ts.dtGetGainBlack(1)
+				sed, bsed = _ts.dtGetGainBlack(findEDet(sedName).getIndex()), _ts.dtGetGainBlack(self._imgDet.getIndex())
 				tmp = tmp + u"          BSED: Contrast %0.2f Brightness: %0.2f\n" % (bsed[0], bsed[1])
 				tmp = tmp + u"           SED: Contrast %0.2f Brightness: %0.2f\n" % (sed[0], sed[1])
 				tmp = tmp + u"        Search: %d to %d at %d pixels × %d pixels at %g µs/pixel\n" % (self._searchLow, self._searchHigh, self.searchDimension(), self.searchDimension(), self._searchDwell / 1000)
@@ -1807,7 +1816,7 @@ areaCriterion(...), maxCriterion(...) build common criteria."""
 				elif self._overlap<1.0:
 					tmp = tmp + u"  Overlap & \\SI{%0.3g}{\\%} overlap of adjacent fields\\\\\n" % ( (1.0 - self._overlap)*100.0, )
 				tmp = tmp + u"  Detector & %s\\\\\n" % (self.getDetector())
-				sed, bsed = _ts.dtGetGainBlack(0), _ts.dtGetGainBlack(1)
+				sed, bsed = _ts.dtGetGainBlack(findEDet(sedName).getIndex()), _ts.dtGetGainBlack(self._imgDet.getIndex())
 				tmp = tmp + u"  BSED & Contrast: \\num{%0.2f} Brightness: \\num{%0.2f}\\\\\n" % (bsed[0], bsed[1])
 				tmp = tmp + u"  SED &	Contrast: \\num{%0.2f} Brightness: \\num{%0.2f}\\\\\n" % (sed[0], sed[1])
 				tmp = tmp + u"  Search & %d to %d at $\\SI{%d}{pixels} \\times \\SI{%d}{pixels}$ at \\SI{%g}{\micro\second\per pixel}\\\\\n" % (self._searchLow, self._searchHigh, self.searchDimension(), self.searchDimension(), self._searchDwell / 1000)

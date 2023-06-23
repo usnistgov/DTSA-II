@@ -427,6 +427,20 @@ public class JCommandLine extends JTextPane {
                   }
                   break;
                }
+               case KeyEvent.VK_EQUALS : {
+                  if ((e.isShiftDown()) && (e.isControlDown() || e.isAltDown())) {
+                     Font f = getFont();
+                     setFont(f.deriveFont(f.getSize2D()+2.0f));
+                  }
+                  break;
+               }
+               case KeyEvent.VK_MINUS: {
+                  if ((e.isShiftDown()) && (e.isControlDown() || e.isAltDown())) {
+                     Font f = getFont();
+                     setFont(f.deriveFont(f.getSize2D()-2.0f));
+                  }
+                  break;
+               }
             }
          }
 
