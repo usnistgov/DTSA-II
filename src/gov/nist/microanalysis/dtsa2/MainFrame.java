@@ -3187,13 +3187,19 @@ public class MainFrame extends JFrame {
    public void processLinearizeEnergyAxis() {
       final List<ISpectrumData> selected = getSelectedSpectra();
       if (!selected.isEmpty()) {
-         final RescaleDialog rd = new RescaleDialog(this, "Linearize energy axis", true);
+         final RescaleDialog rd = new RescaleDialog(this, "Actually the energy axis was...", true);
+         rd.initialize(selected.get(0).getZeroOffset(), selected.get(0).getChannelWidth());
          rd.setLocationRelativeTo(this);
          rd.setChannelWidth(selected.iterator().next().getChannelWidth());
          rd.setVisible(true);
          if (rd.getOk())
             for (final ISpectrumData sd : selected)
-               addSpectrum(SpectrumUtils.linearizeSpectrum(sd, rd.getPolynomial(), rd.getChannelWidth()), true, sd);
+               try {
+                  addSpectrum(SpectrumUtils.linearizeSpectrum2(sd, rd.getPolynomial(), rd.getChannelWidth()), true, sd);
+               } catch (EPQException e) {
+                  ErrorDialog.createErrorMessage(this, "Error while linearizing "+sd.toString(), e);
+                  e.printStackTrace();
+               }
       }
    }
 

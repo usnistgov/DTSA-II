@@ -23,6 +23,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
+import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
 
@@ -68,6 +69,7 @@ public class RescaleDialog
    JLabel jLabel_eV = new JLabel();
 
    private final double[] mPolynomial = new double[4];
+   private final double[] mInitialize = new double[] { 0.0, 10.0 };
    private boolean mOk = false;
 
    /**
@@ -90,17 +92,17 @@ public class RescaleDialog
    }
 
    public void initialize() {
-      jLabel_Intro.setText("E'(E) = ");
-      jTextField_Zero.setText("0.0");
+      jLabel_Intro.setText("E'(i) = ");
+      jTextField_Zero.setText(Double.toString(mInitialize[0]));
       jLabel_Zero.setText("+");
-      jTextField_One.setText("1.0");
-      jLabel_One.setText("E +");
+      jTextField_One.setText(Double.toString(mInitialize[1]));
+      jLabel_One.setText(" i + ");
       jTextField_Two.setText("0.0");
-      jLabel_Two.setText("E\u00B2 +");
+      jLabel_Two.setText("× 10⁻⁶ i\u00B2 + ");
       jTextField_Three.setText("0.0");
-      jLabel_Three.setText("E\u00B3");
+      jLabel_Three.setText("× 10⁻⁹ i\u00B3");
 
-      final FormLayout fl = new FormLayout("right:30dlu, 2dlu, 30dlu, center:10dlu, 30dlu, center:15dlu, 30dlu, center:17dlu, 30dlu, 2dlu, left:25dlu", "pref, 4dlu, pref");
+      final FormLayout fl = new FormLayout("right:30dlu, 2dlu, 35dlu, pref, 35dlu, pref, 35dlu, pref, 35dlu, 2dlu, pref", "pref, 4dlu, pref");
       final CellConstraints cc = new CellConstraints();
       jPanel_Polynomial.setLayout(fl);
       jPanel_Polynomial.add(jLabel_Intro, cc.xy(1, 1));
@@ -115,7 +117,7 @@ public class RescaleDialog
       jPanel_Polynomial.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
       jLabel_Width.setText("Channel width");
-      jTextField_Width.setText("10.0");
+      jTextField_Width.setText(Double.toString(mInitialize[1]));
       jLabel_eV.setText("eV");
 
       jPanel_Polynomial.add(jLabel_Width, cc.xyw(6, 3, 3));
@@ -172,15 +174,14 @@ public class RescaleDialog
 
    public void jButton_Ok_actionPerformed(ActionEvent actionEvent) {
       try {
-         final NumberFormat nf = NumberFormat.getInstance();
-         mPolynomial[0] = nf.parse(jTextField_Zero.getText().trim()).doubleValue();
-         mPolynomial[1] = nf.parse(jTextField_One.getText().trim()).doubleValue();
-         mPolynomial[2] = nf.parse(jTextField_Two.getText().trim()).doubleValue();
-         mPolynomial[3] = nf.parse(jTextField_Three.getText().trim()).doubleValue();
+         mPolynomial[0] = Double.parseDouble(jTextField_Zero.getText().trim());
+         mPolynomial[1] = Double.parseDouble(jTextField_One.getText().trim());
+         mPolynomial[2] = Double.parseDouble(jTextField_Two.getText().trim())*1.0e-6;
+         mPolynomial[3] = Double.parseDouble(jTextField_Three.getText().trim())*1.0e-9;
          mOk = true;
          setVisible(false);
       }
-      catch(final ParseException e) {
+      catch(final Exception e) {
       }
    }
 
@@ -212,10 +213,7 @@ public class RescaleDialog
     */
    public void setChannelWidth(double d) {
       if((d > 0.0) && (d < 1000.0)) {
-         final NumberFormat nf = NumberFormat.getInstance();
-         nf.setGroupingUsed(false);
-         nf.setMaximumFractionDigits(2);
-         jTextField_Width.setText(nf.format(d));
+         jTextField_Width.setText(String.format("%.4f", d));
       }
    }
 
@@ -240,5 +238,13 @@ public class RescaleDialog
     */
    public double[] getPolynomial() {
       return mPolynomial.clone();
+   }
+   
+   public void initialize(double zero, double gain) {
+      mInitialize[0] = zero;
+      mInitialize[1] = gain;
+      jTextField_Width.setText(String.format("%.4f", mInitialize[1]));
+      jTextField_Zero.setText(String.format("%.2f", mInitialize[0]));
+      jTextField_One.setText(String.format("%.4f", mInitialize[1]));
    }
 }

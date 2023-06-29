@@ -1,5 +1,5 @@
-set "D2V=2023-06-23"
-set "NUM_VER=14.1.8.0"
+set "D2V=2023-06-29"
+set "NUM_VER=14.1.9.0"
 set "JDK_VER=20"
 set "BPATH=C:\Users\nritchie\repositories"
 set "NAME_VER=neptune"
