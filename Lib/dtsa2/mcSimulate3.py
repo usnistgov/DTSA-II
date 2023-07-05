@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# DTSA-II/NISTMonte script - Nicholas W. M. Ritchie - 6-May-2010
+# DTSA-II/NISTMonte script - Nicholas W. M. Ritchie - 5-Jul-2023
 """A series of scripts for simulating various common geometries using the 3rd generation NISTMonte Monte Carlo simulation algorithms. \
 Note that the Monte Carlo algorithm requires densities for all materials.  Usually this is accomplished by:
   1) creating a epq.Material object directly
@@ -38,7 +38,7 @@ from compiler.pycodegen import TRY_FINALLY
 # Mac OS X seems to require the next line.
 
 __revision__ = "$Id: mcSimulate3.py Nicholas W. M. Ritchie. Mod JRM $"
-__version__ = "0.0.3 - 2016-07-05"
+__version__ = "0.1.0 - 2023-07-05"
 
 import sys
 sys.packageManager.makeJavaPackage("gov.nist.microanalysis.NISTMonte.Gen3", "CharacteristicXRayGeneration3, BremsstrahlungXRayGeneration3, FluorescenceXRayGeneration3, XRayTransport3", None)
