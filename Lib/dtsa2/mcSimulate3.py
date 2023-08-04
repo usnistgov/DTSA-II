@@ -1294,3 +1294,63 @@ def bsedAngular(mat, e0, nTraj=100000, eFrac=0.9, filename=None, params={}):
     print "  BS: %g, %g, %g" % ( jl.Math.toDegrees(bsf.average()), jl.Math.toDegrees(bsf.maximum()), jl.Math.toDegrees(bsf.standardDeviation()) ) 
     print " NBS: %g, %g, %g" % ( jl.Math.toDegrees(nbsf.average()), jl.Math.toDegrees(nbsf.maximum()), jl.Math.toDegrees(nbsf.standardDeviation()) ) 
     return ( bsf, nbsf )  
+    
+    
+def buildWedge(monte, chamber, origin, buildParams):
+    matA = buildParams["MaterialA"]
+    matB = buildParams["MaterialB"]
+    matC = buildParams.get("MaterialC", matA)
+    t = buildParams["Thickness"]
+    rotation = jl.Math.toRadians(buildParams.get("Rotation", 0.0))
+    theta = jl.Math.toRadians(buildParams["Tilt"])
+    ct, st = jl.Math.cos(theta), jl.Math.sin(theta)
+    vA = nm.MultiPlaneShape()
+    vA.addPlane([-1.0,0.0,0.0], epu.Math2.plus(origin, [-1.0e-4, 0.0, 0.0]))
+    vA.addPlane([ct,0.0,st], epu.Math2.plus(origin, [-0.5*t, 0.0, 0.0]))
+    vA.addPlane([0.0,0.0,-1.0], epu.Math2.plus(origin, [0.0, 0.0, 0.0]))
+    vA.addPlane([0.0,0.0,1.0], epu.Math2.plus(origin, [0.0, 0.0, 1.0e-4]))
+    vA.addPlane([-1.0,0.0,0.0], epu.Math2.plus(origin, [-1.0e-4, 0.0, 0.0]))
+    vA.addPlane([1.0,0.0,0.0], epu.Math2.plus(origin, [1.0e-4, 0.0, 0.0]))
+    vA.rotate(origin, 0.0, 0.0, rotation)
+    monte.addSubRegion(chamber, matA, vA)
+    vB = nm.MultiPlaneShape()
+    vB.addPlane([-ct,0.0,-st], epu.Math2.plus(origin, [-0.5*t, 0.0, 0.0]))
+    vB.addPlane([ct,0.0,st], epu.Math2.plus(origin, [0.5*t, 0.0, 0.0]))
+    vB.addPlane([0.0,0.0,-1.0], epu.Math2.plus(origin, [0.0, 0.0, 0.0]))
+    vB.addPlane([0.0,0.0,1.0], epu.Math2.plus(origin, [0.0, 0.0, 1.0e-4]))
+    vB.addPlane([-1.0,0.0,0.0], epu.Math2.plus(origin, [-1.0e-4, 0.0, 0.0]))
+    vB.addPlane([1.0,0.0,0.0], epu.Math2.plus(origin, [1.0e-4, 0.0, 0.0]))
+    vB.rotate(origin, 0.0, 0.0, rotation)
+    monte.addSubRegion(chamber, matB, vB)
+    vC = nm.MultiPlaneShape()
+    vC.addPlane([1.0,0.0,0.0], epu.Math2.plus(origin, [1.0e-4, 0.0, 0.0]))
+    vC.addPlane([-ct,0.0,-st], epu.Math2.plus(origin, [0.5*t, 0.0, 0.0]))
+    vC.addPlane([0.0,0.0,-1.0], epu.Math2.plus(origin, [0.0, 0.0, 0.0]))
+    vC.addPlane([0.0,0.0,1.0], epu.Math2.plus(origin, [0.0, 0.0, 1.0e-4]))
+    vC.addPlane([-1.0,0.0,0.0], epu.Math2.plus(origin, [-1.0e-4, 0.0, 0.0]))
+    vC.addPlane([1.0,0.0,0.0], epu.Math2.plus(origin, [1.0e-4, 0.0, 0.0]))
+    vC.rotate(origin, 0.0, 0.0, rotation)
+    monte.addSubRegion(chamber, matC, vC)
+
+
+def simulateWedge(matA, matB, matC, tilt, thickness, det, e0=20.0, rotation = 0.0, dose=defaultDose, withPoisson=True, nTraj=defaultNumTraj, sf=defaultCharFluor, bf=defaultBremFluor, xtraParams=defaultXtraParams):
+    """simulateWedge(matA, matB, matC, theta, thickness, det, e0=20.0, rotation = 0.0, dose=defaultDose, withPoisson=True, nTraj=defaultNumTraj, sf=defaultCharFluor, bf=defaultBremFluor, xtraParams=defaultXtraParams):
+    Simulate a spectrum from a tilted wedge of `matA` and `thickness` (measured along surface) at an angle `tilt` on the detector det at beam energy e0 (in keV).  \
+    rotation rotates the sample around the beam axis/origin.  If sf then simulate characteristic secondary fluorescence. If bf then simulate bremsstrahlung secondary \
+    fluorescence. nTraj specifies the number of electron trajectories. dose is in nA*sec."""
+    params = { 
+        "MaterialA" : material(matA), 
+        "MaterialB" : material(matB),  
+        "MaterialC" : material(matC), 
+        "Tilt" : tilt,
+        "Thickness" : thickness,
+        "Rotation" : rotation
+    }
+    if not ( isinstance(matA, epq.Material) and isinstance(matB, epq.Material) and isinstance(matC, epq.Material)):
+        print u"Please provide a material with a density - %s, %s, %s" % ( matA, matB, matC)
+    tmp = u"MC simulation of %g um wedge at %g degrees of %s at %0.1f keV%s%s" % (thickness/1.0e-6, tilt, matB, e0, (" + CSF" if sf else ""), (" + BSF" if bf else ""))
+    print tmp
+    return base(det, e0, withPoisson, nTraj, dose, sf, bf, tmp, buildWedge, params, xtraParams)
+    
+
+    

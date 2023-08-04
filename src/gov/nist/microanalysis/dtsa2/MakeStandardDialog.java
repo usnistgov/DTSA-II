@@ -127,8 +127,8 @@ public class MakeStandardDialog extends JWizardDialog {
 			final CellConstraints cc0 = new CellConstraints();
 			pb.add(new JScrollPane(jTable_Dose), cc0.xyw(1, 1, 7));
 			pb.addSeparator("Update selected spectra", CC.xyw(1, 3, 7));
-			pb.addLabel("Probe Current", cc0.xyw(1, 5, 3));
-			pb.addLabel("Live Time", cc0.xyw(5, 5, 3));
+			pb.addLabel("Probe Current (nA)", cc0.xyw(1, 5, 3));
+			pb.addLabel("Live Time (s)", cc0.xyw(5, 5, 3));
 			pb.add(jTextField_ProbeCurrent, cc0.xy(1, 7));
 			pb.add(jButton_UpdatePC, cc0.xy(3, 7));
 			pb.add(jTextField_LiveTime, cc0.xy(5, 7));
