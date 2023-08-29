@@ -6,7 +6,7 @@
 # Set the SITE to account for site specific hardware variations
 from gov.nist.microanalysis.EPQLibrary import SpectrumProperties
 NIST, MCCRONE, PNNL, PAS, PAS2, AEM, ORNL, SRNL, PLEASANTON, WARRENDALE, GRYPHON = ( "NIST", "McCRONE", "PNNL", "PAS", "PAS2", "AEM", "ORNL", "SRNL", "PLEASANTON", "WARRENDALE", "Gryphon" )
-SITE = PAS2 # SET THE SITE!!!!!!
+SITE = SRNL # SET THE SITE!!!!!!
 
 if SITE==GRYPHON:
 	_COMPANY_ = "Valecitos Laboratory"
@@ -17,6 +17,9 @@ elif SITE==NIST:
 elif SITE==PAS2:
 	_COMPANY_ =  "PAS"
 	_INSTRUMENT_ = "X CC 004"
+elif SITE==SRNL:
+	_COMPANY = "SRNL"
+	_INSTRUMENT = "TESCAN MIRA4"
 else:
 	print "Please set the _COMPANY_ and _INSTRUMENT_ variables in the setup.py script"
 	_COMPANY = "Unknown"
@@ -2911,6 +2914,17 @@ def updateZ(pts, newZ):
 	return pts
 
 if connect:
+	def collectZoom(name, fov, factor=4.0, dims=(512,512), dwell=6, writeMask=SAVE_IMAGE_MASK):
+		"""collectZoom(name, fov, factor=4.0, dims=(512,512), dwell=6, factor=4.0, postFix="")
+		Collects images of a field-of-view and a series of field-of-views that differ by `factor` up
+		to a maximum of 2.0 mm. For example fov=0.01 mm and factor = 4.0, (0.01 mm, 0.04 mm, 0.16 mm, 0.64 mm) 
+		Images are stored in the current project path directory."""
+		collectImages("%s - %g mm" % (name, fov), fov, dims=dims, dwell=dwell, writeMask=writeMask)
+		f = factor*fov
+		while f < 2.0:
+			collectImages("%s - %g mm" % (name, f), f, dims=dims, dwell=dwell, writeMask=writeMask)
+			f*=factor
+	
 	def collectQC(lt=30.0, path=None):
 		"""collectQC(lt=30.0, path='QC+time')
 		Collect QC spectra and process them.
