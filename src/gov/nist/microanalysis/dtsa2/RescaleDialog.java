@@ -23,7 +23,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
-import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
 
