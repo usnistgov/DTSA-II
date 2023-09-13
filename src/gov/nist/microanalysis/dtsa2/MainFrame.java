@@ -38,6 +38,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.net.URI;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.text.DateFormat;
@@ -1010,8 +1011,8 @@ public class MainFrame extends JFrame {
          @Override
          public void actionPerformed(ActionEvent arg0) {
             try {
-               final URL url = new URL("http://www.jython.org/jythonbook/en/1.0/index.html");
-               Desktop.getDesktop().browse(url.toURI());
+               final URI uri = new URI("http://www.jython.org/jythonbook/en/1.0/index.html");
+               Desktop.getDesktop().browse(uri);
             } catch (final Exception e) {
                ErrorDialog.createErrorMessage(MainFrame.this, "Open Jython web site", e);
             }
@@ -1024,8 +1025,8 @@ public class MainFrame extends JFrame {
          @Override
          public void actionPerformed(ActionEvent arg0) {
             try {
-               final URL url = new URL("http://docs.python.org/2/");
-               Desktop.getDesktop().browse(url.toURI());
+               final URI uri = new URI("http://docs.python.org/2/");
+               Desktop.getDesktop().browse(uri);
             } catch (final Exception e) {
                ErrorDialog.createErrorMessage(MainFrame.this, "Open Python tutorial", e);
             }
@@ -1045,8 +1046,8 @@ public class MainFrame extends JFrame {
          @Override
          public void actionPerformed(ActionEvent arg0) {
             try {
-               final URL url = new URL("http://probesoftware.com/smf/index.php?board=32.0");
-               Desktop.getDesktop().browse(url.toURI());
+               final URI uri = new URI("http://probesoftware.com/smf/index.php?board=32.0");
+               Desktop.getDesktop().browse(uri);
             } catch (final Exception e) {
                ErrorDialog.createErrorMessage(MainFrame.this, "Open DTSA-II Forum", e);
             }
@@ -2110,8 +2111,8 @@ public class MainFrame extends JFrame {
 
    public void helpOpenWebSite() {
       try {
-         final URL url = new URL("http://www.cstl.nist.gov/div837/837.02/epq/dtsa2/index.html");
-         Desktop.getDesktop().browse(url.toURI());
+         final URI uri = new URI("http://www.cstl.nist.gov/div837/837.02/epq/dtsa2/index.html");
+         Desktop.getDesktop().browse(uri);
       } catch (final Exception e) {
          ErrorDialog.createErrorMessage(this, "Open web site", e);
       }

@@ -11,7 +11,7 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
+import java.net.URI;
 import java.text.DateFormat;
 import java.util.Collections;
 import java.util.Date;
@@ -1857,8 +1857,7 @@ public class AppPreferences {
 	private void openURL(String path) {
 		try {
 			if (path.startsWith("http://")) {
-				final URL url = new URL(path);
-				Desktop.getDesktop().browse(url.toURI());
+				Desktop.getDesktop().browse(new URI(path));
 			} else {
 				final File f = new File(path, "index.html");
 				Desktop.getDesktop().browse(f.toURI());
