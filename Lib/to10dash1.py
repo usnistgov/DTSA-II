@@ -79,12 +79,12 @@ assumed to come from the same material.  The "_error" columns reflect the standa
 		incident_beam_energy = "%0.1f" % ( e0, )
 		star_elemental_comments = comment[elm]
 		element = str(jl.String(elm.toAbbrev()).toUpperCase())
+		if isinstance(sample_id,int):
+			sample_id = "%07i" % sample_id
 		item = ( action_code, sample_id, srm_id, pkg_lab_id, analysis_lab_id, element, instrument, instrument_number, 
 			instrument_analysis_date, operator, weight_percent, weight_percent_error, atom_percent, atom_percent_error, 
 			amount, k_value, normalization_factor, normalization_model, count_rate, diffracting_crystal, spectrometer, 
 			e0, beam_current, spot_size, star_elemental_comments )
-		if isinstance(sample_id,int):
-			sample_id = "%07i" % sample_id
 		res = "%1s%-7s %-6s %1s %1s %-3s %-2s %-3s %-11s %12s %12s %12s %12s %12s %5s %12s %12s %3s %12s %-6s %5s %4s %5s %5s %s" % item
 		full = "%s%s\n" % (full, res)
 		print(res)
