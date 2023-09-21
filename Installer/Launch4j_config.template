@@ -22,6 +22,7 @@
     <maxVersion></maxVersion>
     <initialHeapPercent>10</initialHeapPercent>
     <maxHeapPercent>70</maxHeapPercent>
+	<opt>-XX:+UseZGC -XX:+ZGenerational</opt>
   </jre>
   <versionInfo>
     <fileVersion>NUMBER_VERSION</fileVersion>
