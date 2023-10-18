@@ -46,7 +46,7 @@ public class CommandBuffer {
    }
 
    public void add(String cmd) {
-      if(!mBuffer.get(mBuffer.size()-1).equals(cmd))
+      if ((mBuffer.size() == 0) || (!mBuffer.get(mBuffer.size() - 1).equals(cmd)))
          mBuffer.add(cmd);
       mIndex = mBuffer.size();
    }
@@ -69,15 +69,15 @@ public class CommandBuffer {
    }
 
    public String search(String cmd) {
-      int st = (mIndex == -1 ? mBuffer.size() : Math.min(mIndex, mBuffer.size()))  - 1;
+      int st = (mIndex == -1 ? mBuffer.size() : Math.min(mIndex, mBuffer.size())) - 1;
       // Search backwards
-      for (int i = st; i >= 0; --i) 
+      for (int i = st; i >= 0; --i)
          if (mBuffer.get(i).startsWith(cmd)) {
             mIndex = i;
             return mBuffer.get(i);
          }
       // Search forwards
-      for (int i = mBuffer.size()-1; i>st; --i)
+      for (int i = mBuffer.size() - 1; i > st; --i)
          if (mBuffer.get(i).startsWith(cmd)) {
             mIndex = i;
             return mBuffer.get(i);
