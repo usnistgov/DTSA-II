@@ -74,6 +74,7 @@ public class JCommandLine extends JTextPane {
    private final Style mStatusStyle;
    private Writer mArchivalWriter;
    private final JPopupMenu jPopupMenu_Main;
+   private final boolean mIsMac;
 
    static private final String COMMAND = "Command";
    static private final String PROMPT = "Prompt";
@@ -278,6 +279,10 @@ public class JCommandLine extends JTextPane {
       }
    }
 
+   private boolean isControlEquivalent(KeyEvent ke) {
+         return mIsMac ? ke.isMetaDown() : ke.isControlDown(); 
+   }
+   
    /**
     * JCommandLine - The default constructor for JCommandLine
     *
@@ -286,6 +291,8 @@ public class JCommandLine extends JTextPane {
    @SuppressWarnings("unchecked")
    public JCommandLine() throws HeadlessException {
       super();
+      final String os = System.getProperty("os.name").toLowerCase();
+      mIsMac = ((os.indexOf("mac") >= 0) || (os.indexOf("os x") >= 0));
       setEditorKit(new RTFEditorKit());
       setDocument(getEditorKit().createDefaultDocument());
       setBackground(Color.white);
@@ -349,7 +356,7 @@ public class JCommandLine extends JTextPane {
                }
                case KeyEvent.VK_UP :
                case KeyEvent.VK_DOWN : {
-                  if (e.isControlDown())
+                  if (isControlEquivalent(e))
                      e.consume();
                   break;
                }
@@ -366,7 +373,7 @@ public class JCommandLine extends JTextPane {
                   return;
                // Kill the enter key
                case KeyEvent.VK_ENTER :
-                  if (e.isControlDown())
+                  if (isControlEquivalent(e))
                      e.consume();
                   break;
             }
@@ -377,7 +384,7 @@ public class JCommandLine extends JTextPane {
          public void keyReleased(KeyEvent e) {
             switch (e.getKeyCode()) {
                case KeyEvent.VK_ESCAPE : {
-                  if (e.isControlDown() || e.isShiftDown()) {
+                  if (isControlEquivalent(e) || e.isShiftDown()) {
                      try {
                         mJythonWorker.execute(RESET_CMD);
                      } catch (final InterruptedException e1) {
@@ -396,13 +403,13 @@ public class JCommandLine extends JTextPane {
                   break;
                }
                case KeyEvent.VK_SPACE :
-                  if (e.isControlDown()) {
+                  if (isControlEquivalent(e)) {
                      performCommandSearch();
                      e.consume();
                   }
                   break;
                case KeyEvent.VK_UP : {
-                  if (e.isControlDown() || e.isAltDown()) {
+                  if (isControlEquivalent(e) || e.isAltDown()) {
                      e.consume();
                      final Document doc = getDocument();
                      try {
@@ -415,7 +422,7 @@ public class JCommandLine extends JTextPane {
                   break;
                }
                case KeyEvent.VK_DOWN : {
-                  if (e.isControlDown() || e.isAltDown()) {
+                  if (isControlEquivalent(e) || e.isAltDown()) {
                      e.consume();
                      final Document doc = getDocument();
                      try {
@@ -428,14 +435,14 @@ public class JCommandLine extends JTextPane {
                   break;
                }
                case KeyEvent.VK_EQUALS : {
-                  if ((e.isShiftDown()) && (e.isControlDown() || e.isAltDown())) {
+                  if ((e.isShiftDown()) && (isControlEquivalent(e) || e.isAltDown())) {
                      Font f = getFont();
                      setFont(f.deriveFont(f.getSize2D()+2.0f));
                   }
                   break;
                }
                case KeyEvent.VK_MINUS: {
-                  if ((e.isShiftDown()) && (e.isControlDown() || e.isAltDown())) {
+                  if ((e.isShiftDown()) && (isControlEquivalent(e) || e.isAltDown())) {
                      Font f = getFont();
                      setFont(f.deriveFont(f.getSize2D()-2.0f));
                   }
@@ -476,7 +483,7 @@ public class JCommandLine extends JTextPane {
                setSelectionStart(mCmdOffset);
                setSelectionEnd(se);
             }
-            if ((e.isControlDown() || e.isAltDown()) && ((e.getKeyChar() == '\n') || (e.getKeyChar() == '\r'))) {
+            if ((isControlEquivalent(e) || e.isAltDown()) && ((e.getKeyChar() == '\n') || (e.getKeyChar() == '\r'))) {
                try {
                   executeCurrentCommand();
                } catch (final BadLocationException ex) {
