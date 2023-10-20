@@ -1595,138 +1595,142 @@ areaCriterion(...), maxCriterion(...) build common criteria."""
 				if terminated:
 					return
 				termP=False
-				jl.System.gc()
-				mapSize = int(self._imgDim * self._transform.imageScale())
-				map = jai.BufferedImage(mapSize, mapSize, jai.BufferedImage.TYPE_3BYTE_BGR)
-				mg = map.createGraphics()
-				ri = self._transform.getImageRectangle()
-				af = jag.AffineTransform(float(mapSize) / float(ri.width), 0.0, 0.0, float(mapSize) / float(ri.height), -float(ri.x) * float(mapSize) / float(ri.width), -float(ri.y) * float(mapSize) / float(ri.height))
-				mg.setTransform(af)
-				mg.setColor(jawt.Color.yellow)
-				mg.setComposite(jawt.AlphaComposite.getInstance(jawt.AlphaComposite.SRC_OVER, 0.5))
-				mg.setFont(jawt.Font("Serif", jawt.Font.PLAIN, 800))
-				# mg.setRenderingHint(jawt.RenderingHint.KEY_ANTIALIASING, jawt.RenderingHint.VALUE_ANTIALIAS_ON)
-				# mg.setRenderingHint(jawt.RenderingHint.KEY_TEXT_ANTIALIASING, jawt.RenderingHint.VALUE_ANTIALIAS_ON)
-				self.debug("CollectField 00")
 				try:
-					scale = 0.001 * _ts.getViewField() / float(ri.width)
-					if self._collectEDS:
-						rt = semtr.RcaTranslator(_sem, pt_det_all, scale)
-						setResolution(_edsResolution)
-					else:
-						rt = semtr.RcaTranslator(_sem, scale)
-					if self._debugPw!=None:
-						rt.setDebugStream(self._debugPw)
-					rt.setMorphologyCriterion(self._morphologyCrit)
-					rt.setStagePosition(_stg.getPosition())
-					_sem.add(rt)
-					r = self._transform.getRCARectangle()
-					rca = semss.RCAConfiguration(self._imgDet.getIndex(), r.width / 2, self._ppmResolution, r, self._searchDwell, self._searchLow, self._searchHigh, self._measureDwell, self._measureLow, self._measureHigh, self._measureStep)
-					mg.draw(rca.getRegion())
-					if self._collectImages:
-						ra = self._transform.rcaToSubraster(r, self._imgDim)
-						imgs = collectImages("%04d" % (fieldNumber, ), self._rcaFov, dims=ra.getImageDimensions(), dwell=3, path="%s/FIELDS" % self._path, subRaster=ra.getSubRaster(), rotation=0.0, writeMask = SAVE_FIELD_MASK)
-						ii = imgs[_apaWrite[0][1]]
-						mg.drawImage(ii, r.x, r.y, r.x + r.width, r.y + r.height, 0, 0, ii.getWidth(), ii.getHeight(), None)
-						_afafb.updateFieldImage(map)
-					_ts.rcaInit(rca)
-					if self._collectEDS:
-						if self._EDSMode==POINT_MODE:
-							_ts.rcaEDXPoint(self._edsDwell)
-						elif self._EDSMode==FIXED_SPACING:
-							_ts.rcaEDXFixedSpacing(self._edsDwell, 8, 0, 0)
-						elif self._EDSMode==FIXED_DIM:
-							_ts.rcaEDXFixedDimension(self._edsDwell, 64, 0, 0)
-						elif self._EDSMode==CHORD_RASTER:
-							_ts.rcaEDXChordRaster(self._edsDwell, self._measureLow, self._measureHigh)
-						_sem.initMapping()
-					if self._blackLevel and self._gain:
-						self._imgDet.setBrightnessContrast(self._gain, self._blackLevel)
-					if self._beamIntensity:
-						_ts.setPCContinual(21.0-self._beamIntensity)
-					nPart=0
-					self.debug("CollectField 01")
-					_ts.rcaNextParticle(False, int(self._edsRealTime * 1000))
-					self.debug("CollectField 02")
-					termP=False
-					while (rt.getStatus() != semtr.RcaTranslator.RCAStatus.AllComplete) and (self._ParticleCount < self._maxPart):
-						datum = _sem.poll()
-						if datum and isinstance(datum, semdi.RcaDatum):
-							self.debug("CollectField 03 : "+str(datum))
-							if not (datum.isDiscarded() or datum.isDuplicate()):
-								nPart=nPart+1
-								self.debug("New particle number %d in frame %d" % ( nPart, fieldNumber) )
-							if not datum.isDuplicate():
-								datum.draw(mg, self._ParticleCount)
-							termP = self.addParticle(datum, fieldNumber)
+					jl.System.gc()
+					mapSize = int(self._imgDim * self._transform.imageScale())
+					map = jai.BufferedImage(mapSize, mapSize, jai.BufferedImage.TYPE_3BYTE_BGR)
+					mg = map.createGraphics()
+					ri = self._transform.getImageRectangle()
+					af = jag.AffineTransform(float(mapSize) / float(ri.width), 0.0, 0.0, float(mapSize) / float(ri.height), -float(ri.x) * float(mapSize) / float(ri.width), -float(ri.y) * float(mapSize) / float(ri.height))
+					mg.setTransform(af)
+					mg.setColor(jawt.Color.yellow)
+					mg.setComposite(jawt.AlphaComposite.getInstance(jawt.AlphaComposite.SRC_OVER, 0.5))
+					mg.setFont(jawt.Font("Serif", jawt.Font.PLAIN, 800))
+					# mg.setRenderingHint(jawt.RenderingHint.KEY_ANTIALIASING, jawt.RenderingHint.VALUE_ANTIALIAS_ON)
+					# mg.setRenderingHint(jawt.RenderingHint.KEY_TEXT_ANTIALIASING, jawt.RenderingHint.VALUE_ANTIALIAS_ON)
+					self.debug("CollectField 00")
+					try:
+						scale = 0.001 * _ts.getViewField() / float(ri.width)
+						if self._collectEDS:
+							rt = semtr.RcaTranslator(_sem, pt_det_all, scale)
+							setResolution(_edsResolution)
 						else:
-							if datum!=None:
-								self.debug("CollectField 03a: "+ str(datum))
+							rt = semtr.RcaTranslator(_sem, scale)
+						if self._debugPw!=None:
+							rt.setDebugStream(self._debugPw)
+						rt.setMorphologyCriterion(self._morphologyCrit)
+						rt.setStagePosition(_stg.getPosition())
+						_sem.add(rt)
+						r = self._transform.getRCARectangle()
+						rca = semss.RCAConfiguration(self._imgDet.getIndex(), r.width / 2, self._ppmResolution, r, self._searchDwell, self._searchLow, self._searchHigh, self._measureDwell, self._measureLow, self._measureHigh, self._measureStep)
+						mg.draw(rca.getRegion())
+						if self._collectImages:
+							ra = self._transform.rcaToSubraster(r, self._imgDim)
+							imgs = collectImages("%04d" % (fieldNumber, ), self._rcaFov, dims=ra.getImageDimensions(), dwell=3, path="%s/FIELDS" % self._path, subRaster=ra.getSubRaster(), rotation=0.0, writeMask = SAVE_FIELD_MASK)
+							ii = imgs[_apaWrite[0][1]]
+							mg.drawImage(ii, r.x, r.y, r.x + r.width, r.y + r.height, 0, 0, ii.getWidth(), ii.getHeight(), None)
 							_afafb.updateFieldImage(map)
-							jl.Thread.sleep(10)
-						if terminated or termP:
-							self.debug(("Manually terminated" if terminated else "Terminated by rule"))
-							break
-						if nPart >= self._maxPartPerField:
-							self.debug("Exceeded maxPartPerField.")
-							break
-				finally:
-					self.debug("CollectField 04")
-					if self._collectEDS:
-						_sem.finalizeMapping()
-					datum = _sem.poll()
-					while datum:
-						if datum and isinstance(datum, semdi.RcaDatum):
-							self.debug("CollectField 04a : "+str(datum))
-							if (self._ParticleCount < self._maxPart) and (nPart < self._maxPartPerField):
+						_ts.rcaInit(rca)
+						if self._collectEDS:
+							if self._EDSMode==POINT_MODE:
+								_ts.rcaEDXPoint(self._edsDwell)
+							elif self._EDSMode==FIXED_SPACING:
+								_ts.rcaEDXFixedSpacing(self._edsDwell, 8, 0, 0)
+							elif self._EDSMode==FIXED_DIM:
+								_ts.rcaEDXFixedDimension(self._edsDwell, 64, 0, 0)
+							elif self._EDSMode==CHORD_RASTER:
+								_ts.rcaEDXChordRaster(self._edsDwell, self._measureLow, self._measureHigh)
+							_sem.initMapping()
+						if self._blackLevel and self._gain:
+							self._imgDet.setBrightnessContrast(self._gain, self._blackLevel)
+						if self._beamIntensity:
+							_ts.setPCContinual(21.0-self._beamIntensity)
+						nPart=0
+						self.debug("CollectField 01")
+						_ts.rcaNextParticle(False, int(self._edsRealTime * 1000))
+						self.debug("CollectField 02")
+						termP=False
+						while (rt.getStatus() != semtr.RcaTranslator.RCAStatus.AllComplete) and (self._ParticleCount < self._maxPart):
+							datum = _sem.poll()
+							if datum and isinstance(datum, semdi.RcaDatum):
+								self.debug("CollectField 03 : "+str(datum))
 								if not (datum.isDiscarded() or datum.isDuplicate()):
 									nPart=nPart+1
-									self.debug("New particle number %d in frame %d (in terminate)" % ( nPart, fieldNumber) )
-								datum.draw(mg, self._ParticleCount)
-								self.addParticle(datum, fieldNumber)
-								_afafb.updateFieldImage(map)
-						datum = _sem.poll()
-					self.debug("CollectField 05")
-					self._zep.setHeaderItem("MAG_FMT","Mag Fields Particles Time Area")
-					self._zep.setHeaderItem("MAG0","%0.0f %d %d %0.2f %0.3f" %
-						(3.5*25.4/self._fov, fieldNumber, self._ParticleCount, self._timer.inSeconds()/60.0, self._fov*self._fov*fieldNumber ))
-					self._zep.setHeaderItem("LOW_MAG","0")
-					self._zep.setHeaderItem("MAGNIFICATIONS","1")
-					self._zep.write(self._zep.getFile().toString())
-					_sem.remove(rt)
-					_ts.rcaFinish()
-					write(map, "%0.4d" % fieldNumber, path="%s/FIELDS" % self._path)
-				try:
-					self.debug("CollectField 06")
-					for pNum, rcaFov, pixDim, sr, spec in self._pImgStack:
-						self.debug("CollectField 07: Particle %d - dim = %s, sr = %s" % ( pNum, pixDim, sr ))
-						imgs = collectImages(None, fov=rcaFov, dims=pixDim, dwell=self._pImgDwell, subRaster=sr, path="%s/mag0" % (self._path,), writeMask=0x0)
-						if imgs:
-							self.debug("CollectField 08: P%i imgs" % (pNum, ))
-							_afafb.updateParticleImage(imgs[_apaWrite[0][1]])
-							if spec:
-								props = spec.getProperties()
-								if len(imgs) > 1:
-									for prop, idx in _apaWrite:
-										props.setImageProperty(prop, imgs[idx])
-								else:
-									props.setImageProperty(props.MicroImage,imgs[0])
-								self._zep.writeSpectrum(spec, pNum)
+									self.debug("New particle number %d in frame %d" % ( nPart, fieldNumber) )
+								if not datum.isDuplicate():
+									datum.draw(mg, self._ParticleCount)
+								termP = self.addParticle(datum, fieldNumber)
 							else:
-								self.debug("CollectField 08: Missing image for P%i" % (pNum, ))
-								print "Missing spectrum for particle %d" % ( pNum )
-					self.debug("CollectField 09")
-				finally:
-					self._pImgStack = []
-				try:
-					for pNum, rcaFov, pixDim, sr in self._pSIStack:
-						siName = "SI%d" % pNum
-						siPath = "%s/si" % self._path
-						si = collectSI(siName, rcaFov, frameCount=1, dwell=self._SIDwell, dim=pixDim, subRaster=sr, path=siPath)
-						self._processSIStack.add(siName, siPath, self._vecs)
-				finally:
-					self._pSIStack = []
-				self.debug("CollectField 10")
+								if datum!=None:
+									self.debug("CollectField 03a: "+ str(datum))
+								_afafb.updateFieldImage(map)
+								jl.Thread.sleep(10)
+							if terminated or termP:
+								self.debug(("Manually terminated" if terminated else "Terminated by rule"))
+								break
+							if nPart >= self._maxPartPerField:
+								self.debug("Exceeded maxPartPerField.")
+								break
+					finally:
+						self.debug("CollectField 04")
+						if self._collectEDS:
+							_sem.finalizeMapping()
+						datum = _sem.poll()
+						while datum:
+							if datum and isinstance(datum, semdi.RcaDatum):
+								self.debug("CollectField 04a : "+str(datum))
+								if (self._ParticleCount < self._maxPart) and (nPart < self._maxPartPerField):
+									if not (datum.isDiscarded() or datum.isDuplicate()):
+										nPart=nPart+1
+										self.debug("New particle number %d in frame %d (in terminate)" % ( nPart, fieldNumber) )
+									datum.draw(mg, self._ParticleCount)
+									self.addParticle(datum, fieldNumber)
+									_afafb.updateFieldImage(map)
+							datum = _sem.poll()
+						self.debug("CollectField 05")
+						self._zep.setHeaderItem("MAG_FMT","Mag Fields Particles Time Area")
+						self._zep.setHeaderItem("MAG0","%0.0f %d %d %0.2f %0.3f" %
+							(3.5*25.4/self._fov, fieldNumber, self._ParticleCount, self._timer.inSeconds()/60.0, self._fov*self._fov*fieldNumber ))
+						self._zep.setHeaderItem("LOW_MAG","0")
+						self._zep.setHeaderItem("MAGNIFICATIONS","1")
+						self._zep.write(self._zep.getFile().toString())
+						_sem.remove(rt)
+						_ts.rcaFinish()
+						write(map, "%0.4d" % fieldNumber, path="%s/FIELDS" % self._path)
+					try:
+						self.debug("CollectField 06")
+						for pNum, rcaFov, pixDim, sr, spec in self._pImgStack:
+							self.debug("CollectField 07: Particle %d - dim = %s, sr = %s" % ( pNum, pixDim, sr ))
+							imgs = collectImages(None, fov=rcaFov, dims=pixDim, dwell=self._pImgDwell, subRaster=sr, path="%s/mag0" % (self._path,), writeMask=0x0)
+							if imgs:
+								self.debug("CollectField 08: P%i imgs" % (pNum, ))
+								_afafb.updateParticleImage(imgs[_apaWrite[0][1]])
+								if spec:
+									props = spec.getProperties()
+									if len(imgs) > 1:
+										for prop, idx in _apaWrite:
+											props.setImageProperty(prop, imgs[idx])
+									else:
+										props.setImageProperty(props.MicroImage,imgs[0])
+									self._zep.writeSpectrum(spec, pNum)
+								else:
+									self.debug("CollectField 08: Missing image for P%i" % (pNum, ))
+									print "Missing spectrum for particle %d" % ( pNum )
+						self.debug("CollectField 09")
+					finally:
+						self._pImgStack = []
+					try:
+						for pNum, rcaFov, pixDim, sr in self._pSIStack:
+							siName = "SI%d" % pNum
+							siPath = "%s/si" % self._path
+							si = collectSI(siName, rcaFov, frameCount=1, dwell=self._SIDwell, dim=pixDim, subRaster=sr, path=siPath)
+							self._processSIStack.add(siName, siPath, self._vecs)
+					finally:
+						self._pSIStack = []
+					self.debug("CollectField 10")
+				except jl.Throwable, th:
+					print str(th)
+					th.printStackTrace()
 				return termP
 
 			def summarize(self, tiling=None):
