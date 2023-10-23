@@ -42,6 +42,7 @@ import org.python.util.InteractiveConsole;
 
 import gov.nist.microanalysis.EPQLibrary.ISpectrumData;
 import gov.nist.microanalysis.EPQTools.SimpleFileFilter;
+import gov.nist.microanalysis.dtsa2.DTSA2.OS;
 
 /**
  * <p>
@@ -74,7 +75,6 @@ public class JCommandLine extends JTextPane {
    private final Style mStatusStyle;
    private Writer mArchivalWriter;
    private final JPopupMenu jPopupMenu_Main;
-   private final boolean mIsMac;
 
    static private final String COMMAND = "Command";
    static private final String PROMPT = "Prompt";
@@ -280,7 +280,7 @@ public class JCommandLine extends JTextPane {
    }
 
    private boolean isControlEquivalent(KeyEvent ke) {
-         return mIsMac ? ke.isMetaDown() : ke.isControlDown(); 
+         return DTSA2.getOS() == OS.OS_MAC ? ke.isMetaDown() : ke.isControlDown(); 
    }
    
    /**
@@ -291,8 +291,6 @@ public class JCommandLine extends JTextPane {
    @SuppressWarnings("unchecked")
    public JCommandLine() throws HeadlessException {
       super();
-      final String os = System.getProperty("os.name").toLowerCase();
-      mIsMac = ((os.indexOf("mac") >= 0) || (os.indexOf("os x") >= 0));
       setEditorKit(new RTFEditorKit());
       setDocument(getEditorKit().createDefaultDocument());
       setBackground(Color.white);
