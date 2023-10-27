@@ -3914,37 +3914,6 @@ public class QuantificationWizard extends JWizardDialog {
             }
          }
 
-         protected RegionOfInterest bestMatch(RegionOfInterest roi, Set<RegionOfInterest> reqRefs) {
-            assert roi.getElementSet().size() == 1;
-            RegionOfInterest best = null;
-            double bestScore = 0.95;
-            for (RegionOfInterest reqRoi : reqRefs) {
-               assert reqRoi.getElementSet().size() == 1;
-               double score = score(reqRoi, roi);
-               if (score > bestScore) {
-                  bestScore = score;
-                  best = reqRoi;
-               }
-            }
-            return best;
-         }
-
-         private double score(RegionOfInterest roi1, RegionOfInterest roi2) {
-            final Set<XRayTransition> xrts1 = new TreeSet<>(roi1.getAllTransitions().getTransitions());
-            final XRayTransitionSet xrts2 = roi2.getAllTransitions();
-            double sum = 0.0, all = 0.0;
-            for (XRayTransition xrt : xrts2.getTransitions()) {
-               all += xrt.getNormalizedWeight();
-               if (xrts1.contains(xrt)) {
-                  sum += xrt.getNormalizedWeight();
-                  xrts1.remove(xrt);
-               }
-            }
-            for (XRayTransition xrt : xrts1)
-               all += xrt.getNormalizedWeight();
-            return sum / all;
-         }
-
          private void addRowFromDatabase() {
             if (mSession != null) {
                final SelectElements se = new SelectElements(QuantificationWizard.this,

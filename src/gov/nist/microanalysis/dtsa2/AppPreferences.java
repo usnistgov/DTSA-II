@@ -11,7 +11,7 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
+import java.net.URI;
 import java.text.DateFormat;
 import java.util.Collections;
 import java.util.Date;
@@ -1818,9 +1818,15 @@ public class AppPreferences {
 			break;
 		case FlatLight:
 			UIManager.setLookAndFeel(new FlatLightLaf());
+         UIManager.put("Table.showHorizontalLines", Boolean.TRUE);
+         UIManager.put("Table.showVerticalLines", Boolean.TRUE);
+         UIManager.put( "TabbedPane.selectedBackground", Color.white );
 			break;
 		case FlatMacLightLaf:
 		   UIManager.setLookAndFeel(new FlatMacLightLaf());
+         UIManager.put("Table.showHorizontalLines", Boolean.TRUE);
+         UIManager.put("Table.showVerticalLines", Boolean.TRUE);
+         UIManager.put( "TabbedPane.selectedBackground", Color.white );
 		   break;
 		case FlatMacDarkLaf:
          UIManager.setLookAndFeel(new FlatMacDarkLaf());
@@ -1851,8 +1857,7 @@ public class AppPreferences {
 	private void openURL(String path) {
 		try {
 			if (path.startsWith("http://")) {
-				final URL url = new URL(path);
-				Desktop.getDesktop().browse(url.toURI());
+				Desktop.getDesktop().browse(new URI(path));
 			} else {
 				final File f = new File(path, "index.html");
 				Desktop.getDesktop().browse(f.toURI());

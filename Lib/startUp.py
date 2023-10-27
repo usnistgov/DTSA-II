@@ -5,8 +5,25 @@
 # Modified: 11-July-2022
 # Set the SITE to account for site specific hardware variations
 from gov.nist.microanalysis.EPQLibrary import SpectrumProperties
-NIST, MCCRONE, PNNL, PAS, AEM, ORNL, SRNL, PLEASANTON, WARRENDALE = ( "NIST", "McCRONE", "PNNL", "PAS", "AEM", "ORNL", "SRNL", "PLEASANTON", "WARRENDALE" )
-SITE = NIST
+NIST, MCCRONE, PNNL, PAS, PAS2, AEM, ORNL, SRNL, PLEASANTON, WARRENDALE, GRYPHON = ( "NIST", "McCRONE", "PNNL", "PAS", "PAS2", "AEM", "ORNL", "SRNL", "PLEASANTON", "WARRENDALE", "Gryphon" )
+SITE = SRNL # SET THE SITE!!!!!!
+
+if SITE==GRYPHON:
+	_COMPANY_ = "Valecitos Laboratory"
+	_INSTRUMENT_ = "TESCAN MIRA3 LMU S/N ?"
+elif SITE==NIST:
+	_COMPANY_ = "DOC NIST MML - 637.02"
+	_INSTRUMENT_ = "TESCAN MIRA3 LMU S/N MI 0791077US"
+elif SITE==PAS2:
+	_COMPANY_ =  "PAS"
+	_INSTRUMENT_ = "X CC 004"
+elif SITE==SRNL:
+	_COMPANY = "SRNL"
+	_INSTRUMENT = "TESCAN MIRA4"
+else:
+	print "Please set the _COMPANY_ and _INSTRUMENT_ variables in the setup.py script"
+	_COMPANY = "Unknown"
+	_INSTRUMENT_="TESCAN MIRA3 LMU S/N ?"
 
 if (SITE == NIST) and (jl.System.getProperty('sun.java.command') == u'gov.nist.microanalysis.dtsa2.DTSA2'):
 	print "JAR paths based on workspace."
@@ -78,7 +95,7 @@ defaultArchivePath = None
 if SITE==NIST:
 	rootPath = "D:"
 	defaultArchivePath = "P:"
-elif (SITE==PNNL) or (SITE==PAS) or (SITE==AEM):
+elif (SITE==PNNL) or (SITE==PAS) or (SITE==AEM) or (SITE==GRYPHON):
 	rootPath = "C:\\Users\\Tescan\\My Documents\\Data"
 elif SITE==ORNL:
 	rootPath = "C:\\Users\\Tescan\\Data"
@@ -88,12 +105,16 @@ elif SITE==WARRENDALE:
 	rootPath = "C:\\Users\\Tescan\\Documents\\DTSA-II Reports\\Data"
 elif SITE==SRNL:
 	rootPath = "C:\\Users\\Tescan\\SEMantics Data"
-else:  # SITE==MCCRONE:
+elif SITE==PAS2:
+	rootPath = "C:\\Users\\Tescan\\Documents\\Data"
+elif SITE==MCCRONE:
+	rootPath = "C:\\Data"
+else:
+	print "WARNING: Unknown site"
 	rootPath = "C:\\Data"
 
-
 BLANKER_INDEX = 0
-if SITE == WARRENDALE or SITE == SRNL:
+if SITE == WARRENDALE or SITE == SRNL or SITE == PAS2:
 	BLANKER_INDEX = 1
 
 # Configure this to determine which field images to save.
@@ -101,6 +122,8 @@ if SITE == WARRENDALE or SITE == SRNL:
 if SITE==WARRENDALE:
 	SAVE_FIELD_MASK = 0x9
 elif (SITE==AEM) or (SITE==PAS):
+	SAVE_FIELD_MASK = 0x0
+elif (SITE==PAS2):
 	SAVE_FIELD_MASK = 0x0
 else:
 	SAVE_FIELD_MASK = 0x3
@@ -122,19 +145,11 @@ else:
 	nullImagePath = "%s\\NullImages" % base
 	keyPath = nullImagePath
 
-defaultStds = { "C": "C std.msa", "Al": "Al std.msa", "Na": "NaCl std.msa", "Cl": "NaCl std.msa",
-		 "O": "MgO std.msa", "Si": "Si std.msa", "Fe": "Fe std.msa", "Ca": "CaF2 std.msa",
-		 "Cr": "Cr std.msa", "Ni":"Ni std.msa", "Cu": "Cu std.msa", "Ti": "Ti std.msa", "Mn":"Mn std.msa",
-		 "Mg": "Mg std.msa", "S": "FeS2 std.msa", "Zn" : "Zn std.msa", "Ba":"BaF2 std.msa",
-#		 "Co":"Co std.msa", "K": "KBr std.msa", "Zr":"Zr std.msa", "Mo":"Mo std.msa",
-#		 "Ag" : "Ag std.msa", "Au" : "Au std.msa", "La" : "LaF3 std.msa", "Pb" : "K227 std.msa"
-}
-
 if (SITE==ORNL) or (SITE==NIST):
 	availableDets = ( True, )*4 # False, False, False )
 elif (SITE==PLEASANTON) or (SITE==WARRENDALE):
 	availableDets = ( True, )
-elif (SITE==SRNL) or (SITE==MCCRONE):
+elif (SITE==SRNL) or (SITE==MCCRONE) or (SITE==GRYPHON) or (SITE==PAS2):
 	availableDets = ( True, )*3
 else:
 	availableDets = ( True, )*2 # False, False, False )
@@ -154,8 +169,13 @@ else:
 	det_off=1
 for i in range(0, defaultDetCount):
 	if availableDets[i]:
-		pt_det.append(findDetector("EDAX Det %d" % (i+det_off, )))
+		d = findDetector("EDAX Det %d" % (i+det_off, ))
+		if d==None:
+			print("The `EDAX Det %d` is missing." % (i+det_off, ));
+		pt_det.append(d)
 pt_det_all = findDetector("EDAX All")
+if pt_det_all==None:
+	print("The 'EDAX All` detector is missing.")
 
 _saverize = semantics.Saverize()
 _saverizeTh = jl.Thread(_saverize)
@@ -166,8 +186,8 @@ connect = (jop.showConfirmDialog(MainFrame, "Connect to the TESCAN?", "Start-up 
 # Location of the Image Magick executables 'convert' and 'montage'
 if SITE==ORNL:
 	IMAGE_MAGICK = "C:\\Program Files\\ImageMagick-6.9.9-Q16"
-elif SITE==NIST:
-	IMAGE_MAGICK = "C:\Program Files\ImageMagick-6.9.12-Q8"
+elif (SITE==NIST) or (SITE==PAS2):
+	IMAGE_MAGICK = "C:\\Program Files\\ImageMagick-6.9.12-Q8"
 else:
 	IMAGE_MAGICK = "C:\\Program Files\\ImageMagick-6.9.6-Q16"
 
@@ -234,33 +254,23 @@ if connect:
 		print "Unable to find a detector named: %s" % name
 		return None
 
-	# Default images to save using collectImages(...)
-	if SITE==PLEASANTON:
-		DEF_IMAGE_MASK = 0x2F
+	sedName = "SE"
+	if SITE==MCCRONE:
+		bseName = "BSED"
 	elif SITE==WARRENDALE:
-		DEF_IMAGE_MASK = 0x9 # 0x2F
-	elif SITE==SRNL:
-		DEF_IMAGE_MASK = (1 << findEDet("BSE").getIndex())+(1 << findEDet("SE").getIndex()) # 0x300 - All detectors is 0x328
-	else:
-		DEF_IMAGE_MASK = 0x3
-
-	# Mask to use for other functions that save images
-	SAVE_IMAGE_MASK = (1 << findEDet("BSE").getIndex())+(1 << findEDet("SE").getIndex())
-
-	# Mask to use for other functions that save images
-	SAVE_IMAGE_MASK = 0x300
-	if SITE==SRNL:
-		_apaDet = findEDet("BSE")
-	elif SITE==MCCRONE:
-		_apaDet = findEDet("BSED")
-	elif SITE==WARRENDALE:
-		_apaDet = findEDet("LE BSE")
+		bseName ="LE BSE"
 	elif SITE==PLEASANTON:
-		_apaDet = findEDet("BSE Q4")
+		bseName = "BSE Q4"
 	else:
-		_apaDet = findEDet("BSE")
+		bseName = "BSE"
 
-	if SITE==SRNL:
+	# Default images to save using collectImages(...)
+	DEF_IMAGE_MASK = (1 << findEDet(bseName).getIndex())+(1 << findEDet(sedName).getIndex()) # 0x300 - All detectors is 0x328
+	# Mask to use for other functions that save images
+	SAVE_IMAGE_MASK = (1 << findEDet(bseName).getIndex())+(1 << findEDet(sedName).getIndex())
+
+	_apaDet = findEDet(bseName)
+	if SITE==SRNL or SITE==PAS2:
 		_apaWrite = ( (epq.SpectrumProperties.MicroImage, 3), (epq.SpectrumProperties.MicroImage2, 2) )
 	else:
 		_apaWrite = ( (epq.SpectrumProperties.MicroImage, 1), (epq.SpectrumProperties.MicroImage2, 0) )
@@ -599,7 +609,7 @@ image: Determines whether an image is collected after acquiring the spectrum (de
 						imgs[i].applyCenterBox(imageFOV*0.001)
 						sp.setObjectProperty(p, imgs[i])
 			if pc:
-				fe = updatedPC(interval=(0 if forcePC else 300))
+				fe = updatedPC(force=forcePC)
 				if fe:
 					sp.setNumericProperty(sp.ProbeCurrent, fe.average())
 		_ts.chamberLed(defLED)
@@ -693,7 +703,7 @@ fov: An optional field of view width to which to set the SEM imaging while colle
 			display(dup)
 			specs.append(wrap(dup))
 		if pc:
-			fe = updatedPC(interval=(0 if forcePC else 300))
+			fe = updatedPC(force=forcePC)
 			if fe:
 				for spec in specs:
 					sp.setNumericProperty(sp.ProbeCurrent, fe.average())
@@ -789,7 +799,7 @@ image: Determines whether an image is collected after acquiring the spectrum (de
 			_ts.setViewField(oldVf)
 		_ts.scSetSpeed(oldSp)
 		if pc:
-			fe = updatedPC(interval=(0 if forcePC else 300))
+			fe = updatedPC(force=forcePC)
 		for spec in specs:
 			if not spec:
 				continue
@@ -801,7 +811,7 @@ image: Determines whether an image is collected after acquiring the spectrum (de
 				comp = material(comp)
 			if isinstance(comp, epq.Composition):
 				sp.setCompositionProperty(epq.SpectrumProperties.StandardComposition, comp)
-			if pc and fe:
+			if fe:
 				sp.setNumericProperty(sp.ProbeCurrent, fe.average())
 		_ts.chamberLed(defLED)
 		logSpectrum((path if path else defaultPath), acqTime, name, mode)
@@ -822,7 +832,7 @@ image: Determines whether an image is collected after acquiring the spectrum (de
 		oldSp = _ts.scGetSpeed()
 		try:
 			if pc:
-				pcb=updatedPC(interval=0)
+				pcb=updatedPC(force=True)
 			collectImages(baseName, fov, dims=(1024,1024),dwell=5,path=path, writeMask=SAVE_IMAGE_MASK)
 			_ts.setViewField(fov)
 			_ts.scStopScan()
@@ -830,11 +840,11 @@ image: Determines whether an image is collected after acquiring the spectrum (de
 				_ts.scSetBeamPosition(pnt[0],pnt[1])
 				time.sleep(0.1)
 				spec=collect2(acqTime, "%s[Pt %i](%0.3g,%0.3g)" % (baseName, i, pnt[0],pnt[1]), mode='L', pc=False, disp=disp, path=path, fov=None, image=False)
-				if pc and spec:
+				if pcb and spec:
 					sp = spec.getProperties()
 					sp.setNumericProperty(sp.ProbeCurrent, pcb.average())
 			if pc:
-				print updatedPC(interval=0)
+				print updatedPC(force=True)
 		finally:
 			_ts.setViewField(oldVf)
 			_ts.scSetSpeed(oldSp)
@@ -897,6 +907,8 @@ image: Determines whether an image is collected after acquiring the spectrum (de
 				time.sleep(0.1)
 				ds.add(0.001 * _ts.getIAbsorbed())
 			print u'Probe current: %f \u00B1 %f nA' % (ds.average(), ds.standardDeviation())
+			if ds.average() < 0.010:
+				print "Is the beam blanker enabled in the TESCAN software? (It should be disabled!)"
 			if restore:
 				moveTo(prevPos)
 			_ts.scSetSpeed(oldSp)
@@ -909,15 +921,15 @@ image: Determines whether an image is collected after acquiring the spectrum (de
 
 	def shouldUpdatePC(interval):
 		global lastPCUpdate, lastPCValue
-		return globals().has_key("faraday") and ((lastPCUpdate == None) or (abs(time.time() - lastPCUpdate) > interval))
+		return globals().has_key("faraday") and ((lastPCUpdate == None) or (abs(time.clock() - lastPCUpdate) > interval))
 
-	def updatedPC(interval=1800):
-		"""updatedPC([interval=1800]) - Works
+	def updatedPC(interval=1800, force=False):
+		"""updatedPC([interval=1800],[force=False]) - Works
 		Returns a measurement of the probe current, updating the measurement if more than 'interval' seconds have elapsed."""
 		global lastPCUpdate, lastPCValue
-		if shouldUpdatePC(interval):
+		if force or shouldUpdatePC(interval):
 			lastPCValue = measurePC()
-			lastPCUpdate = time.time()
+			lastPCUpdate = time.clock()
 		return lastPCValue
 
 	def trueRule(tvm):
@@ -1101,7 +1113,7 @@ Get the spectrum associated with the specified row number"""
 	Updates the probe current if necessary and then asks to recenter particle"""
 			if shouldUpdatePC(300):
 				lastPCUpdate = None
-				updatedPC(interval=300)
+				updatedPC()
 				if jop.showConfirmDialog(MainFrame, "Centered and focused?", "Relocate", jop.YES_NO_OPTION) <> jop.YES_OPTION:
 					return
 
@@ -1188,6 +1200,7 @@ if connect and (_ts.hasRCALicense() or SITE==SRNL):
 		project - The name of the project with which this analysis is associated
 		sample - The name of the sample on which this analysis is being performed
 		analysis - An optional name for the analysis (Otherwise a date stamp is used.)"""
+				assert globals().has_key("faraday"), "Please define the position of the Faraday cup and restart!"
 				self._project = project
 				self._sample = sample
 				self._analyst = analyst
@@ -1213,6 +1226,7 @@ if connect and (_ts.hasRCALicense() or SITE==SRNL):
 				self._measureDwell = 4000
 				self._measureStep = 8
 				self._beamIntensity = None
+				self._probeCurrent = updatedPC(force=True).average()
 				self.configEDS(None, None, 0.4)
 				self.setMorphologyCriterion(semtr.RcaTranslator.AreaCriterion(10.0, 1.0e6))
 				self.setFieldOfView(0.1, 9)
@@ -1426,9 +1440,9 @@ areaCriterion(...), maxCriterion(...) build common criteria."""
 				z.setHeaderItem("START_TIME", jtext.SimpleDateFormat("hh:mm:ss a z").format(dt))
 				z.setHeaderItem("SAMPLE", self._sample)
 				z.setHeaderItem("PROJECT", self._project)
-				z.setHeaderItem("COMPANY", "DOC NIST MML - 637.02")
-				z.setHeaderItem("INSTRUMENT", "NIST's TESCAN MIRA3 in 217 F101")
-				z.setHeaderItem("PROBE_CURRENT", "%g nA" % (updatedPC(0).average() , ) )
+				z.setHeaderItem("COMPANY", _COMPANY_)
+				z.setHeaderItem("INSTRUMENT", _INSTRUMENT_)
+				z.setHeaderItem("PROBE_CURRENT", "%g nA" % ( self._probeCurrent, ) )
 				z.setHeaderItem("RULE_FILE", u"%s" % ( self._rules, ))
 				z.setHeaderItem("VEC_FILE", u"%s"  % (self._vecs, ))
 				z.setHeaderItem("STAGE_FILE", "tiling.xml")
@@ -1495,6 +1509,12 @@ areaCriterion(...), maxCriterion(...) build common criteria."""
 						props.setParticleSignatureProperty(epq.SpectrumProperties.ParticleSignature, ps)
 						props.setImageProperty(epq.SpectrumProperties.MicroImage, ps.createBarGraph(256,0.01))
 						props.setNumericProperty(epq.SpectrumProperties.RealTime, self._edsRealTime)
+						if self._probeCurrent:
+							props.setNumericProperty(epq.SpectrumProperties.ProbeCurrent, self._probeCurrent)
+						if self._analyst:
+							props.setTextProperty(SpectrumProperties.InstrumentOperator, self._analyst)
+						props.setTextProperty(SpectrumProperties.SampleId, self._sample)
+						props.setTextProperty(SpectrumProperties.ProjectName, self._project)
 						elms = tuple(ps.getNthElement(i) for i in range(0, 4))
 						for i in range(0, 4):
 							vals.append(elms[i].getAtomicNumber())
@@ -1575,145 +1595,148 @@ areaCriterion(...), maxCriterion(...) build common criteria."""
 				if terminated:
 					return
 				termP=False
-				jl.System.gc()
-				mapSize = int(self._imgDim * self._transform.imageScale())
-				map = jai.BufferedImage(mapSize, mapSize, jai.BufferedImage.TYPE_3BYTE_BGR)
-				mg = map.createGraphics()
-				ri = self._transform.getImageRectangle()
-				af = jag.AffineTransform(float(mapSize) / float(ri.width), 0.0, 0.0, float(mapSize) / float(ri.height), -float(ri.x) * float(mapSize) / float(ri.width), -float(ri.y) * float(mapSize) / float(ri.height))
-				mg.setTransform(af)
-				mg.setColor(jawt.Color.yellow)
-				mg.setComposite(jawt.AlphaComposite.getInstance(jawt.AlphaComposite.SRC_OVER, 0.5))
-				mg.setFont(jawt.Font("Serif", jawt.Font.PLAIN, 800))
-				# mg.setRenderingHint(jawt.RenderingHint.KEY_ANTIALIASING, jawt.RenderingHint.VALUE_ANTIALIAS_ON)
-				# mg.setRenderingHint(jawt.RenderingHint.KEY_TEXT_ANTIALIASING, jawt.RenderingHint.VALUE_ANTIALIAS_ON)
-				self.debug("CollectField 00")
 				try:
-					scale = 0.001 * _ts.getViewField() / float(ri.width)
-					if self._collectEDS:
-						rt = semtr.RcaTranslator(_sem, pt_det_all, scale)
-						setResolution(_edsResolution)
-					else:
-						rt = semtr.RcaTranslator(_sem, scale)
-					if self._debugPw!=None:
-						rt.setDebugStream(self._debugPw)
-					rt.setMorphologyCriterion(self._morphologyCrit)
-					rt.setStagePosition(_stg.getPosition())
-					_sem.add(rt)
-					r = self._transform.getRCARectangle()
-					rca = semss.RCAConfiguration(self._imgDet.getIndex(), r.width / 2, self._ppmResolution, r, self._searchDwell, self._searchLow, self._searchHigh, self._measureDwell, self._measureLow, self._measureHigh, self._measureStep)
-					mg.draw(rca.getRegion())
-					if self._collectImages:
-						ra = self._transform.rcaToSubraster(r, self._imgDim)
-						imgs = collectImages("%04d" % (fieldNumber, ), self._rcaFov, dims=ra.getImageDimensions(), dwell=3, path="%s/FIELDS" % self._path, subRaster=ra.getSubRaster(), rotation=0.0, writeMask = SAVE_FIELD_MASK)
-						ii = imgs[_apaWrite[0][1]]
-						mg.drawImage(ii, r.x, r.y, r.x + r.width, r.y + r.height, 0, 0, ii.getWidth(), ii.getHeight(), None)
-						_afafb.updateFieldImage(map)
-					_ts.rcaInit(rca)
-					if self._collectEDS:
-						if self._EDSMode==POINT_MODE:
-							_ts.rcaEDXPoint(self._edsDwell)
-						elif self._EDSMode==FIXED_SPACING:
-							_ts.rcaEDXFixedSpacing(self._edsDwell, 8, 0, 0)
-						elif self._EDSMode==FIXED_DIM:
-							_ts.rcaEDXFixedDimension(self._edsDwell, 64, 0, 0)
-						elif self._EDSMode==CHORD_RASTER:
-							_ts.rcaEDXChordRaster(self._edsDwell, self._measureLow, self._measureHigh)
-						_sem.initMapping()
-					if self._blackLevel and self._gain:
-						self._imgDet.setBrightnessContrast(self._gain, self._blackLevel)
-					if self._beamIntensity:
-						_ts.setPCContinual(21.0-self._beamIntensity)
-					nPart=0
-					self.debug("CollectField 01")
-					_ts.rcaNextParticle(False, int(self._edsRealTime * 1000))
-					self.debug("CollectField 02")
-					termP=False
-					while (rt.getStatus() != semtr.RcaTranslator.RCAStatus.AllComplete) and (self._ParticleCount < self._maxPart):
-						datum = _sem.poll()
-						if datum and isinstance(datum, semdi.RcaDatum):
-							self.debug("CollectField 03 : "+str(datum))
-							if not (datum.isDiscarded() or datum.isDuplicate()):
-								nPart=nPart+1
-								self.debug("New particle number %d in frame %d" % ( nPart, fieldNumber) )
-							if not datum.isDuplicate():
-								datum.draw(mg, self._ParticleCount)
-							termP = self.addParticle(datum, fieldNumber)
+					jl.System.gc()
+					mapSize = int(self._imgDim * self._transform.imageScale())
+					map = jai.BufferedImage(mapSize, mapSize, jai.BufferedImage.TYPE_3BYTE_BGR)
+					mg = map.createGraphics()
+					ri = self._transform.getImageRectangle()
+					af = jag.AffineTransform(float(mapSize) / float(ri.width), 0.0, 0.0, float(mapSize) / float(ri.height), -float(ri.x) * float(mapSize) / float(ri.width), -float(ri.y) * float(mapSize) / float(ri.height))
+					mg.setTransform(af)
+					mg.setColor(jawt.Color.yellow)
+					mg.setComposite(jawt.AlphaComposite.getInstance(jawt.AlphaComposite.SRC_OVER, 0.5))
+					mg.setFont(jawt.Font("Serif", jawt.Font.PLAIN, 800))
+					# mg.setRenderingHint(jawt.RenderingHint.KEY_ANTIALIASING, jawt.RenderingHint.VALUE_ANTIALIAS_ON)
+					# mg.setRenderingHint(jawt.RenderingHint.KEY_TEXT_ANTIALIASING, jawt.RenderingHint.VALUE_ANTIALIAS_ON)
+					self.debug("CollectField 00")
+					try:
+						scale = 0.001 * _ts.getViewField() / float(ri.width)
+						if self._collectEDS:
+							rt = semtr.RcaTranslator(_sem, pt_det_all, scale)
+							setResolution(_edsResolution)
 						else:
-							if datum!=None:
-								self.debug("CollectField 03a: "+ str(datum))
+							rt = semtr.RcaTranslator(_sem, scale)
+						if self._debugPw!=None:
+							rt.setDebugStream(self._debugPw)
+						rt.setMorphologyCriterion(self._morphologyCrit)
+						rt.setStagePosition(_stg.getPosition())
+						_sem.add(rt)
+						r = self._transform.getRCARectangle()
+						rca = semss.RCAConfiguration(self._imgDet.getIndex(), r.width / 2, self._ppmResolution, r, self._searchDwell, self._searchLow, self._searchHigh, self._measureDwell, self._measureLow, self._measureHigh, self._measureStep)
+						mg.draw(rca.getRegion())
+						if self._collectImages:
+							ra = self._transform.rcaToSubraster(r, self._imgDim)
+							imgs = collectImages("%04d" % (fieldNumber, ), self._rcaFov, dims=ra.getImageDimensions(), dwell=3, path="%s/FIELDS" % self._path, subRaster=ra.getSubRaster(), rotation=0.0, writeMask = SAVE_FIELD_MASK)
+							ii = imgs[_apaWrite[0][1]]
+							mg.drawImage(ii, r.x, r.y, r.x + r.width, r.y + r.height, 0, 0, ii.getWidth(), ii.getHeight(), None)
 							_afafb.updateFieldImage(map)
-							jl.Thread.sleep(10)
-						if terminated or termP:
-							self.debug(("Manually terminated" if terminated else "Terminated by rule"))
-							break
-						if nPart >= self._maxPartPerField:
-							self.debug("Exceeded maxPartPerField.")
-							break
-				finally:
-					self.debug("CollectField 04")
-					if self._collectEDS:
-						_sem.finalizeMapping()
-					datum = _sem.poll()
-					while datum:
-						if datum and isinstance(datum, semdi.RcaDatum):
-							self.debug("CollectField 04a : "+str(datum))
-							if (self._ParticleCount < self._maxPart) and (nPart < self._maxPartPerField):
+						_ts.rcaInit(rca)
+						if self._collectEDS:
+							if self._EDSMode==POINT_MODE:
+								_ts.rcaEDXPoint(self._edsDwell)
+							elif self._EDSMode==FIXED_SPACING:
+								_ts.rcaEDXFixedSpacing(self._edsDwell, 8, 0, 0)
+							elif self._EDSMode==FIXED_DIM:
+								_ts.rcaEDXFixedDimension(self._edsDwell, 64, 0, 0)
+							elif self._EDSMode==CHORD_RASTER:
+								_ts.rcaEDXChordRaster(self._edsDwell, self._measureLow, self._measureHigh)
+							_sem.initMapping()
+						if self._blackLevel and self._gain:
+							self._imgDet.setBrightnessContrast(self._gain, self._blackLevel)
+						if self._beamIntensity:
+							_ts.setPCContinual(21.0-self._beamIntensity)
+						nPart=0
+						self.debug("CollectField 01")
+						_ts.rcaNextParticle(False, int(self._edsRealTime * 1000))
+						self.debug("CollectField 02")
+						termP=False
+						while (rt.getStatus() != semtr.RcaTranslator.RCAStatus.AllComplete) and (self._ParticleCount < self._maxPart):
+							datum = _sem.poll()
+							if datum and isinstance(datum, semdi.RcaDatum):
+								self.debug("CollectField 03 : "+str(datum))
 								if not (datum.isDiscarded() or datum.isDuplicate()):
 									nPart=nPart+1
-									self.debug("New particle number %d in frame %d (in terminate)" % ( nPart, fieldNumber) )
-								datum.draw(mg, self._ParticleCount)
-								self.addParticle(datum, fieldNumber)
-								_afafb.updateFieldImage(map)
-						datum = _sem.poll()
-					self.debug("CollectField 05")
-					self._zep.setHeaderItem("MAG_FMT","Mag Fields Particles Time Area")
-					self._zep.setHeaderItem("MAG0","%0.0f %d %d %0.2f %0.3f" %
-						(3.5*25.4/self._fov, fieldNumber, self._ParticleCount, self._timer.inSeconds()/60.0, self._fov*self._fov*fieldNumber ))
-					self._zep.setHeaderItem("LOW_MAG","0")
-					self._zep.setHeaderItem("MAGNIFICATIONS","1")
-					self._zep.write(self._zep.getFile().toString())
-					_sem.remove(rt)
-					_ts.rcaFinish()
-					write(map, "%0.4d" % fieldNumber, path="%s/FIELDS" % self._path)
-				try:
-					self.debug("CollectField 06")
-					for pNum, rcaFov, pixDim, sr, spec in self._pImgStack:
-						self.debug("CollectField 07: Particle %d - dim = %s, sr = %s" % ( pNum, pixDim, sr ))
-						imgs = collectImages(None, fov=rcaFov, dims=pixDim, dwell=self._pImgDwell, subRaster=sr, path="%s/mag0" % (self._path,), writeMask=0x0)
-						if imgs:
-							self.debug("CollectField 08: P%i imgs" % (pNum, ))
-							_afafb.updateParticleImage(imgs[_apaWrite[0][1]])
-							if spec:
-								props = spec.getProperties()
-								if len(imgs) > 1:
-									for prop, idx in _apaWrite:
-										props.setImageProperty(prop, imgs[idx])
-								else:
-									props.setImageProperty(props.MicroImage,imgs[0])
-								self._zep.writeSpectrum(spec, pNum)
+									self.debug("New particle number %d in frame %d" % ( nPart, fieldNumber) )
+								if not datum.isDuplicate():
+									datum.draw(mg, self._ParticleCount)
+								termP = self.addParticle(datum, fieldNumber)
 							else:
-								self.debug("CollectField 08: Missing image for P%i" % (pNum, ))
-								print "Missing spectrum for particle %d" % ( pNum )
-					self.debug("CollectField 09")
-				finally:
-					self._pImgStack = []
-				try:
-					for pNum, rcaFov, pixDim, sr in self._pSIStack:
-						siName = "SI%d" % pNum
-						siPath = "%s/si" % self._path
-						si = collectSI(siName, rcaFov, frameCount=1, dwell=self._SIDwell, dim=pixDim, subRaster=sr, path=siPath)
-						self._processSIStack.add(siName, siPath, self._vecs)
-				finally:
-					self._pSIStack = []
-				self.debug("CollectField 10")
+								if datum!=None:
+									self.debug("CollectField 03a: "+ str(datum))
+								_afafb.updateFieldImage(map)
+								jl.Thread.sleep(10)
+							if terminated or termP:
+								self.debug(("Manually terminated" if terminated else "Terminated by rule"))
+								break
+							if nPart >= self._maxPartPerField:
+								self.debug("Exceeded maxPartPerField.")
+								break
+					finally:
+						self.debug("CollectField 04")
+						if self._collectEDS:
+							_sem.finalizeMapping()
+						datum = _sem.poll()
+						while datum:
+							if datum and isinstance(datum, semdi.RcaDatum):
+								self.debug("CollectField 04a : "+str(datum))
+								if (self._ParticleCount < self._maxPart) and (nPart < self._maxPartPerField):
+									if not (datum.isDiscarded() or datum.isDuplicate()):
+										nPart=nPart+1
+										self.debug("New particle number %d in frame %d (in terminate)" % ( nPart, fieldNumber) )
+									datum.draw(mg, self._ParticleCount)
+									self.addParticle(datum, fieldNumber)
+									_afafb.updateFieldImage(map)
+							datum = _sem.poll()
+						self.debug("CollectField 05")
+						self._zep.setHeaderItem("MAG_FMT","Mag Fields Particles Time Area")
+						self._zep.setHeaderItem("MAG0","%0.0f %d %d %0.2f %0.3f" %
+							(3.5*25.4/self._fov, fieldNumber, self._ParticleCount, self._timer.inSeconds()/60.0, self._fov*self._fov*fieldNumber ))
+						self._zep.setHeaderItem("LOW_MAG","0")
+						self._zep.setHeaderItem("MAGNIFICATIONS","1")
+						self._zep.write(self._zep.getFile().toString())
+						_sem.remove(rt)
+						_ts.rcaFinish()
+						write(map, "%0.4d" % fieldNumber, path="%s/FIELDS" % self._path)
+					try:
+						self.debug("CollectField 06")
+						for pNum, rcaFov, pixDim, sr, spec in self._pImgStack:
+							self.debug("CollectField 07: Particle %d - dim = %s, sr = %s" % ( pNum, pixDim, sr ))
+							imgs = collectImages(None, fov=rcaFov, dims=pixDim, dwell=self._pImgDwell, subRaster=sr, path="%s/mag0" % (self._path,), writeMask=0x0)
+							if imgs:
+								self.debug("CollectField 08: P%i imgs" % (pNum, ))
+								_afafb.updateParticleImage(imgs[_apaWrite[0][1]])
+								if spec:
+									props = spec.getProperties()
+									if len(imgs) > 1:
+										for prop, idx in _apaWrite:
+											props.setImageProperty(prop, imgs[idx])
+									else:
+										props.setImageProperty(props.MicroImage,imgs[0])
+									self._zep.writeSpectrum(spec, pNum)
+								else:
+									self.debug("CollectField 08: Missing image for P%i" % (pNum, ))
+									print "Missing spectrum for particle %d" % ( pNum )
+						self.debug("CollectField 09")
+					finally:
+						self._pImgStack = []
+					try:
+						for pNum, rcaFov, pixDim, sr in self._pSIStack:
+							siName = "SI%d" % pNum
+							siPath = "%s/si" % self._path
+							si = collectSI(siName, rcaFov, frameCount=1, dwell=self._SIDwell, dim=pixDim, subRaster=sr, path=siPath)
+							self._processSIStack.add(siName, siPath, self._vecs)
+					finally:
+						self._pSIStack = []
+					self.debug("CollectField 10")
+				except jl.Throwable, th:
+					print str(th)
+					th.printStackTrace()
 				return termP
 
 			def summarize(self, tiling=None):
 				"""Internal use only...
 	summarize(tiling)
 	Summarize the analysis configuration to the command output window."""
-				i0 = (updatedPC(300) if globals().has_key('faraday') else None)
 				tmp = u"Analysis Summary ================================\n"
 				tmp = tmp + u"       Project: %s\n" % self._project
 				tmp = tmp + u"        Sample: %s\n" % self._sample
@@ -1727,7 +1750,7 @@ areaCriterion(...), maxCriterion(...) build common criteria."""
 				elif self._overlap<1.0:
 					tmp = tmp + u"       Overlap: %0.3g%% overlap of adjacent fields\n" % ( (1.0 - self._overlap)*100.0, )
 				tmp = tmp + u"      Detector: %s\n" % (self.getDetector())
-				sed, bsed = _ts.dtGetGainBlack(0), _ts.dtGetGainBlack(1)
+				sed, bsed = _ts.dtGetGainBlack(findEDet(sedName).getIndex()), _ts.dtGetGainBlack(self._imgDet.getIndex())
 				tmp = tmp + u"          BSED: Contrast %0.2f Brightness: %0.2f\n" % (bsed[0], bsed[1])
 				tmp = tmp + u"           SED: Contrast %0.2f Brightness: %0.2f\n" % (sed[0], sed[1])
 				tmp = tmp + u"        Search: %d to %d at %d pixels × %d pixels at %g µs/pixel\n" % (self._searchLow, self._searchHigh, self.searchDimension(), self.searchDimension(), self._searchDwell / 1000)
@@ -1738,8 +1761,8 @@ areaCriterion(...), maxCriterion(...) build common criteria."""
 				tmp = tmp + u" Max per field: %d\n" % self._maxPartPerField
 				tmp = tmp + u"      Beam Int: %0.2f\n" % _ts.getPCContinual()
 				tmp = tmp + u"          Spot: %0.2f nm\n" % _ts.getSpotSize()
-				if i0:
-					tmp = tmp + u"       Faraday: %0.2f nA\n" % i0.average()
+				if self._probeCurrent:
+					tmp = tmp + u"       Faraday: %0.2f nA\n" % self._probeCurrent
 				else:
 					tmp = tmp + u"          IAbs: %0.2f nA\n" % (_ts.getIAbsorbed() / 1000.0)
 				tmp = tmp + u"        Beam E: %0.2f keV\n" % (_ts.hvGetVoltage() / 1000.0)
@@ -1786,7 +1809,6 @@ areaCriterion(...), maxCriterion(...) build common criteria."""
 				"""Internal use only...
 				toLatex(tiling)
 				Summarize the analysis configuration to the command output window."""
-				i0 = (updatedPC(300) if globals().has_key('faraday') else None)
 				tmp="\\begin{tabular}{rl}"
 				tmp=tmp + "\\colspan{2}{Analysis Summary}\\\\\n"
 				tmp = tmp + u"  Project & %s\\\\\n" % self._project
@@ -1801,7 +1823,7 @@ areaCriterion(...), maxCriterion(...) build common criteria."""
 				elif self._overlap<1.0:
 					tmp = tmp + u"  Overlap & \\SI{%0.3g}{\\%} overlap of adjacent fields\\\\\n" % ( (1.0 - self._overlap)*100.0, )
 				tmp = tmp + u"  Detector & %s\\\\\n" % (self.getDetector())
-				sed, bsed = _ts.dtGetGainBlack(0), _ts.dtGetGainBlack(1)
+				sed, bsed = _ts.dtGetGainBlack(findEDet(sedName).getIndex()), _ts.dtGetGainBlack(self._imgDet.getIndex())
 				tmp = tmp + u"  BSED & Contrast: \\num{%0.2f} Brightness: \\num{%0.2f}\\\\\n" % (bsed[0], bsed[1])
 				tmp = tmp + u"  SED &	Contrast: \\num{%0.2f} Brightness: \\num{%0.2f}\\\\\n" % (sed[0], sed[1])
 				tmp = tmp + u"  Search & %d to %d at $\\SI{%d}{pixels} \\times \\SI{%d}{pixels}$ at \\SI{%g}{\micro\second\per pixel}\\\\\n" % (self._searchLow, self._searchHigh, self.searchDimension(), self.searchDimension(), self._searchDwell / 1000)
@@ -1812,8 +1834,8 @@ areaCriterion(...), maxCriterion(...) build common criteria."""
 				tmp = tmp + u"  Max per field & %d\\\\\n" % self._maxPartPerField
 				tmp = tmp + u"  Beam Intensity & \\num{%0.2f}\\\\\n" % _ts.getPCContinual()
 				tmp = tmp + u"  Spot & \\SI{%0.2f}{\\nano\\meter}\\\\\n" % _ts.getSpotSize()
-				if i0:
-					tmp = tmp + u"  Faraday & \\SI{%0.2f}{\\nano\\ampere}\\\\\n" % i0.average()
+				if self._probeCurrent:
+					tmp = tmp + u"  Faraday & \\SI{%0.2f}{\\nano\\ampere}\\\\\n" % self._probeCurrent
 				else:
 					tmp = tmp + u"  IAbs & \\SI{%0.2f}{\\nano\\ampere}\\\\\n" % (_ts.getIAbsorbed() / 1000.0)
 				tmp = tmp + u"  Beam Energy & \\SI{%0.2f}{\\keV}\\\\\n" % (_ts.hvGetVoltage() / 1000.0)
@@ -1876,7 +1898,9 @@ areaCriterion(...), maxCriterion(...) build common criteria."""
 						res = res+ u"Particles by Class\n"
 						for i in range(0, self._rules.ruleCount()):
 							cx = self._zep.getClassMemberCount(self._rules, i)
-							res = res + u"	%20s: %d particles\n" % (self._rules.ruleName(i), cx)
+							res = res + u"    %20s: %d particles\n" % (self._rules.ruleName(i), cx)
+					el = jl.Math.round(self._timer.totalElapseTime()+0.5)
+					res = res + u"Elapse time: %d:%02d:%02d (%d s)\n" % ( (el / 3600), (el / 60) % 60, (el % 60), el )
 					print res
 					tos.println(res)
 				else:
@@ -2019,6 +2043,7 @@ areaCriterion(...), maxCriterion(...) build common criteria."""
 					if self._processSIStack:
 						self._processSIStack.add( None, None, None )
 					self._debugPw = None
+					print self._timer.stop()
 
 
 		def buildRCA(project, sample, vecs, rules, fov = 0.512, morph = None, analyst = None, realTime=0.3, path = None):
@@ -2626,17 +2651,17 @@ class Elapse:
 
 	def __init__(self, nItems):
 		self._nItems = nItems
-		self._start = jl.System.currentTimeMillis()
+		self._start = time.clock()
+		self._stop = None
 
 	def inSeconds(self):
-		return 0.001 * (jl.System.currentTimeMillis() - self._start)
+		return time.clock() - self._start
 
 	def update(self, completed):
 		"""update(completed)
 		completed:	The number of items completed
 		Estimates the ETA based on the number of items completed since the Elapse object was constucted."""
 		print "Completed: %d of %d" % (completed, self._nItems)
-		now = jl.System.currentTimeMillis()
 		elapse = self.inSeconds()
 		print "	  Elapse: %d:%02d:%02d" % (int(elapse) / 3600, (int(elapse) / 60) % 60, int(elapse) % 60)
 		if completed > 0:
@@ -2644,14 +2669,20 @@ class Elapse:
 			print "		 ETA: %d:%02d:%02d" % (eta / 3600, (eta / 60) % 60, eta % 60)
 
 	def updateString(self, completed):
-		now = jl.System.currentTimeMillis()
-		elapse = 0.001 * (now - self._start)
+		elapse = self.inSeconds()
 		tmp = "TBD"
 		if completed > 0:
 			eta = int((elapse * (self._nItems - completed)) / completed)
 			tmp = "%d:%02d:%02d" % (eta / 3600, (eta / 60) % 60, eta % 60)
 		return "Elapse: %d:%02d:%02d  ETA: %s" % (int(elapse) / 3600, (int(elapse) / 60) % 60, int(elapse) % 60, tmp)
-
+		
+	def stop(self):
+		self._stop = time.clock()
+		s = self._stop - self._start
+		return "Total elapse time: %d:%02d:%02d" % (s / 3600, (s / 60) % 60, s % 60)
+	
+	def totalElapseTime(self):
+		return self._stop - self._start
 
 if connect:
 	def collectSpectra(sample, pts, liveTime=60.0, fov=0.005):
@@ -2734,6 +2765,7 @@ results are written to the defaultDir."""
 						done = True
 			completed = completed + 1
 			el.update(completed)
+		el.stop()
 		if offenze and (not terminated):
 			turnOff()
 
@@ -2886,6 +2918,17 @@ def updateZ(pts, newZ):
 	return pts
 
 if connect:
+	def collectZoom(name, fov, factor=4.0, dims=(512,512), dwell=6, writeMask=SAVE_IMAGE_MASK):
+		"""collectZoom(name, fov, factor=4.0, dims=(512,512), dwell=6, factor=4.0, postFix="")
+		Collects images of a field-of-view and a series of field-of-views that differ by `factor` up
+		to a maximum of 2.0 mm. For example fov=0.01 mm and factor = 4.0, (0.01 mm, 0.04 mm, 0.16 mm, 0.64 mm) 
+		Images are stored in the current project path directory."""
+		collectImages("%s - %g mm" % (name, fov), fov, dims=dims, dwell=dwell, writeMask=writeMask)
+		f = factor*fov
+		while f < 2.0:
+			collectImages("%s - %g mm" % (name, f), f, dims=dims, dwell=dwell, writeMask=writeMask)
+			f*=factor
+	
 	def collectQC(lt=30.0, path=None):
 		"""collectQC(lt=30.0, path='QC+time')
 		Collect QC spectra and process them.
@@ -2908,7 +2951,7 @@ if connect:
 		if abs(_ts.hvGetVoltage() - e0 * 1.0e3) > 100.0:
 			print "Please set the beam energy to %0.1f keV" % e0
 			return
-		i0 = updatedPC(1.0)
+		i0 = updatedPC(force=True)
 		if (i0.average() < 0.4) or (i0.average() > 2.5):
 			print "The probe current (%0.3f nA) is out of range (0.4 nA to 2.5 nA)." % i0.average()
 			return
@@ -3044,7 +3087,7 @@ if connect:
 				write(semstg.TilingUtilities.createMap(tiling, 2048), "Tiling[MAG=%d]" % mag, path=path)
 		finally:
 			tf.close()
-		print elapse.updateString(tileCx)
+		print elapse.stop()
 
 
 	def collectTiledSIs(tiling, mags=((2.0, 0,), (0.5, 0,)), overlap=0.9, imgDim= 1024, imgDwell=9, seed=0xBADF00D):
@@ -3104,7 +3147,7 @@ if connect:
 				write(semstg.TilingUtilities.createMap(tiling, 2048), "Tiling[MAG=%d]" % mag, path=path)
 		finally:
 			tf.close()
-		print elapse.updateString(tileCx)
+		print elapse.stop()
 
 
 

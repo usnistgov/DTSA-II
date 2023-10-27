@@ -14,6 +14,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.WindowConstants;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
@@ -46,6 +47,20 @@ import gov.nist.microanalysis.EPQTools.SwingUtils;
  */
 
 public class DTSA2 {
+   
+   enum OS {
+      OS_WINDOWS, OS_MAC, OS_OTHER;
+   }
+   
+   private static OS determineOS() {
+      OS res = OS.OS_OTHER;
+      final String os = System.getProperty("os.name").toLowerCase();
+      if((os.indexOf("mac") >= 0) || (os.indexOf("os x") >= 0))
+         res = OS.OS_MAC;
+      else if(os.startsWith("windows"))
+         res = OS.OS_WINDOWS;
+      return res;
+   }
 
 	private static final String STANDARDS_DB2 = "standards.sd2.xml";
 	private static final String STANDARDS_BAK2 = "standards.sd2.bak";
@@ -71,12 +86,13 @@ public class DTSA2 {
 		}
 
 	}
-
+	
 	static public final String APP_NAME = "NIST DTSA-II";
 	static private final String SPECTRUM_DIR = "Default spectrum directory";
 	static private DTSA2 mApplication;
 	private final MainFrame mFrame;
 	private static Session mSession;
+	private static OS sOS = determineOS();
 
 	static public String getSpectrumDirectory() {
 		final Preferences userPref = Preferences.userNodeForPackage(DTSA2.class);
@@ -87,6 +103,10 @@ public class DTSA2 {
 		final Preferences userPref = Preferences.userNodeForPackage(DTSA2.class);
 		if (path.exists())
 			userPref.put(SPECTRUM_DIR, path.toString());
+	}
+	
+	static public OS getOS() {
+	   return sOS;
 	}
 
 	// Construct the application
@@ -237,10 +257,32 @@ public class DTSA2 {
 				return true;
 		return false;
 	}
-
+	
 	// Main method
 	public static void main(String[] args) {
-		// Due to additional security concerns, JRE versions after 16, require an
+      AppPreferences.getInstance();
+      if (sOS==OS.OS_MAC) {
+         System.setProperty("apple.laf.useScreenMenuBar", "true");
+         System.setProperty("apple.laf.smallTabs", "true");
+         System.setProperty("com.apple.mrj.application.apple.menu.about.name", "NIST DTSA-II");
+      }
+      // This eliminates an exception in Jython 2.7.0
+      // "console: Failed to install '':
+      // java.nio.charset.UnsupportedCharsetException: cp0"
+      System.setProperty("python.console.encoding", "UTF-8");
+      try {
+         AppPreferences.getInstance().applyAppearance();
+      } catch (final Exception e) {
+         e.printStackTrace();
+         try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+         } catch (Exception e1) {
+            e1.printStackTrace();
+         }
+      }
+      JFrame.setDefaultLookAndFeelDecorated(false);
+	   
+	   // Due to additional security concerns, JRE versions after 16, require an
 		// "Add-Opens"
 		// statement to instantiate objects from XML using XStream. This can either be
 		// the form of additional command line arguments:
@@ -263,28 +305,6 @@ public class DTSA2 {
 					e3.toString());
 			System.exit(1);
 		}
-		final String os = System.getProperty("os.name").toLowerCase();
-		final boolean isMac=((os.indexOf("mac") >= 0) || (os.indexOf("os x") >= 0));
-		final boolean isWindows = System.getProperty("os.name").startsWith("Windows"); 
-		if (isMac) {
-			System.setProperty("apple.laf.useScreenMenuBar", "true");
-			System.setProperty("apple.laf.smallTabs", "true");
-			System.setProperty("com.apple.mrj.application.apple.menu.about.name", "NIST DTSA-II");
-		}
-		// This eliminates an exception in Jython 2.7.0
-		// "console: Failed to install '':
-		// java.nio.charset.UnsupportedCharsetException: cp0"
-		System.setProperty("python.console.encoding", "UTF-8");
-		try {
-			if(isWindows)
-				AppPreferences.getInstance().applyAppearance();
-			else
-				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		} catch (final Exception e) {
-			e.printStackTrace();
-		}
-		JFrame.setDefaultLookAndFeelDecorated(false);
-		AppPreferences.getInstance();
 		/*
 		 * Start a background thread to initialize the database.
 		 */

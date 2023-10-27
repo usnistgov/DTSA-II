@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# DTSA-II/NISTMonte script - Nicholas W. M. Ritchie - 6-May-2010
+# DTSA-II/NISTMonte script - Nicholas W. M. Ritchie - 5-Jul-2023
 """A series of scripts for simulating various common geometries using the 3rd generation NISTMonte Monte Carlo simulation algorithms. \
 Note that the Monte Carlo algorithm requires densities for all materials.  Usually this is accomplished by:
   1) creating a epq.Material object directly
@@ -38,7 +38,7 @@ from compiler.pycodegen import TRY_FINALLY
 # Mac OS X seems to require the next line.
 
 __revision__ = "$Id: mcSimulate3.py Nicholas W. M. Ritchie. Mod JRM $"
-__version__ = "0.0.3 - 2016-07-05"
+__version__ = "0.1.0 - 2023-07-05"
 
 import sys
 sys.packageManager.makeJavaPackage("gov.nist.microanalysis.NISTMonte.Gen3", "CharacteristicXRayGeneration3, BremsstrahlungXRayGeneration3, FluorescenceXRayGeneration3, XRayTransport3", None)
@@ -1252,3 +1252,105 @@ def bsed(mat, e0, angle, nTraj=100000, eFrac=0.9, scale=1.0e-6, filename=None, p
     finally:
         fos.close()
     return (bs0.backscatterFraction(), bs0.forwardscatterFraction())
+
+def bsedAngular(mat, e0, nTraj=100000, eFrac=0.9, filename=None, params={}):
+    """bsed(mat, e0, angle, nTraj=100000, eFrac=0.9, scale=1.0e-6, filename = None, params={})
+    mat = material("Si",2.33)
+    e0 = 20.0 # keV
+    angle = 3.1415926/4
+    nTraj = 100000
+    eFrac = 0.9
+    scale = 1.0e-6  Linear dimensions of the full detector area
+    filename = None - Define for a custom output filename like "backscatter - 55 deg.csv"
+    Constructs a histogram of scatter angles for scatter events for all backscattered and 
+    non-backscattered electron trajectories.  Outputs the result to 'filename'."""
+    defOut = (dtsa2.DefaultOutput if dtsa2.DefaultOutput else dtsa2.reportPath())
+    monte = nm.MonteCarloSS()
+    monte.setBeamEnergy(epq.ToSI.keV(e0))
+    origin = (0.0, 0.0, 0.0)
+    p = params.copy()
+    p["Tilt"] = 0.0
+    p["Material"] = mat
+    buildTilted(monte, monte.getChamber(), origin, p)
+    bs0 = nm.BackscatterAngleHistogram(eFrac*epq.ToSI.keV(e0), True)
+    monte.addActionListener(bs0)
+    bs1 = nm.BackscatterStats(monte, 100)
+    monte.addActionListener(bs1)
+    monte.runMultipleTrajectories(nTraj)
+    if not filename:
+        tmpFile=jio.File.createTempFile("angular", ".csv", jio.File(defOut))
+    else:
+        tmpFile = jio.File(jio.File(defOut), filename)
+    print u"%s" % tmpFile
+    pw = jio.PrintWriter(tmpFile)
+    try:
+        bs0.dump(pw)
+    finally:
+        pw.close()
+    print "Backscatter fraction: %g" % ( bs1.backscatterFraction(), )
+    print "Scatter angle statistics (in degrees)"
+    bsf, nbsf = bs0.getBackscatterDS(), bs0.getNonBackscatterDS()
+    print "      Avg, Max, StdDev"
+    print "  BS: %g, %g, %g" % ( jl.Math.toDegrees(bsf.average()), jl.Math.toDegrees(bsf.maximum()), jl.Math.toDegrees(bsf.standardDeviation()) ) 
+    print " NBS: %g, %g, %g" % ( jl.Math.toDegrees(nbsf.average()), jl.Math.toDegrees(nbsf.maximum()), jl.Math.toDegrees(nbsf.standardDeviation()) ) 
+    return ( bsf, nbsf )  
+    
+    
+def buildWedge(monte, chamber, origin, buildParams):
+    matA = buildParams["MaterialA"]
+    matB = buildParams["MaterialB"]
+    matC = buildParams.get("MaterialC", matA)
+    t = buildParams["Thickness"]
+    rotation = jl.Math.toRadians(buildParams.get("Rotation", 0.0))
+    theta = jl.Math.toRadians(buildParams["Tilt"])
+    ct, st = jl.Math.cos(theta), jl.Math.sin(theta)
+    vA = nm.MultiPlaneShape()
+    vA.addPlane([-1.0,0.0,0.0], epu.Math2.plus(origin, [-1.0e-4, 0.0, 0.0]))
+    vA.addPlane([ct,0.0,st], epu.Math2.plus(origin, [-0.5*t, 0.0, 0.0]))
+    vA.addPlane([0.0,0.0,-1.0], epu.Math2.plus(origin, [0.0, 0.0, 0.0]))
+    vA.addPlane([0.0,0.0,1.0], epu.Math2.plus(origin, [0.0, 0.0, 1.0e-4]))
+    vA.addPlane([-1.0,0.0,0.0], epu.Math2.plus(origin, [-1.0e-4, 0.0, 0.0]))
+    vA.addPlane([1.0,0.0,0.0], epu.Math2.plus(origin, [1.0e-4, 0.0, 0.0]))
+    vA.rotate(origin, 0.0, 0.0, rotation)
+    monte.addSubRegion(chamber, matA, vA)
+    vB = nm.MultiPlaneShape()
+    vB.addPlane([-ct,0.0,-st], epu.Math2.plus(origin, [-0.5*t, 0.0, 0.0]))
+    vB.addPlane([ct,0.0,st], epu.Math2.plus(origin, [0.5*t, 0.0, 0.0]))
+    vB.addPlane([0.0,0.0,-1.0], epu.Math2.plus(origin, [0.0, 0.0, 0.0]))
+    vB.addPlane([0.0,0.0,1.0], epu.Math2.plus(origin, [0.0, 0.0, 1.0e-4]))
+    vB.addPlane([-1.0,0.0,0.0], epu.Math2.plus(origin, [-1.0e-4, 0.0, 0.0]))
+    vB.addPlane([1.0,0.0,0.0], epu.Math2.plus(origin, [1.0e-4, 0.0, 0.0]))
+    vB.rotate(origin, 0.0, 0.0, rotation)
+    monte.addSubRegion(chamber, matB, vB)
+    vC = nm.MultiPlaneShape()
+    vC.addPlane([1.0,0.0,0.0], epu.Math2.plus(origin, [1.0e-4, 0.0, 0.0]))
+    vC.addPlane([-ct,0.0,-st], epu.Math2.plus(origin, [0.5*t, 0.0, 0.0]))
+    vC.addPlane([0.0,0.0,-1.0], epu.Math2.plus(origin, [0.0, 0.0, 0.0]))
+    vC.addPlane([0.0,0.0,1.0], epu.Math2.plus(origin, [0.0, 0.0, 1.0e-4]))
+    vC.addPlane([-1.0,0.0,0.0], epu.Math2.plus(origin, [-1.0e-4, 0.0, 0.0]))
+    vC.addPlane([1.0,0.0,0.0], epu.Math2.plus(origin, [1.0e-4, 0.0, 0.0]))
+    vC.rotate(origin, 0.0, 0.0, rotation)
+    monte.addSubRegion(chamber, matC, vC)
+
+
+def simulateWedge(matA, matB, matC, tilt, thickness, det, e0=20.0, rotation = 0.0, dose=defaultDose, withPoisson=True, nTraj=defaultNumTraj, sf=defaultCharFluor, bf=defaultBremFluor, xtraParams=defaultXtraParams):
+    """simulateWedge(matA, matB, matC, theta, thickness, det, e0=20.0, rotation = 0.0, dose=defaultDose, withPoisson=True, nTraj=defaultNumTraj, sf=defaultCharFluor, bf=defaultBremFluor, xtraParams=defaultXtraParams):
+    Simulate a spectrum from a tilted wedge of `matA` and `thickness` (measured along surface) at an angle `tilt` on the detector det at beam energy e0 (in keV).  \
+    rotation rotates the sample around the beam axis/origin.  If sf then simulate characteristic secondary fluorescence. If bf then simulate bremsstrahlung secondary \
+    fluorescence. nTraj specifies the number of electron trajectories. dose is in nA*sec."""
+    params = { 
+        "MaterialA" : material(matA), 
+        "MaterialB" : material(matB),  
+        "MaterialC" : material(matC), 
+        "Tilt" : tilt,
+        "Thickness" : thickness,
+        "Rotation" : rotation
+    }
+    if not ( isinstance(matA, epq.Material) and isinstance(matB, epq.Material) and isinstance(matC, epq.Material)):
+        print u"Please provide a material with a density - %s, %s, %s" % ( matA, matB, matC)
+    tmp = u"MC simulation of %g um wedge at %g degrees of %s at %0.1f keV%s%s" % (thickness/1.0e-6, tilt, matB, e0, (" + CSF" if sf else ""), (" + BSF" if bf else ""))
+    print tmp
+    return base(det, e0, withPoisson, nTraj, dose, sf, bf, tmp, buildWedge, params, xtraParams)
+    
+
+    

@@ -79,13 +79,12 @@ public class DataManager {
 
    private void fireActionListener(int action) {
 
-      if((!mListeners.isEmpty()) && mNotify) {
+      if ((!mListeners.isEmpty()) && mNotify) {
          final ActionEvent ae = new ActionEvent(this, action, "Data Manager");
-         for(final ActionListener al : mListeners)
+         for (final ActionListener al : mListeners)
             try {
                al.actionPerformed(ae);
-            }
-            catch(final Exception e) {
+            } catch (final Exception e) {
             }
       }
    }
@@ -104,7 +103,7 @@ public class DataManager {
     * @return DataManager
     */
    public static DataManager getInstance() {
-      if(mInstance == null)
+      if (mInstance == null)
          mInstance = new DataManager();
       mInstance.validate();
       return mInstance;
@@ -114,7 +113,8 @@ public class DataManager {
     * addActionListener - This class fires when the contents of the data manager
     * change.
     *
-    * @param ae ActionListener
+    * @param ae
+    *           ActionListener
     */
    public void addActionListener(ActionListener ae) {
       mListeners.add(ae);
@@ -123,7 +123,8 @@ public class DataManager {
    /**
     * removeActionListener - Remove the specified action listener.
     *
-    * @param ae ActionListener
+    * @param ae
+    *           ActionListener
     */
    public void removeActionListener(ActionListener ae) {
       mListeners.remove(ae);
@@ -139,7 +140,8 @@ public class DataManager {
    /**
     * addSpectrum - Add a spectrum to the spectrum list but don't select it.
     *
-    * @param sd ISpectrumData
+    * @param sd
+    *           ISpectrumData
     */
    public void addSpectrum(ISpectrumData sd) {
       addSpectrum(sd, false);
@@ -149,7 +151,8 @@ public class DataManager {
     * addSpectrum - Add a spectrum to the spectrum list and optionally select
     * it.
     *
-    * @param sd ISpectrumData
+    * @param sd
+    *           ISpectrumData
     */
    public void addSpectrum(ISpectrumData sd, boolean select) {
       addSpectrum(sd, select, null);
@@ -159,35 +162,35 @@ public class DataManager {
     * addSpectrum - Add a spectrum to the spectrum list and optionally select
     * it.
     *
-    * @param sd ISpectrumData
+    * @param sd
+    *           ISpectrumData
     */
    public void addSpectrum(ISpectrumData sd, boolean select, ISpectrumData assoc) {
       int event = 0;
-      if((sd != null) && (!mSpectra.contains(sd))) {
+      if ((sd != null) && (!mSpectra.contains(sd))) {
          final Integer i = Integer.valueOf(mNextIndex++);
          // Place the spectrum on the list
-         if((assoc != null) && mSpectra.contains(assoc))
+         if ((assoc != null) && mSpectra.contains(assoc))
             mSpectra.add(mSpectra.indexOf(assoc) + 1, sd);
          else
             mSpectra.add(sd);
          // Add the spectrum to the index list
          mSpectrumIndex.put(sd, i);
          // Add the spectrum to the Jython environment
-         if(mJython != null)
+         if (mJython != null)
             try {
                mJython.addSpectrum(sd, i.intValue());
-            }
-            catch(final InterruptedException e) {
+            } catch (final InterruptedException e) {
                e.printStackTrace();
             }
          event = ADD_SPECTRUM;
       }
       // Notify others...
-      if(select) {
+      if (select) {
          mSelected.add(sd);
          event |= SELECTION_CHANGE;
       }
-      if(event != 0)
+      if (event != 0)
          fireActionListener(event);
       validate();
    }
@@ -197,21 +200,21 @@ public class DataManager {
     */
    public void moveSelectedUp() {
       final ArrayList<ISpectrumData> sel = new ArrayList<>();
-      for(final ISpectrumData spec : mSpectra)
-         if(mSelected.contains(spec))
+      for (final ISpectrumData spec : mSpectra)
+         if (mSelected.contains(spec))
             sel.add(spec);
       boolean update = false;
       int prev = 0;
-      for(final ISpectrumData spec : sel) {
+      for (final ISpectrumData spec : sel) {
          final int i = mSpectra.indexOf(spec);
-         if(i > prev)
-            if(!sel.contains(mSpectra.get(i - 1))) {
+         if (i > prev)
+            if (!sel.contains(mSpectra.get(i - 1))) {
                mSpectra.set(i, mSpectra.set(i - 1, mSpectra.get(i)));
                update = true;
                prev = i;
             }
       }
-      if(update)
+      if (update)
          fireActionListener(REORDER_SPECTRA);
       validate();
    }
@@ -221,19 +224,19 @@ public class DataManager {
     */
    public void moveSelectedDown() {
       final ArrayList<ISpectrumData> sel = new ArrayList<>();
-      for(final ISpectrumData spec : mSpectra)
-         if(mSelected.contains(spec))
+      for (final ISpectrumData spec : mSpectra)
+         if (mSelected.contains(spec))
             sel.add(spec);
       boolean update = false;
-      for(int j = sel.size() - 1; j >= 0; --j) {
+      for (int j = sel.size() - 1; j >= 0; --j) {
          final ISpectrumData spec = sel.get(j);
          final int i = mSpectra.indexOf(spec);
-         if(((i + 1) < mSpectra.size()) && (!sel.contains(mSpectra.get(i + 1)))) {
+         if (((i + 1) < mSpectra.size()) && (!sel.contains(mSpectra.get(i + 1)))) {
             mSpectra.set(i, mSpectra.set(i + 1, mSpectra.get(i)));
             update = true;
          }
       }
-      if(update)
+      if (update)
          fireActionListener(REORDER_SPECTRA);
       validate();
    }
@@ -244,18 +247,18 @@ public class DataManager {
    public void group() {
       int first = -1;
       final ArrayList<ISpectrumData> sel = new ArrayList<>();
-      for(int i = 0; i < mSpectra.size(); ++i) {
+      for (int i = 0; i < mSpectra.size(); ++i) {
          final ISpectrumData spec = mSpectra.get(i);
-         if(mSelected.contains(spec)) {
-            if(first == -1)
+         if (mSelected.contains(spec)) {
+            if (first == -1)
                first = i;
             sel.add(spec);
          }
       }
       mSpectra.removeAll(sel);
-      for(final ISpectrumData spec : sel)
+      for (final ISpectrumData spec : sel)
          mSpectra.add(first++, spec);
-      if(sel.size() > 1)
+      if (sel.size() > 1)
          fireActionListener(REORDER_SPECTRA);
       validate();
    }
@@ -263,22 +266,22 @@ public class DataManager {
    /**
     * removeSpectrum - Remove the specified spectrum from the spectrum list.
     *
-    * @param sd ISpectrumData
+    * @param sd
+    *           ISpectrumData
     */
    public void removeSpectrum(ISpectrumData sd) {
       final Integer index = mSpectrumIndex.get(sd);
-      if(index != null) {
-         if(mJython != null)
+      if (index != null) {
+         if (mJython != null)
             try {
                mJython.removeSpectrum(index.intValue());
-            }
-            catch(final InterruptedException e) {
+            } catch (final InterruptedException e) {
                e.printStackTrace();
             }
          mSpectra.remove(sd);
          mSpectrumIndex.remove(sd);
          int event = REMOVE_SPECTRUM;
-         if(mSelected.contains(sd)) {
+         if (mSelected.contains(sd)) {
             mSelected.remove(sd);
             event |= SELECTION_CHANGE;
          }
@@ -287,16 +290,42 @@ public class DataManager {
       validate();
    }
 
+   public void removeSpectra(Collection<ISpectrumData> specs) {
+      boolean selChange = false;
+      for (ISpectrumData sd : specs) {
+         final Integer index = mSpectrumIndex.get(sd);
+         if (index != null) {
+            if (mJython != null)
+               try {
+                  mJython.removeSpectrum(index.intValue());
+               } catch (final InterruptedException e) {
+                  e.printStackTrace();
+               }
+            mSpectra.remove(sd);
+            mSpectrumIndex.remove(sd);
+         }
+         if (mSelected.contains(sd)) {
+            selChange = true;
+            mSelected.remove(sd);
+         }
+      }
+      int event = selChange ? REMOVE_SPECTRUM | SELECTION_CHANGE : REMOVE_SPECTRUM;
+      fireActionListener(event);
+      validate();
+   }
+
    /**
     * replaceSpectrum - Replace the old spectrum with the newSp spectrum. If old
     * was selected then newSp will be selected; otherwise newSp is not selected.
     *
-    * @param old ISpectrumData
-    * @param newSp ISpectrumData
+    * @param old
+    *           ISpectrumData
+    * @param newSp
+    *           ISpectrumData
     */
    public void replaceSpectrum(ISpectrumData old, ISpectrumData newSp) {
       final Integer index = mSpectrumIndex.get(old);
-      if(index != null) {
+      if (index != null) {
          assert mSpectra.contains(old);
          final int selIdx = mSelected.indexOf(old);
          final int specIdx = mSpectra.indexOf(old);
@@ -305,15 +334,14 @@ public class DataManager {
          mSpectrumIndex.remove(old);
          mSpectrumIndex.put(newSp, index);
          int event = UPDATE_SPECTRUM;
-         if(selIdx >= 0) {
+         if (selIdx >= 0) {
             mSelected.set(selIdx, newSp);
             // event |= SELECTION_CHANGE;
          }
-         if(mJython != null)
+         if (mJython != null)
             try {
                mJython.addSpectrum(newSp, index.intValue());
-            }
-            catch(final InterruptedException e) {
+            } catch (final InterruptedException e) {
                e.printStackTrace();
             }
          fireActionListener(event);
@@ -330,26 +358,25 @@ public class DataManager {
     */
    public void replaceSpectra(Map<ISpectrumData, ISpectrumData> oldToNew) {
       int event = UPDATE_SPECTRUM;
-      for(final Map.Entry<ISpectrumData, ISpectrumData> me : oldToNew.entrySet()) {
+      for (final Map.Entry<ISpectrumData, ISpectrumData> me : oldToNew.entrySet()) {
          final ISpectrumData old = me.getKey();
          final ISpectrumData newSp = me.getValue();
          final Integer index = mSpectrumIndex.get(old);
-         if(index != null) {
+         if (index != null) {
             assert mSpectra.contains(old);
             final int selIdx = mSelected.indexOf(old);
             final int specIdx = mSpectra.indexOf(old);
             mSpectra.set(specIdx, newSp);
             mSpectrumIndex.remove(old);
             mSpectrumIndex.put(newSp, index);
-            if(selIdx >= 0) {
+            if (selIdx >= 0) {
                mSelected.set(selIdx, newSp);
                event |= SELECTION_CHANGE;
             }
-            if(mJython != null)
+            if (mJython != null)
                try {
                   mJython.addSpectrum(newSp, index.intValue());
-               }
-               catch(final InterruptedException e) {
+               } catch (final InterruptedException e) {
                   e.printStackTrace();
                }
          }
@@ -361,7 +388,8 @@ public class DataManager {
    /**
     * containsSpectrum - Does the data manager contain the specified spectrum?
     *
-    * @param spec ISpectrumData
+    * @param spec
+    *           ISpectrumData
     * @return boolean
     */
    public boolean containsSpectrum(ISpectrumData spec) {
@@ -383,13 +411,13 @@ public class DataManager {
     */
    private void validate() {
       // Every selected spectrum is also listed
-      for(final ISpectrumData spec : mSelected)
+      for (final ISpectrumData spec : mSelected)
          assert mSpectra.contains(spec);
       // Every spectrum in the index is listed
-      for(final ISpectrumData spec : mSpectrumIndex.keySet())
+      for (final ISpectrumData spec : mSpectrumIndex.keySet())
          assert mSpectra.contains(spec);
       // Every listed spectrum is in the index
-      for(final ISpectrumData spec : mSpectra)
+      for (final ISpectrumData spec : mSpectra)
          assert mSpectrumIndex.containsKey(spec);
    }
 
@@ -397,18 +425,17 @@ public class DataManager {
     * clearSpectrumList - Clear all spectra from the spectrum list.
     */
    public void clearSpectrumList() {
-      if(mJython != null)
-         for(final Map.Entry<ISpectrumData, Integer> me : mSpectrumIndex.entrySet())
+      if (mJython != null)
+         for (final Map.Entry<ISpectrumData, Integer> me : mSpectrumIndex.entrySet())
             try {
                mJython.removeSpectrum(me.getValue().intValue());
-            }
-            catch(final InterruptedException e) {
+            } catch (final InterruptedException e) {
                e.printStackTrace();
             }
       mSpectra.clear();
       mSpectrumIndex.clear();
       int event = REMOVE_SPECTRUM;
-      if(!mSelected.isEmpty()) {
+      if (!mSelected.isEmpty()) {
          mSelected.clear();
          event |= SELECTION_CHANGE;
       }
@@ -434,12 +461,12 @@ public class DataManager {
    public void setSelected(Collection<ISpectrumData> specs) {
       int event = mSelected.isEmpty() ? 0 : SELECTION_CHANGE;
       mSelected.clear();
-      for(final ISpectrumData spec : specs)
-         if(mSpectra.contains(spec)) {
+      for (final ISpectrumData spec : specs)
+         if (mSpectra.contains(spec)) {
             mSelected.add(spec);
             event = SELECTION_CHANGE;
          }
-      if(event != 0)
+      if (event != 0)
          fireActionListener(event);
       validate();
    }
@@ -452,17 +479,17 @@ public class DataManager {
     */
    public void select(Collection<ISpectrumData> specs, boolean select) {
       int event = 0;
-      for(final ISpectrumData spec : specs)
-         if(mSpectra.contains(spec) && select) {
-            if(!mSelected.contains(spec)) {
+      for (final ISpectrumData spec : specs)
+         if (mSpectra.contains(spec) && select) {
+            if (!mSelected.contains(spec)) {
                event = SELECTION_CHANGE;
                mSelected.add(spec);
             }
-         } else if(mSelected.contains(spec)) {
+         } else if (mSelected.contains(spec)) {
             mSelected.remove(spec);
             event = SELECTION_CHANGE;
          }
-      if(event != 0)
+      if (event != 0)
          fireActionListener(event);
       validate();
    }
@@ -477,16 +504,16 @@ public class DataManager {
    public void select(ISpectrumData spec, boolean select) {
       assert mSpectra.contains(spec);
       int event = 0;
-      if(mSpectra.contains(spec) && select) {
-         if(!mSelected.contains(spec)) {
+      if (mSpectra.contains(spec) && select) {
+         if (!mSelected.contains(spec)) {
             mSelected.add(spec);
             event = SELECTION_CHANGE;
          }
-      } else if(mSelected.contains(spec)) {
+      } else if (mSelected.contains(spec)) {
          mSelected.remove(spec);
          event = SELECTION_CHANGE;
       }
-      if(event != 0)
+      if (event != 0)
          fireActionListener(event);
       validate();
    }
@@ -495,7 +522,7 @@ public class DataManager {
     * Remove all spectra from the selected list.
     */
    public void clearSelections() {
-      if(!mSelected.isEmpty()) {
+      if (!mSelected.isEmpty()) {
          mSelected.clear();
          fireActionListener(SELECTION_CHANGE);
       }
@@ -551,10 +578,10 @@ public class DataManager {
    public String listSpectra() {
       final StringBuffer res = new StringBuffer();
       final TreeMap<Integer, ISpectrumData> ordered = new TreeMap<>();
-      for(final Map.Entry<ISpectrumData, Integer> me : mSpectrumIndex.entrySet())
+      for (final Map.Entry<ISpectrumData, Integer> me : mSpectrumIndex.entrySet())
          ordered.put(me.getValue(), me.getKey());
-      for(final Map.Entry<Integer, ISpectrumData> me : ordered.entrySet()) {
-         if(res.length() > 0)
+      for (final Map.Entry<Integer, ISpectrumData> me : ordered.entrySet()) {
+         if (res.length() > 0)
             res.append("\n");
          res.append("s");
          res.append(me.getKey().toString());
@@ -568,9 +595,7 @@ public class DataManager {
       return mSpectra.isEmpty();
    }
 
-   public static class TimestampSort
-      implements
-      Comparator<ISpectrumData> {
+   public static class TimestampSort implements Comparator<ISpectrumData> {
 
       final static Date DEFAULT = new Date(0);
 
@@ -584,9 +609,7 @@ public class DataManager {
       }
    }
 
-   public static class NameSort
-      implements
-      Comparator<ISpectrumData> {
+   public static class NameSort implements Comparator<ISpectrumData> {
 
       @Override
       public int compare(ISpectrumData arg0, ISpectrumData arg1) {
@@ -594,9 +617,7 @@ public class DataManager {
       }
    }
 
-   public static class DetectorSort
-      implements
-      Comparator<ISpectrumData> {
+   public static class DetectorSort implements Comparator<ISpectrumData> {
 
       private final Comparator<ISpectrumData> mSecondary;
 
@@ -613,7 +634,7 @@ public class DataManager {
          final String name0 = det0 != null ? det0.toString() : "Unknown";
          final String name1 = det1 != null ? det1.toString() : "Unknown";
          final int res = name0.compareTo(name1);
-         if((res == 0) && (mSecondary != null))
+         if ((res == 0) && (mSecondary != null))
             return mSecondary.compare(arg0, arg1);
          return res;
       }
