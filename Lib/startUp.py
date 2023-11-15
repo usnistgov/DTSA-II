@@ -2,41 +2,12 @@
 # Name:     startUp.py
 # Purpose:  This script initializes the SEMantics library.   It optionally connects to the
 #   TESCAN SEM and provides a mechanism to control the SEM, collect data and process SEM data.
-# Modified: 11-July-2022
-# Set the SITE to account for site specific hardware variations
+# Modified: 15-Nov-2023
+# This file is custom configured for each instrument.  The script looks for
+# this configuration in the "config.py" file in the same directory as this script.
+# A handful of configuration files are available labs/instruments for which NWMR has data.
+# Find the one that corresponds to your instrument, make a copy and rename the copy to "config.py"
 from gov.nist.microanalysis.EPQLibrary import SpectrumProperties
-NIST, MCCRONE, PNNL, PAS, PAS2, AEM, ORNL, SRNL, PLEASANTON, WARRENDALE, GRYPHON = ( "NIST", "McCRONE", "PNNL", "PAS", "PAS2", "AEM", "ORNL", "SRNL", "PLEASANTON", "WARRENDALE", "Gryphon" )
-SITE = NIST # SET THE SITE!!!!!!
-
-if SITE==GRYPHON:
-	_COMPANY_ = "Valecitos Laboratory"
-	_INSTRUMENT_ = "TESCAN MIRA3 LMU S/N ?"
-elif SITE==NIST:
-	_COMPANY_ = "DOC NIST MML - 637.02"
-	_INSTRUMENT_ = "TESCAN MIRA3 LMU S/N MI 0791077US"
-elif SITE==PAS2:
-	_COMPANY_ =  "PAS"
-	_INSTRUMENT_ = "X CC 004"
-elif SITE==SRNL:
-	_COMPANY = "SRNL"
-	_INSTRUMENT = "TESCAN MIRA4"
-else:
-	print "Please set the _COMPANY_ and _INSTRUMENT_ variables in the setup.py script"
-	_COMPANY = "Unknown"
-	_INSTRUMENT_="TESCAN MIRA3 LMU S/N ?"
-
-if (SITE == NIST) and (jl.System.getProperty('sun.java.command') == u'gov.nist.microanalysis.dtsa2.DTSA2'):
-	print "JAR paths based on workspace."
-	sys.path.append("C:\\Users\\nritchie\\Documents\\workspace\\SEMantics\\bin")
-	sys.path.append("C:\\Users\\nritchie\\Documents\\workspace\\Graf\\classes")
-	sys.path.append("C:\\Users\\nritchie\\Documents\\workspace\\FastQuant\\bin")
-else:
-	base = jl.System.getProperty("user.dir")
-	print "JAR paths based on user.dir = %s." % base
-	sys.path.append("%s\\graf.jar" % base)
-	sys.path.append("%s\\FastQuant.jar" % base)
-	sys.path.append("%s\\semantics.jar" % base)
-
 import array as javaarray
 import com.thoughtworks.xstream as xst
 sys.packageManager.makeJavaPackage("gov.nist.microanalysis.Graf", "Graf", None)
@@ -79,8 +50,6 @@ R_AXIS = epq.StageCoordinate.Axis.R
 T_AXIS = epq.StageCoordinate.Axis.T
 B_AXIS = epq.StageCoordinate.Axis.B
 
-defaultBounds = (-40.0, -30.0, 40.0, 30.0)
-
 def setDefaultPath(path):
 	"""setDefaultPath(path)
 	Specify the default directory path into which to write images, spectra and other data."""
@@ -90,83 +59,15 @@ def setDefaultPath(path):
 	print "Session data: %s" % defaultPath
 	report("<p>Writing session data to <i>%s</i></p>" % defaultPath)
 
-defaultArchivePath = None
+execfile(jio.File(DefaultOutput).getParent()+"\\config.py")
 
-if SITE==NIST:
-	rootPath = "D:"
-	defaultArchivePath = "P:"
-elif (SITE==PNNL) or (SITE==PAS) or (SITE==AEM) or (SITE==GRYPHON):
-	rootPath = "C:\\Users\\Tescan\\My Documents\\Data"
-elif SITE==ORNL:
-	rootPath = "C:\\Users\\Tescan\\Data"
-elif SITE==PLEASANTON:
-	rootPath = "C:\\Users\\Tescan\\Documents\\DTSA-II Reports\\Data" 
-elif SITE==WARRENDALE:
-	rootPath = "C:\\Users\\Tescan\\Documents\\DTSA-II Reports\\Data"
-elif SITE==SRNL:
-	rootPath = "C:\\Users\\Tescan\\SEMantics Data"
-elif SITE==PAS2:
-	rootPath = "C:\\Users\\Tescan\\Documents\\Data"
-elif SITE==MCCRONE:
-	rootPath = "C:\\Data"
-else:
-	print "WARNING: Unknown site"
-	rootPath = "C:\\Data"
-
-BLANKER_INDEX = 0
-if SITE == WARRENDALE or SITE == SRNL or SITE == PAS2:
-	BLANKER_INDEX = 1
-
-# Configure this to determine which field images to save.
-#   Image 1 => 0x1, Image 2 => 0x2, Image N => 2^(N-1) and Image 1+2 = 0x1 + 0x2 etc.
-if SITE==WARRENDALE:
-	SAVE_FIELD_MASK = 0x9
-elif (SITE==AEM) or (SITE==PAS):
-	SAVE_FIELD_MASK = 0x0
-elif (SITE==PAS2):
-	SAVE_FIELD_MASK = 0x0
-else:
-	SAVE_FIELD_MASK = 0x3
-
-DEFAULT_E0 = 25
-if (SITE == NIST) or (SITE==WARRENDALE):
-	DEFAULT_E0 = 20
-
-if SITE<>PNNL:
-	setDefaultPath("%s\\Daily\\%s" % (rootPath, jtext.SimpleDateFormat("dd-MMM-yyyy").format(ju.Date())))
-	defaultRulePath = "%s\\Standards\\Combined" % rootPath
-	defaultVecPath = "%s\\Standards\\Combined\\%d keV" % (rootPath, DEFAULT_E0)
-	nullImagePath = "%s\\Standards\\Null images" % rootPath
-	keyPath = "%s\\Standards\\Null images" % rootPath
-else:
-	setDefaultPath("%s\\Daily\\%s" % (rootPath, jtext.SimpleDateFormat("dd-MMM-yyyy").format(ju.Date())))
-	defaultRulePath = "%s\\Standards\\Rule" % rootPath
-	defaultVecPath = "%s\\Standards\\Combined\\% keV" % ( rootPath, DEFAULT_E0 )
-	nullImagePath = "%s\\NullImages" % base
-	keyPath = nullImagePath
-
-if (SITE==ORNL) or (SITE==NIST):
-	availableDets = ( True, )*4 # False, False, False )
-elif (SITE==PLEASANTON) or (SITE==WARRENDALE):
-	availableDets = ( True, )
-elif (SITE==SRNL) or (SITE==MCCRONE) or (SITE==GRYPHON) or (SITE==PAS2):
-	availableDets = ( True, )*3
-else:
-	availableDets = ( True, )*2 # False, False, False )
 defaultDetCount = len(availableDets)
 defaultDetMask = 0
 for i in range(0, defaultDetCount):
 	if availableDets[i]:
 		defaultDetMask = defaultDetMask + (1 << i)
-_edsResolution="MediumLE"
-
-defLED = True
 
 pt_det = []
-if SITE==SRNL:
-	det_off=0
-else:
-	det_off=1
 for i in range(0, defaultDetCount):
 	if availableDets[i]:
 		d = findDetector("EDAX Det %d" % (i+det_off, ))
@@ -182,14 +83,6 @@ _saverizeTh = jl.Thread(_saverize)
 _saverizeTh.start()
 
 connect = (jop.showConfirmDialog(MainFrame, "Connect to the TESCAN?", "Start-up Script", jop.YES_NO_OPTION) == jop.YES_OPTION)
-
-# Location of the Image Magick executables 'convert' and 'montage'
-if SITE==ORNL:
-	IMAGE_MAGICK = "C:\\Program Files\\ImageMagick-6.9.9-Q16"
-elif (SITE==NIST) or (SITE==PAS2):
-	IMAGE_MAGICK = "C:\\Program Files\\ImageMagick-6.9.12-Q8"
-else:
-	IMAGE_MAGICK = "C:\\Program Files\\ImageMagick-6.9.6-Q16"
 
 def pascalToTorr(pa):
 	return pa * 0.0075006
@@ -254,15 +147,6 @@ if connect:
 		print "Unable to find a detector named: %s" % name
 		return None
 
-	sedName = "SE"
-	if SITE==MCCRONE:
-		bseName = "BSED"
-	elif SITE==WARRENDALE:
-		bseName ="LE BSE"
-	elif SITE==PLEASANTON:
-		bseName = "BSE Q4"
-	else:
-		bseName = "BSE"
 
 	# Default images to save using collectImages(...)
 	DEF_IMAGE_MASK = (1 << findEDet(bseName).getIndex())+(1 << findEDet(sedName).getIndex()) # 0x300 - All detectors is 0x328
@@ -270,10 +154,6 @@ if connect:
 	SAVE_IMAGE_MASK = (1 << findEDet(bseName).getIndex())+(1 << findEDet(sedName).getIndex())
 
 	_apaDet = findEDet(bseName)
-	if SITE==SRNL or SITE==PAS2:
-		_apaWrite = ( (epq.SpectrumProperties.MicroImage, 3), (epq.SpectrumProperties.MicroImage2, 2) )
-	else:
-		_apaWrite = ( (epq.SpectrumProperties.MicroImage, 1), (epq.SpectrumProperties.MicroImage2, 0) )
 
 	# Initialize the PulseTor detectors
 
@@ -605,6 +485,7 @@ image: Determines whether an image is collected after acquiring the spectrum (de
 			sp.setTimestampProperty(epq.SpectrumProperties.AcquisitionTime, start_ts)
 			sp.setObjectProperty(epq.SpectrumProperties.StagePosition, stg_pos)
 			sp.setNumericProperty(epq.SpectrumProperties.WorkingDistance, _opt.getWorkingDistance())
+			sp.setTextProperty(epq.SpectrumProperties.Instrument, _INSTRUMENT_)
 			sp.setDetector(pt_det_all)
 			sp.setTextProperty(sp.DetectorMode, "%s" % _pt.getResolutionMode(0))
 			if isinstance(comp, str):
@@ -700,6 +581,7 @@ fov: An optional field of view width to which to set the SEM imaging while colle
 			sp.setTimestampProperty(epq.SpectrumProperties.AcquisitionTime, start_ts)
 			sp.setObjectProperty(epq.SpectrumProperties.StagePosition, stg_pos)
 			sp.setNumericProperty(epq.SpectrumProperties.WorkingDistance, _opt.getWorkingDistance())
+			sp.setTextProperty(epq.SpectrumProperties.Instrument, _INSTRUMENT_)
 			sp.setDetector(pt_det_all)
 			sp.setTextProperty(sp.DetectorMode, "%s" % _pt.getResolutionMode(0))
 			if isinstance(comp, str):
@@ -817,6 +699,7 @@ image: Determines whether an image is collected after acquiring the spectrum (de
 			sp.setTimestampProperty(epq.SpectrumProperties.AcquisitionTime, start_ts)
 			sp.setObjectProperty(epq.SpectrumProperties.StagePosition, stg_pos)
 			sp.setNumericProperty(epq.SpectrumProperties.WorkingDistance, _opt.getWorkingDistance())
+			sp.setTextProperty(epq.SpectrumProperties.Instrument, _INSTRUMENT_)
 			if isinstance(comp, str):
 				comp = material(comp)
 			if isinstance(comp, epq.Composition):
