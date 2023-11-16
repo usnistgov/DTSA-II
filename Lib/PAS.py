@@ -2,39 +2,27 @@ _COMPANY = "ManTech PAS"
 _INSTRUMENT_="TESCAN MIRA3 LMU S/N ?"
 
 base = jl.System.getProperty("user.dir")
-print "JAR paths based on user.dir = %s." % base
 sys.path.append("%s\\graf.jar" % base)
 sys.path.append("%s\\FastQuant.jar" % base)
 sys.path.append("%s\\semantics.jar" % base)
 
 defaultBounds = (-40.0, -30.0, 40.0, 30.0)
-
-defaultArchivePath = None
-
-rootPath = "C:\\Users\\Tescan\\My Documents\\Data"
-
 BLANKER_INDEX = 0
-
-# Configure this to determine which field images to save.
-#   Image 1 => 0x1, Image 2 => 0x2, Image N => 2^(N-1) and Image 1+2 = 0x1 + 0x2 etc.
 SAVE_FIELD_MASK = 0x0
 DEFAULT_E0 = 25
+availableDets = ( True, )*2 # False, False, False )
+_edsResolution="MediumLE"
+defLED = True
+det_off=1
+sedName = "SE"
+bseName = "BSE"
+_apaWrite = ( (epq.SpectrumProperties.MicroImage, 1), (epq.SpectrumProperties.MicroImage2, 0) )
 
+rootPath = "C:\\Users\\Tescan\\My Documents\\Data"
 setDefaultPath("%s\\Daily\\%s" % (rootPath, jtext.SimpleDateFormat("dd-MMM-yyyy").format(ju.Date())))
 defaultRulePath = "%s\\Standards\\Rule" % rootPath
 defaultVecPath = "%s\\Standards\\Combined\\% keV" % ( rootPath, DEFAULT_E0 )
 nullImagePath = "%s\\NullImages" % base
 keyPath = nullImagePath
-
-availableDets = ( True, )*2 # False, False, False )
-_edsResolution="MediumLE"
-
-defLED = True
-det_off=1
-
+defaultArchivePath = None
 IMAGE_MAGICK = "C:\\Program Files\\ImageMagick-6.9.6-Q16"
-
-sedName = "SE"
-bseName = "BSE"
-
-_apaWrite = ( (epq.SpectrumProperties.MicroImage, 1), (epq.SpectrumProperties.MicroImage2, 0) )

@@ -61,6 +61,8 @@ def setDefaultPath(path):
 
 execfile(jio.File(DefaultOutput).getParent()+"\\config.py")
 
+print "Instrument: %s" % _INSTRUMENT_
+
 defaultDetCount = len(availableDets)
 defaultDetMask = 0
 for i in range(0, defaultDetCount):
