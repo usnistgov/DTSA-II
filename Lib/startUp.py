@@ -26,6 +26,8 @@ sys.packageManager.makeJavaPackage("gov.nist.microanalysis.semantics.automated",
 import gov.nist.microanalysis.semantics.automated as sema
 sys.packageManager.makeJavaPackage("gov.nist.microanalysis.semantics.staging", "staging", None)
 import gov.nist.microanalysis.semantics.staging as semstg
+sys.packageManager.makeJavaPackage("gov.nist.microanalysis.EPQImage", "EPQImage", None)
+import gov.nist.microanalysis.EPQImage as epqi
 import java.awt as jawt
 import java.awt.image as jawtimg
 import java.awt.geom as jag
@@ -177,6 +179,8 @@ if connect:
 			_edsResolution = res
 			updateCalibration(False)
 
+# Indexed via dwell-time setting (on range [1,10])
+	dwellTimes = ( 0.0, 0.1e-6, 0.32e-6, 1.0e-6, 3.2e-6, 10.0e-6, 32.0e-6, 100.0e-6, 320.0e-6, 1.0e-3, 3.2e-3 )
 
 	def turnOff():
 		"""turnOff()
@@ -1002,7 +1006,7 @@ Get the spectrum associated with the specified row number"""
 			print "%s archived to %s" % (src, destF)
 			return
 
-	if connect and (_ts.hasRCALicense() or SITE==SRNL): 
+	if connect and _ts.hasRCALicense():
 		def updatePC(self):
 			"""z.updatePC()
 	Updates the probe current if necessary and then asks to recenter particle"""
@@ -1079,7 +1083,7 @@ Get the spectrum associated with the specified row number"""
 				self.getZ().setTranslation(res)
 
 
-if connect and (_ts.hasRCALicense() or SITE==SRNL):
+if connect and _ts.hasRCALicense():
 
 		POINT_MODE = "Point mode EDS"
 		FIXED_SPACING = "Fixed spacing EDS"
@@ -1132,10 +1136,10 @@ if connect and (_ts.hasRCALicense() or SITE==SRNL):
 				self._pImgDim = 64
 				self._pImgStack = []
 				self._pSIStack = []
-				self._collectSI = falseRule
+				self._collectSI = None
 				self._processSIStack = None
 				self._SIDwell = 10
-				self._SIDim = 64
+				self._SIDuration = 2.0
 				self._EDSMode = POINT_MODE
 				self._ParticleCount = 0
 				self._debugPw = None
@@ -1221,14 +1225,14 @@ if connect and (_ts.hasRCALicense() or SITE==SRNL):
 				self._rules = rules
 				self._EDSMode = mode
 
-			def configSI(self,  collectSIFunc, dwell=10, dim=64):
+			def configSI(self,  collectSIFunc = None, dwell=10, duration=2.0):
 				"""configSI(collectSIFunc, dwell=10, dims=64)
 	Configure the optional acquisition of a x-ray spectrum image. /
 	If the function collectSIFunc(tvm) evaluates True then a spectrum image with the specified dwell and max dimensions (dim) /
 	will be collected following the end-of-frame."""
 				self._collectSI = collectSIFunc
 				self._SIDwell = dwell
-				self._SIDim = dim
+				self._SIDuration = duration
 				self._processSIStack = SIProcessor()
 				self._processSIStack.start()
 
@@ -1438,7 +1442,8 @@ areaCriterion(...), maxCriterion(...) build common criteria."""
 					termP = self._terminateAnalysis(tvm, z)
 					if acqPImage:
 						self.collectParticleImage(pNum, datum.bounds(), spec)
-					if self._collectSI(tvm):
+					if self._collectSI and self._collectSI(className):
+						print "Queuing an SI for P%d" % pNum
 						self.collectPartSI(pNum, datum.bounds())
 					if spec:
 						epq.SpectrumUtils.rename(spec, "P%0.4d - %s" % (pNum, className))
@@ -1467,7 +1472,7 @@ areaCriterion(...), maxCriterion(...) build common criteria."""
 
 			def collectPartSI(self, pNum, bounds):
 				"""Internal use only..."""
-				xtra = bounds.width / 4
+				xtra = bounds.width/2
 				expBounds = jawt.Rectangle(bounds.x - xtra, bounds.y - xtra, bounds.width + 2 * xtra, bounds.height + 2 * xtra)
 				ra = self._transform.rcaToSubraster(expBounds, self._pImgDim)
 				self._pSIStack.append( (pNum, self._rcaFov, ra.getImageDimensions(), ra.getSubRaster()) )
@@ -1501,8 +1506,6 @@ areaCriterion(...), maxCriterion(...) build common criteria."""
 					mg.setColor(jawt.Color.yellow)
 					mg.setComposite(jawt.AlphaComposite.getInstance(jawt.AlphaComposite.SRC_OVER, 0.5))
 					mg.setFont(jawt.Font("Serif", jawt.Font.PLAIN, 800))
-					# mg.setRenderingHint(jawt.RenderingHint.KEY_ANTIALIASING, jawt.RenderingHint.VALUE_ANTIALIAS_ON)
-					# mg.setRenderingHint(jawt.RenderingHint.KEY_TEXT_ANTIALIASING, jawt.RenderingHint.VALUE_ANTIALIAS_ON)
 					self.debug("CollectField 00")
 					try:
 						scale = 0.001 * _ts.getViewField() / float(ri.width)
@@ -1616,10 +1619,29 @@ areaCriterion(...), maxCriterion(...) build common criteria."""
 						self._pImgStack = []
 					try:
 						for pNum, rcaFov, pixDim, sr in self._pSIStack:
-							siName = "SI%d" % pNum
-							siPath = "%s/si" % self._path
-							si = collectSI(siName, rcaFov, frameCount=1, dwell=self._SIDwell, dim=pixDim, subRaster=sr, path=siPath)
-							self._processSIStack.add(siName, siPath, self._vecs)
+   							siName = "SI%d" % pNum
+							print "Collecting %s..." % siName
+							siPath = "%s/SI" % self._path
+							# Collect an image to locate the particle
+							imgs = collectImages(None, fov=rcaFov, dims=pixDim, dwell=self._pImgDwell, subRaster=sr, writeMask=0x0)
+							if not imgs:
+								break
+							# Locate the largest feature in the image
+							raster = sr
+							blobs =  epqi.Blobber(epqi.ImageProxy(imgs[self._imgDet.getIndex()]), self._measureLow, self._measureHigh).getBlobs()
+							if len(blobs)>0: # Zoom in on largest particle
+								bb = blobs[0].getBounds()
+								xtra = max(2, max(bb.height, bb.width)/10)
+								raster = jawt.Rectangle(sr.x+bb.x-xtra, sr.y+bb.y-xtra, bb.width+2*xtra, bb.height+2*xtra)
+							# Collect at least for self._SIDuration seconds
+							fc = min(100, max(1, int(self._SIDuration / (raster.width*raster.height*dwellTimes[self._SIDwell]))))
+							si = collectSI(siName, rcaFov, frameCount=fc, dwell=self._SIDwell, dims=pixDim, subRaster=raster, path=siPath)
+							if not si:
+								break
+							si.getProperties().setImageProperty(props.MicroImage, ( blobs[0].getMask() if len(blobs)>0 else imgs[this._imgDet.getIndex()]))
+							display(si)
+							write(si, siName, path=siPath, fmt="tif")
+							#self._processSIStack.add(siName, siPath, self._vecs)
 					finally:
 						self._pSIStack = []
 					self.debug("CollectField 10")
@@ -1636,7 +1658,7 @@ areaCriterion(...), maxCriterion(...) build common criteria."""
 				tmp = tmp + u"       Project: %s\n" % self._project
 				tmp = tmp + u"        Sample: %s\n" % self._sample
 				tmp = tmp + u"      Analysis: %s\n" % self._analysis
-				tmp = tmp + u"    Instrument: %s's TESCAN MIRA3\n" % (SITE, )
+				tmp = tmp + u"    Instrument: %s's TESCAN MIRA3\n" % (_COMPANY_, )
 				tmp = tmp + u"      Operator: %s\n" % self._analyst
 				tmp = tmp + u"Search and Measure ==============================\n"
 				tmp = tmp + u"           FOV: %g mm × %g mm FOV\n" % (self._fov, self._fov)
@@ -1666,8 +1688,7 @@ areaCriterion(...), maxCriterion(...) build common criteria."""
 				tmp = tmp + u"       VP Mode: %s\n" % _ts.vacGetVPMode()
 				tmp = tmp + u"       Chamber: %0.5g torr\n" % pascalToTorr(_ts.vacGetPressure(0))
 				tmp = tmp + u"        Column: %0.5g torr\n" % pascalToTorr(_ts.vacGetPressure(1))
-				if SITE!=WARRENDALE:
-					tmp = tmp + u"           Gun: %0.5g torr\n" % pascalToTorr(_ts.vacGetPressure(2))
+				tmp = tmp + u"           Gun: %0.5g torr\n" % pascalToTorr(_ts.vacGetPressure(2))
 				tmp = tmp + u"Images ==========================================\n"
 				if self._collectImages:
 					tmp = tmp + u"         Field: Collect at %d pixels × %d pixels\n" % (self._imgDim, self._imgDim)
@@ -1684,8 +1705,8 @@ areaCriterion(...), maxCriterion(...) build common criteria."""
 				if self._collectSI:
 					tmp = tmp + u"SI Collection ==================================\n"
 					tmp = tmp + u"          When: Based on rule evaluation\n"
-					tmp = tmp + u"    Dimensions: %d\n" % self._SIDim
-					tmp = tmp + u"         Dwell: %d\n" % self._SIDwell
+					tmp = tmp + u"         Dwell: %g microseconds (%d)\n" % ( 1.0e6*dwellTimes[self._SIDwell], self._SIDwell)
+					tmp = tmp + u"......Duration: %g s\n" % self._SIDuration
 				if tiling:
 					tmp = tmp + u"Tiling ========================================\n"
 					tmp = tmp + u"   Description: %s\n" % tiling
@@ -1709,7 +1730,7 @@ areaCriterion(...), maxCriterion(...) build common criteria."""
 				tmp = tmp + u"  Project & %s\\\\\n" % self._project
 				tmp = tmp + u"  Sample & %s\\\\\n" % self._sample
 				tmp = tmp + u"  Analysis & %s\\\\\n" % self._analysis
-				tmp = tmp + u"  Instrument & TESCAN MIRA3 at %s \\\\\n" % (SITE, )
+				tmp = tmp + u"  Instrument & TESCAN MIRA3 at %s \\\\\n" % (_COMPANY_, )
 				tmp = tmp + u"  Operator & %s\\\\\n" % self._analyst
 				tmp = tmp + u"  \\colspan{2}{Search and Measure}\\\\\n"
 				tmp = tmp + u"  FOV & $\\SI{%g}{\\milli\\meter} \\times \\SI{%g}{\\milli\\meter}$ FOV\\\\\n" % (self._fov, self._fov)
@@ -1756,8 +1777,8 @@ areaCriterion(...), maxCriterion(...) build common criteria."""
 				if self._collectSI:
 					tmp = tmp + u"  \\colspan{2}{SI Collection}\\\\\n"
 					tmp = tmp + u"  When & Based on rule evaluation\\\\\n"
-					tmp = tmp + u"  Dimensions & $\\SI{%d}{pixels} \\times \\SI{%d}{pixels}$\\\\\n" % (self._SIDim, self._SIDim)
-					tmp = tmp + u"  Dwell & %d\\\\\n" % self._SIDwell
+					tmp = tmp + u"  Dwell& %g $\mu$s (%d)\\\\\n" % ( 1.0e6*dwellTimes[self._SIDwell], self._SIDwell)
+					tmp = tmp + u"..Duration& %g s\\\\\n" % self._SIDuration
 				if tiling:
 					tmp = tmp + u"  \\colspan{2}{Tiling}\\\\\n"
 					tmp = tmp + u"  Description & %s\\\\\n" % tiling
@@ -1872,7 +1893,7 @@ areaCriterion(...), maxCriterion(...) build common criteria."""
 				tos.println(toXML(tiling))
 				tos.close()
 				self.summarize(tiling)
-				if SITE==NIST:
+				if _COMPANY_.startswith("DOC NIST"):
 					self.toLatex(tiling)
 				write(semstg.TilingUtilities.createMap(tiling, 2048), "Summary Map", self._path) # updated at end...
 				tos2 = jio.PrintStream(jio.File(self._path, "progress.txt"))
@@ -2842,10 +2863,7 @@ if connect:
 		if terminated:
 			return
 		std = "Pure copper"
-		if (SITE==NIST) or (SITE==ORNL) or (SITE==WARRENDALE):
-			e0 = 20.0
-		else:
-			e0 = 25.0
+		e0 = DEFAULT_E0
 		if not path:
 			path = "%s\\QC\\%s" % (rootPath, jtext.SimpleDateFormat("dd-MMM-yyyy H-m-s Z").format(ju.Date()))
 		outPath = jio.File(path)
