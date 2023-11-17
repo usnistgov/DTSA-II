@@ -1135,11 +1135,6 @@ if connect and _ts.hasRCALicense():
 				self._terminateAnalysis = falseTerminate
 				self._pImgDim = 64
 				self._pImgStack = []
-				self._pSIStack = []
-				self._collectSI = None
-				self._processSIStack = None
-				self._SIDwell = 10
-				self._SIDuration = 2.0
 				self._EDSMode = POINT_MODE
 				self._ParticleCount = 0
 				self._debugPw = None
@@ -1224,18 +1219,6 @@ if connect and _ts.hasRCALicense():
 				self._vecs = (vecs if self._collectEDS else None)
 				self._rules = rules
 				self._EDSMode = mode
-
-			def configSI(self,  collectSIFunc = None, dwell=10, duration=2.0):
-				"""configSI(collectSIFunc, dwell=10, dims=64)
-	Configure the optional acquisition of a x-ray spectrum image. /
-	If the function collectSIFunc(tvm) evaluates True then a spectrum image with the specified dwell and max dimensions (dim) /
-	will be collected following the end-of-frame."""
-				self._collectSI = collectSIFunc
-				self._SIDwell = dwell
-				self._SIDuration = duration
-				self._processSIStack = SIProcessor()
-				self._processSIStack.start()
-
 
 			def setMorphologyCriterion(self, crit):
 				"""setMorphologyCriterion(crit)
@@ -1442,9 +1425,6 @@ areaCriterion(...), maxCriterion(...) build common criteria."""
 					termP = self._terminateAnalysis(tvm, z)
 					if acqPImage:
 						self.collectParticleImage(pNum, datum.bounds(), spec)
-					if self._collectSI and self._collectSI(className):
-						print "Queuing an SI for P%d" % pNum
-						self.collectPartSI(pNum, datum.bounds())
 					if spec:
 						epq.SpectrumUtils.rename(spec, "P%0.4d - %s" % (pNum, className))
 						spec.getProperties().setObjectProperty(epq.SpectrumProperties.StagePosition, stgPos)
@@ -1469,13 +1449,6 @@ areaCriterion(...), maxCriterion(...) build common criteria."""
 				expBounds = jawt.Rectangle(bounds.x - xtra, bounds.y - xtra, bounds.width + 2 * xtra, bounds.height + 2 * xtra)
 				ra = self._transform.rcaToSubraster(expBounds, self._pImgDim)
 				self._pImgStack.append( (pNum, self._rcaFov, ra.getImageDimensions(), ra.getSubRaster(), spec) )
-
-			def collectPartSI(self, pNum, bounds):
-				"""Internal use only..."""
-				xtra = bounds.width/2
-				expBounds = jawt.Rectangle(bounds.x - xtra, bounds.y - xtra, bounds.width + 2 * xtra, bounds.height + 2 * xtra)
-				ra = self._transform.rcaToSubraster(expBounds, self._pImgDim)
-				self._pSIStack.append( (pNum, self._rcaFov, ra.getImageDimensions(), ra.getSubRaster()) )
 
 			def path(self):
 				return self._path
@@ -1617,35 +1590,6 @@ areaCriterion(...), maxCriterion(...) build common criteria."""
 						self.debug("CollectField 09")
 					finally:
 						self._pImgStack = []
-					try:
-						for pNum, rcaFov, pixDim, sr in self._pSIStack:
-   							siName = "SI%d" % pNum
-							siPath = "%s/SI" % self._path
-							# Collect an image to locate the particle
-							#imgs = collectImages(None, fov=rcaFov, dims=pixDim, dwell=self._pImgDwell, subRaster=sr, writeMask=0x0)
-							#if not imgs:
-							#	break
-							# Locate the largest feature in the image
-							raster = sr
-							#blobs =  epqi.Blobber(epqi.ImageProxy(imgs[self._imgDet.getIndex()]), self._measureLow, self._measureHigh).getBlobs()
-							#if len(blobs)>0: # Zoom in on largest particle
-							#	bb = blobs[0].getBounds()
-							#	xtra = max(2, max(bb.height, bb.width)/10)
-							#	raster = jawt.Rectangle(sr.x+bb.x-xtra, sr.y+bb.y-xtra, bb.width+2*xtra, bb.height+2*xtra)
-							# Collect at least for self._SIDuration seconds
-							fc = min(100, max(1, int(self._SIDuration / (raster.width*raster.height*dwellTimes[self._SIDwell]))))
-							print "CollectSI(%s, fov=%g, frameCount=%d, dwell=%d, dims=%s, subRaster=%s)" % ( siName, rcaFov, fc, self._SIDwell, str(pixDim), str(raster) )
-							si = collectSI(siName, rcaFov, frameCount=fc, dwell=self._SIDwell, dims=pixDim, subRaster=raster, path=siPath)
-							if not si:
-								break
-							#si.getProperties().setImageProperty(props.MicroImage, ( blobs[0].getMask() if len(blobs)>0 else imgs[self._imgDet.getIndex()]))
-							#si.getProperties().setImageProperty(props.MicroImage, imgs[self._imgDet.getIndex()])
-							#si.getProperties().setImageProperty(props.MicroImage2, imgs[1-self._imgDet.getIndex()])
-							display(si)
-							write(si, siName, path=siPath, fmt="tif")
-							#self._processSIStack.add(siName, siPath, self._vecs)
-					finally:
-						self._pSIStack = []
 					self.debug("CollectField 10")
 				except jl.Throwable, th:
 					print str(th)
@@ -1704,11 +1648,6 @@ areaCriterion(...), maxCriterion(...) build common criteria."""
 					tmp = tmp + u"       Vectors: %s\n" % self._vecs
 					tmp = tmp + u"      Elements: %s\n" % (", ".join("%s" % v.toAbbrev() for v in self._vecs.getElements()))
 					tmp = tmp + u"         Rules: %s\n" % self._rules
-				if self._collectSI:
-					tmp = tmp + u"SI Collection ==================================\n"
-					tmp = tmp + u"          When: Based on rule evaluation\n"
-					tmp = tmp + u"         Dwell: %g microseconds (%d)\n" % ( 1.0e6*dwellTimes[self._SIDwell], self._SIDwell)
-					tmp = tmp + u"......Duration: %g s\n" % self._SIDuration
 				if tiling:
 					tmp = tmp + u"Tiling ========================================\n"
 					tmp = tmp + u"   Description: %s\n" % tiling
@@ -1776,11 +1715,6 @@ areaCriterion(...), maxCriterion(...) build common criteria."""
 					tmp = tmp + u"  Vectors & %s\\\\\n" % self._vecs
 					tmp = tmp + u"  Elements & %s\\\\\n" % (", ".join("%s" % v.toAbbrev() for v in self._vecs.getElements()))
 					tmp = tmp + u"  Rules & %s\\\\\n" % self._rules
-				if self._collectSI:
-					tmp = tmp + u"  \\colspan{2}{SI Collection}\\\\\n"
-					tmp = tmp + u"  When & Based on rule evaluation\\\\\n"
-					tmp = tmp + u"  Dwell& %g $\mu$s (%d)\\\\\n" % ( 1.0e6*dwellTimes[self._SIDwell], self._SIDwell)
-					tmp = tmp + u"..Duration& %g s\\\\\n" % self._SIDuration
 				if tiling:
 					tmp = tmp + u"  \\colspan{2}{Tiling}\\\\\n"
 					tmp = tmp + u"  Description & %s\\\\\n" % tiling
@@ -1958,8 +1892,6 @@ areaCriterion(...), maxCriterion(...) build common criteria."""
 						updatedPC()
 					_ts.chamberLed(defLED)
 					_ts.scSetBlanker(BLANKER_INDEX, oldBlank)
-					if self._processSIStack:
-						self._processSIStack.add( None, None, None )
 					self._debugPw = None
 					print self._timer.stop()
 
