@@ -1620,25 +1620,27 @@ areaCriterion(...), maxCriterion(...) build common criteria."""
 					try:
 						for pNum, rcaFov, pixDim, sr in self._pSIStack:
    							siName = "SI%d" % pNum
-							print "Collecting %s..." % siName
 							siPath = "%s/SI" % self._path
 							# Collect an image to locate the particle
-							imgs = collectImages(None, fov=rcaFov, dims=pixDim, dwell=self._pImgDwell, subRaster=sr, writeMask=0x0)
-							if not imgs:
-								break
+							#imgs = collectImages(None, fov=rcaFov, dims=pixDim, dwell=self._pImgDwell, subRaster=sr, writeMask=0x0)
+							#if not imgs:
+							#	break
 							# Locate the largest feature in the image
 							raster = sr
-							blobs =  epqi.Blobber(epqi.ImageProxy(imgs[self._imgDet.getIndex()]), self._measureLow, self._measureHigh).getBlobs()
-							if len(blobs)>0: # Zoom in on largest particle
-								bb = blobs[0].getBounds()
-								xtra = max(2, max(bb.height, bb.width)/10)
-								raster = jawt.Rectangle(sr.x+bb.x-xtra, sr.y+bb.y-xtra, bb.width+2*xtra, bb.height+2*xtra)
+							#blobs =  epqi.Blobber(epqi.ImageProxy(imgs[self._imgDet.getIndex()]), self._measureLow, self._measureHigh).getBlobs()
+							#if len(blobs)>0: # Zoom in on largest particle
+							#	bb = blobs[0].getBounds()
+							#	xtra = max(2, max(bb.height, bb.width)/10)
+							#	raster = jawt.Rectangle(sr.x+bb.x-xtra, sr.y+bb.y-xtra, bb.width+2*xtra, bb.height+2*xtra)
 							# Collect at least for self._SIDuration seconds
 							fc = min(100, max(1, int(self._SIDuration / (raster.width*raster.height*dwellTimes[self._SIDwell]))))
+							print "CollectSI(%s, fov=%g, frameCount=%d, dwell=%d, dims=%s, subRaster=%s)" % ( siName, rcaFov, fc, self._SIDwell, str(pixDim), str(raster) )
 							si = collectSI(siName, rcaFov, frameCount=fc, dwell=self._SIDwell, dims=pixDim, subRaster=raster, path=siPath)
 							if not si:
 								break
-							si.getProperties().setImageProperty(props.MicroImage, ( blobs[0].getMask() if len(blobs)>0 else imgs[this._imgDet.getIndex()]))
+							#si.getProperties().setImageProperty(props.MicroImage, ( blobs[0].getMask() if len(blobs)>0 else imgs[self._imgDet.getIndex()]))
+							#si.getProperties().setImageProperty(props.MicroImage, imgs[self._imgDet.getIndex()])
+							#si.getProperties().setImageProperty(props.MicroImage2, imgs[1-self._imgDet.getIndex()])
 							display(si)
 							write(si, siName, path=siPath, fmt="tif")
 							#self._processSIStack.add(siName, siPath, self._vecs)
