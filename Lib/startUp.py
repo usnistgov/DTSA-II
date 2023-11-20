@@ -1373,7 +1373,6 @@ areaCriterion(...), maxCriterion(...) build common criteria."""
 					if self._rules:
 						vals.append(0) # CLASS (set below...)
 					spec, ps = None, None
-					macro = datum.getMacroImage(32)
 					spec = datum.getSpectrum()
 					if self._vecs and spec:
 						totalCx=epq.SpectrumUtils.totalCounts(spec, True)
@@ -1386,6 +1385,7 @@ areaCriterion(...), maxCriterion(...) build common criteria."""
 							wr.close()
 						kr = self._vecs.getKRatios(spec)
 						props = spec.getProperties()
+						print "LT=%g, RT=%g" % (props.getNumericWithDefault(epq.SpectrumProperties.LiveTime, -1.0), props.getNumericWithDefault(epq.SpectrumProperties.RealTime, -1.0))
 						props.setKRatioProperty(epq.SpectrumProperties.KRatios, kr)
 						ps = epq.ParticleSignature(kr, [epq.Element.C], [epq.Element.O])
 						props.setParticleSignatureProperty(epq.SpectrumProperties.ParticleSignature, ps)
@@ -1410,8 +1410,6 @@ areaCriterion(...), maxCriterion(...) build common criteria."""
 							vals.append(ps.get(elm) * 100.0)
 							if ps.get(elm)>0.01:
 								klmElms.append(elm)
-					else:
-						props.setImageProperty(epq.SpectrumProperties.MicroImage, macro)
 					pNum = z.addRow(vals)
 					row = pNum - 1
 					className = "Unclassified"
@@ -1430,8 +1428,8 @@ areaCriterion(...), maxCriterion(...) build common criteria."""
 						spec.getProperties().setObjectProperty(epq.SpectrumProperties.StagePosition, stgPos)
 						if not acqPImage: # Write spectrum
 							z.writeSpectrum(spec, pNum)
-					elif macro: # Image only
-						write(macro, "%0.5d", path="%s/mag0" % (self._path), fmt="tif")
+					else: # Image only
+						write(datum.getMacroImage(32), "%0.5d", path="%s/mag0" % (self._path), fmt="tif")
 					if spec:
 						clear()
 						display(spec)
