@@ -32,6 +32,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
+import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
@@ -39,6 +40,7 @@ import com.formdev.flatlaf.FlatDarculaLaf;
 import com.formdev.flatlaf.FlatLightLaf;
 import com.formdev.flatlaf.themes.FlatMacDarkLaf;
 import com.formdev.flatlaf.themes.FlatMacLightLaf;
+import com.jgoodies.forms.FormsSetup;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.PanelBuilder;
 import com.jgoodies.forms.layout.CellConstraints;
@@ -105,6 +107,8 @@ public class AppPreferences {
 	private String mStartupScript = "";
 	private String mShutdownScript = "";
 	private String mEPQJavaDoc = EPQ_JAVA_DOC_DEFAULT;
+   private boolean mVariableFF = true;
+   private boolean mOFudge = false;
 	// Algorithms
 	private String mCorrectionAlgorithm;
 	private String mMACAlgorithm;
@@ -290,6 +294,9 @@ public class AppPreferences {
 		private JComboBox<String> jComboBox_MAC;
 		private JComboBox<String> jComboBox_BremAngular;
 		private JComboBox<String> jComboBox_Ionization;
+      private JCheckBox jCheckBox_VariableFF = new JCheckBox("Use variable width fitting filter (def: true)");
+      private JCheckBox jCheckBox_UseOFudge = new JCheckBox("Use oxygen k-ratio fudge factor (def: false)");
+
 
 		/**
 		 * Constructs a QuantPreferences
@@ -309,7 +316,7 @@ public class AppPreferences {
 
 		private void initialize() throws Exception {
 			final FormLayout fl = new FormLayout("5dlu, right:pref, 5dlu, 150dlu",
-					"pref, 5dlu, pref, 5dlu, pref, 5dlu, pref");
+					"pref, 5dlu, pref, 5dlu, pref, 5dlu, pref, 200dlu, pref, 5dlu, pref, 5dlu, pref");
 			setLayout(fl);
 			final CellConstraints cc = new CellConstraints();
 			add(new JLabel("Correction Algorithm"), cc.xy(2, 1));
@@ -354,6 +361,16 @@ public class AppPreferences {
 			jComboBox_Ionization.addItem(AbsoluteIonizationCrossSection.Casnati82.getName());
 			jComboBox_Ionization.setSelectedItem(getIonizationCrossSection());
 			add(jComboBox_Ionization, cc.xy(4, 7));
+			
+			
+			add(FormsSetup.getComponentFactoryDefault().createSeparator("Specialized Options", SwingConstants.LEFT), cc.xyw(1, 9, 4));
+			
+			jCheckBox_VariableFF.setSelected(useVariableFF());
+			add(jCheckBox_VariableFF, cc.xy(4, 11));
+			jCheckBox_UseOFudge.setSelected(useOFudge());
+			jCheckBox_UseOFudge.setToolTipText("An ill-considered attempt to improve O quant.");
+			add(jCheckBox_UseOFudge, cc.xy(4, 13));
+			
 		}
 
 		@Override
@@ -363,6 +380,8 @@ public class AppPreferences {
 			setMACAlgorithm(jComboBox_MAC.getSelectedItem().toString());
 			setIonizationCrossSection(jComboBox_Ionization.getSelectedItem().toString());
 			setBremsstrahlungAngularDistribution(jComboBox_BremAngular.getSelectedItem().toString());
+			setUseVariableFF(jCheckBox_VariableFF.isSelected());
+			setUseOFudge(jCheckBox_UseOFudge.isSelected());
 		}
 	}
 
@@ -571,7 +590,7 @@ public class AppPreferences {
 			help.setEditable(false);
 			help.setText("<HTML><h3 align=right>Overview</h3><p align=left>" + DTSA2.APP_NAME
 					+ " makes extensive use of user defined detectors to define the instrumentation on which spectra are collected "
-					+ "or on which sepectra are to be simulated.  In this model, all detectors are associated with instruments.  "
+					+ "or on which spectra are to be simulated.  In this model, all detectors are associated with instruments.  "
 					+ "Each instrument may have zero or more detectors.  Detectors definitions contain all the relevant information "
 					+ "about the performance of the detector including geometry, physical make-up and calibration.  When a detector "
 					+ "is first constructed, you supply an approximate default calibration.   This calibration may be updated at "
@@ -1673,6 +1692,8 @@ public class AppPreferences {
 				AbsoluteIonizationCrossSection.BoteSalvat2008.getName());
 		mSession = DTSA2.getSession();
 		mBaseReportPath = HTMLReport.getBasePath();
+		mVariableFF = userPref.getBoolean("Variable FF", true);
+		mOFudge = userPref.getBoolean("Oxygen fudge", false);
 		updateStrategy();
 	}
 
@@ -1724,6 +1745,31 @@ public class AppPreferences {
 			updateStrategy();
 		}
 	}
+	
+	public boolean useVariableFF() {
+	   return mVariableFF;
+	}
+	
+	public void setUseVariableFF(boolean b) {
+	   if(mVariableFF != b) {
+	      mVariableFF = b;
+         final Preferences userPref = Preferences.userNodeForPackage(getClass());
+         userPref.putBoolean("Variable FF", mVariableFF);
+	   }
+	}
+	
+	  public boolean useOFudge() {
+	      return mOFudge;
+	   }
+	   
+	   public void setUseOFudge(boolean b) {
+	      if(mOFudge != b) {
+	         mOFudge = b;
+	         final Preferences userPref = Preferences.userNodeForPackage(getClass());
+	         userPref.putBoolean("Oxygen fudge", mOFudge);
+	      }
+	   }
+
 
 	/**
 	 * Gets the current value assigned to mACAlgorithm
