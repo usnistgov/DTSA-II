@@ -1228,7 +1228,8 @@ public class QuantificationWizard extends JWizardDialog {
                final double beamEnergy = ToSI.keV(getBeamEnergy_keV());
                if ((mQuantUsingStandards == null) || (!Math2.approxEquals(mQuantUsingStandards.getBeamEnergy(), beamEnergy, 0.01))
                      || (det != mQuantUsingStandards.getDetector())) {
-                  mQuantUsingStandards = new QuantifyUsingStandards(det, beamEnergy);
+                  mQuantUsingStandards = new QuantifyUsingStandards(det, beamEnergy, false, AppPreferences.getInstance().useVariableFF());
+                  mQuantUsingStandards.setOFudge(AppPreferences.getInstance().useOFudge());
                   LLSQPath.this.mBeamEnergy = beamEnergy;
                   LLSQPath.this.mDetector = det;
                }
