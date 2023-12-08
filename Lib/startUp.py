@@ -1385,7 +1385,7 @@ areaCriterion(...), maxCriterion(...) build common criteria."""
 							wr.close()
 						kr = self._vecs.getKRatios(spec)
 						props = spec.getProperties()
-						print "LT=%g, RT=%g" % (props.getNumericWithDefault(epq.SpectrumProperties.LiveTime, -1.0), props.getNumericWithDefault(epq.SpectrumProperties.RealTime, -1.0))
+						# print "LT=%g, RT=%g" % (props.getNumericWithDefault(epq.SpectrumProperties.LiveTime, -1.0), props.getNumericWithDefault(epq.SpectrumProperties.RealTime, -1.0))
 						props.setKRatioProperty(epq.SpectrumProperties.KRatios, kr)
 						ps = epq.ParticleSignature(kr, [epq.Element.C], [epq.Element.O])
 						props.setParticleSignatureProperty(epq.SpectrumProperties.ParticleSignature, ps)
