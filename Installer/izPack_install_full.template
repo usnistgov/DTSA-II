@@ -152,6 +152,14 @@
             <file override="update" src="$BUILDPATH/../../Lib/bbb.py" targetdir="$INSTALL_PATH/"/>
             <file override="update" src="$BUILDPATH/TESCAN_backdrop theme.themepack" targetdir="$INSTALL_PATH/"/>
             <file override="update" src="$BUILDPATH/../../Lib/to10dash1.py" targetdir="${INSTALL_PATH}/Lib/dtsa2"/>
+            <file override="update" src="$BUILDPATH/../../Lib/AEM1.py" targetdir="${INSTALL_PATH}/Lib/dtsa2"/>
+            <file override="update" src="$BUILDPATH/../../Lib/Gryphon.py" targetdir="${INSTALL_PATH}/Lib/dtsa2"/>
+            <file override="update" src="$BUILDPATH/../../Lib/McCrone1.py" targetdir="${INSTALL_PATH}/Lib/dtsa2"/>
+            <file override="update" src="$BUILDPATH/../../Lib/NIST.py" targetdir="${INSTALL_PATH}/Lib/dtsa2"/>
+            <file override="update" src="$BUILDPATH/../../Lib/PAS.py" targetdir="${INSTALL_PATH}/Lib/dtsa2"/>
+            <file override="update" src="$BUILDPATH/../../Lib/PAS2.py" targetdir="${INSTALL_PATH}/Lib/dtsa2"/>
+            <file override="update" src="$BUILDPATH/../../Lib/PNNL.py" targetdir="${INSTALL_PATH}/Lib/dtsa2"/>
+            <file override="update" src="$BUILDPATH/../../Lib/SRNL.py" targetdir="${INSTALL_PATH}/Lib/dtsa2"/>
         </pack>
     </packs>
     <listeners>
