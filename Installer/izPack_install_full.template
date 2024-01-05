@@ -104,6 +104,7 @@
             <file override="update" src="$BUILDPATH/dtsa2.jar" targetdir="$INSTALL_PATH/"/>
             <file override="update" src="$BUILDPATH/fastQuant.jar" targetdir="$INSTALL_PATH/"/>
             <file override="update" src="$BUILDPATH/DTSA-II.exe" targetdir="$INSTALL_PATH/"/>
+            <file override="update" src="$BUILDPATH/DTSA-II_G1.exe" targetdir="$INSTALL_PATH/"/>
             <file override="update" src="$BUILDPATH/Basic scripting in DTSA-II.pdf" targetdir="$INSTALL_PATH/doc/"/>
             <file override="update" src="$BUILDPATH/Introduction to DTSA-II.pdf" targetdir="$INSTALL_PATH/doc/"/>
             <file override="update" src="$BUILDPATH/MT1_GettingStartedWithNIST_DTSA_II.pdf" targetdir="$INSTALL_PATH/doc/"/>
