@@ -1387,7 +1387,7 @@ unless density=None in which case the mat.getDensity() in g/cm^3 is used."""
     return epq.ElectronRange.KanayaAndOkayama1972.compute(mat, epq.ToSI.keV(e0)) / epq.ToSI.gPerCC(density)
  
 
-def tabulateAsOxides(specs, withErrs=False, prop=epq.SpectrumProperties.MicroanalyticalComposition, precision=4, oxidizer=None):
+def tabulateAsOxides(specs, withErrs=False, prop=epq.SpectrumProperties.MicroanalyticalComposition, precision=4, oxidizer=None, sep="\t"):
    """tabulateAsOxide(specs, [withErrs=False], [prop=epq.SpectrumProperties.MicroanalyticalComposition], [precision=4],[oxidizer=epq.Oxidizer()]):
    Tabulate the compositions associated with these spectra as oxides."""
    if isinstance(prop, str):
@@ -1399,7 +1399,14 @@ def tabulateAsOxides(specs, withErrs=False, prop=epq.SpectrumProperties.Microana
       prop = propMap[prop]
    if not oxidizer:
       oxidizer = epq.Oxidizer()
-   fmtStr = "%s\t%2." + str(precision) + "f"
+   if sep=="|":
+      lst = "| "
+      lend = " |\n"
+      sep = " | "
+   else:
+      lst =""
+      lend = "\n"
+   fmtStr = "%s"+sep+"%2." + str(precision) + "f"
    stats = {}
    data = []
    keys = []
@@ -1423,22 +1430,29 @@ def tabulateAsOxides(specs, withErrs=False, prop=epq.SpectrumProperties.Microana
             if key not in keys:
                keys.append(key)
                stats[key] = epu.DescriptiveStatistics()
-   # Build header            
-   tmp = "Spectrum"
+   # Build header
+   tmp = lst + "Spectrum"
+   splitter = "| --- |"
    for key in keys:
       if withErrs:
-         tmp = "%s\t%s\tU(%s)" % (tmp, key, key,)
+         tmp = "%s%s%s\tU(%s)" % (tmp, sep, key, key,)
+         splitter = splitter + " --- | --- |"
       else:
-         tmp = "%s\t%s" % (tmp, key,)
+         tmp = "%s%s%s" % (tmp, sep, key,)
+         splitter = splitter + " --- |"
    if remainder:
       if withErrs:
-         tmp = "%s\tO\tU(O)" % (tmp,)
+         tmp = "%s%sO%sU(O)" % (tmp, sep, sep)
+         splitter = splitter + " --- | --- |"
       else:
-         tmp = "%s\tO" % (tmp,)
-   print tmp
+         tmp = "%s%sO" % (tmp, sep)
+         splitter = splitter + " --- |"
+   tmp = tmp + lend
+   if sep == " | ":
+      tmp = tmp + splitter + "\n"
    # Report each spectrum
    for spec, c, ox in data:
-       tmp = "%s" % str(spec)
+       tmp = tmp + lst + ("%s" % str(spec))
        for key in keys:
           mf = ox.get(key, epu.UncertainValue2.ZERO)
           tmp = fmtStr % (tmp, mf.doubleValue(),)
@@ -1451,42 +1465,42 @@ def tabulateAsOxides(specs, withErrs=False, prop=epq.SpectrumProperties.Microana
           if withErrs:
              tmp = fmtStr % (tmp, mf.uncertainty(),)
           stats[remainder].add(mf.doubleValue())
-       print tmp
+       tmp = tmp + lend
    # Output summary statistics       
    if len(specs) > 1:
-       tmp = "Average"
+       tmp = tmp + lst + "Average"
        for key in keys:
            ds = stats[key]
            tmp = fmtStr % (tmp, ds.average(),)
            if withErrs:
-              tmp = "%s\t" % (tmp,)
+              tmp = "%s%s" % (tmp, sep) 
        if remainder:
-           ds = stats[remainder]              
+           ds = stats[remainder]
            tmp = fmtStr % (tmp, ds.average(),)
            if withErrs:
-              tmp = "%s\t" % (tmp,)
-       print tmp  
-       tmp = "Std. Dev."
+              tmp = "%s%s" % (tmp, sep)
+       tmp = tmp + lend + lst + "Std. Dev."
        for key in keys:
            ds = stats[key]
            tmp = fmtStr % (tmp, ds.standardDeviation(),)
            if withErrs:
-              tmp = "%s\t" % (tmp,)
+              tmp = "%s%s" % (tmp, sep)
        if remainder:
-           ds = stats[remainder]              
+           ds = stats[remainder]
            tmp = fmtStr % (tmp, ds.standardDeviation(),)
            if withErrs:
-              tmp = "%s\t" % (tmp,)
-       print tmp  
+              tmp = "%s%s" % (tmp, sep)
+           tmp = tmp + lend
+   return tmp 
 
 
-def tabulate(specs, withErrs=False, normalize=False, prop=epq.SpectrumProperties.MicroanalyticalComposition, precision=4, massFrac=True, asOxides=False, total=True, stageCoords=tuple()):
+def tabulate(specs, withErrs=False, normalize=False, prop=epq.SpectrumProperties.MicroanalyticalComposition, precision=4, massFrac=True, asOxides=False, total=True, stageCoords=tuple(), sep="\t"):
    """tabulate(specs,[withErrs=False],[normalize=False],[prop=epq.SpectrumProperties.MicroanalyticalComposition],[precision=4],[massFrac=True],[asOxides=False],[total=True],[stageCoords=()])
 Tabulate the compositions associated with the specified collection of spectra.  Rows represent spectra and columns represent elements. \
 You can use 'k', 'c' or 's' for prop for k-ratios, measured composition or standard composition respectively. precision>4 will output \
 additional decimal digits of precision. [massFrac->False for atomic fraction.] [total -> True|False] \
 [stageCoords->( ['x',] ['y',] ['z',] ['r',] ['t',] ['b'] )"""
-   print tabulateHelper(specs, withErrs, normalize, prop, precision, massFrac, asOxides, total, stageCoords)
+   print tabulateHelper(specs, withErrs, normalize, prop, precision, massFrac, asOxides, total, stageCoords, sep)
    
    
 
@@ -1504,26 +1518,33 @@ Displays a summary report for N spectra with mass fraction values and standard d
          se.add(c.weightFraction(elm, False))
       print("%s\t%s\t%g\t%g" % (elm.toAbbrev(), date, se.average(), se.standardDeviation()))
 
-def printTab(file, specs, withErrs=False, normalize=False, prop=epq.SpectrumProperties.MicroanalyticalComposition, precision=4, massFrac=True, asOxides=False, total=True, stageCoords=tuple()):
+def printTab(file, specs, withErrs=False, normalize=False, prop=epq.SpectrumProperties.MicroanalyticalComposition, precision=4, massFrac=True, asOxides=False, total=True, stageCoords=tuple(), sep="\t"):
    with open(file,"a") as pw:
-       pw.write(tabulateHelper(specs, withErrs, normalize, prop, precision, massFrac, asOxides, total, stageCoords))
+       pw.write(tabulateHelper(specs, withErrs, normalize, prop, precision, massFrac, asOxides, total, stageCoords, sep))
 
 
-def tabulateHelper(specs, withErrs, normalize, prop, precision, massFrac, asOxides, total, stageCoords):
-   def prStgCoord(spec, coords):
+def tabulateHelper(specs, withErrs, normalize, prop, precision, massFrac, asOxides, total, stageCoords, sep):
+   def prStgCoord(spec, coords, sep):
       def pcoord(ax, coord):
          return ("%2.3f" % coord.get(ax) if coord.isPresent(ax) else "-")
       if not isinstance(spec, epq.ISpectrumData):
-         return "\t-" * len(coords)
+         return ("%s-" % sep) * len(coords)
       coord = spec.getProperties().getObjectWithDefault(epq.SpectrumProperties.StagePosition, None)
       if not coord:
-         return "\t-" * len(coords)
+         return ("%s-" % sep) * len(coords)
       res = ""
       cmap = { 'x': epq.StageCoordinate.Axis.X, 'y':epq.StageCoordinate.Axis.Y, 'z':epq.StageCoordinate.Axis.Z, 'r':epq.StageCoordinate.Axis.R, 't':epq.StageCoordinate.Axis.T, 'b':epq.StageCoordinate.Axis.B}
       for ax in map(cmap.get, coords) :
-         res = "%s\t%s" % (res, pcoord(ax, coord))        
+         res = "%s%s%s" % (res, sep, pcoord(ax, coord))        
       return res
    ans = ""
+   if sep=="|":
+      sep = " | "
+      lst = "| "
+      lend = " |\n"
+   else:
+      lst = ""
+      lend = "\n"
    if isinstance(prop, str):
       propMap = { 
              'k' : epq.SpectrumProperties.KRatios,
@@ -1532,9 +1553,9 @@ def tabulateHelper(specs, withErrs, normalize, prop, precision, massFrac, asOxid
              }
       prop = propMap[prop]
    if prop <> epq.SpectrumProperties.KRatios:
-      fmtStr = "%s\t%2." + str(precision) + "f"
+      fmtStr = "%s"+sep+"%2." + str(precision) + "f"
       if asOxides:
-          tabulateAsOxides(specs, withErrs=withErrs, prop=prop, precision=4)
+          tabulateAsOxides(specs, withErrs=withErrs, prop=prop, precision=4, sep=sep)
       else:
          res = {}
          elms = ju.TreeSet()
@@ -1546,25 +1567,32 @@ def tabulateHelper(specs, withErrs, normalize, prop, precision, massFrac, asOxid
             if c != None:
                res[spec] = c
                elms.addAll(c.getElementSet())
-         tmp = "Name"
+         tmp = lst + "Name"
+         splitter = "| ---- |"
          stats = {}
          for elm in elms:
-            tmp = "%s\t%s" % (tmp, elm.toAbbrev())
+            tmp = "%s%s%s" % (tmp, sep, elm.toAbbrev())
+            splitter = splitter + " --- |"
             if withErrs:
-               tmp = "%s\tU(%s)" % (tmp, elm.toAbbrev())
+               tmp = "%s%sU(%s)" % (tmp, sep, elm.toAbbrev())
+               splitter = splitter + " --- |"
             stats[elm] = epu.DescriptiveStatistics()
          if total:            
-            tmp = "%s\tTotal" % tmp
+            tmp = "%s%sTotal" % (tmp, sep)
+            splitter = splitter + " --- |"
             if withErrs:
-               tmp = "%s\tU(Total)" % tmp
+               tmp = "%s%sU(Total)" % (tmp, sep)
+               splitter = splitter + " --- |"
          if len(stageCoords) > 0:
-            tmp = tmp + "\t" + "\t".join(map(lambda s : s.upper(), stageCoords)) 
-
-         ans = ans + "\n" + tmp
+            tmp = tmp + sep + sep.join(map(lambda s : s.upper(), stageCoords))
+            splitter = splitter + (" --- |" * len(stageCoords))
+         ans = tmp + lend
+         if sep==" | ":
+            ans = ans + splitter +"\n"
          for spec in specs:
             if res.has_key(spec):
                c = res[spec]
-               tmp = "%s" % spec
+               tmp = "%s%s" % (lst, spec)
                for elm in elms:
                   u = (c.weightFractionU(elm, normalize) if massFrac else c.atomicPercentU(elm))
                   stats[elm].add(u.doubleValue())
@@ -1577,25 +1605,22 @@ def tabulateHelper(specs, withErrs, normalize, prop, precision, massFrac, asOxid
                    if withErrs: 
                       tmp = fmtStr % (tmp, 100.0 * u.uncertainty())
                if len(stageCoords) > 0:
-                   tmp = "%s%s" % (tmp, prStgCoord(spec, stageCoords))
-
-               ans = ans + "\n" + tmp
+                   tmp = "%s%s" % (tmp, prStgCoord(spec, stageCoords, sep))
+               ans = ans + tmp + lend
          if len(specs) > 1:
-            tmp = "Average"
+            tmp = lst + "Average"
             for elm in elms:
                tmp = fmtStr % (tmp, 100.0 * stats[elm].average())
                if withErrs:
-                  tmp = tmp + "\t"
-
-            ans = ans + "\n" + tmp   
+                  tmp = tmp + sep
+            ans = ans + tmp + sep + lend
          if len(specs) > 2:            
-            tmp = "Std. Dev."
+            tmp = lst + "Std. Dev."
             for elm in elms:
                tmp = fmtStr % (tmp, 100.0 * stats[elm].standardDeviation())
                if withErrs:
-                  tmp = tmp + "\t"
-
-            ans = ans + "\n" + tmp   
+                  tmp = tmp + sep
+            ans = ans + tmp + sep + lend
    else:
       res = {}
       xrtss = ju.TreeSet()
@@ -1604,44 +1629,44 @@ def tabulateHelper(specs, withErrs, normalize, prop, precision, massFrac, asOxid
          if krs != None:
             res[spec] = krs
             xrtss.addAll(krs.getTransitions())
-      tmp = "Name"
+      tmp = lst + "Name"
+      splitter = "| --- |"
       stats = {}
       for xrts in xrtss:
          stats[xrts] = epu.DescriptiveStatistics()
-         tmp = "%s\t%s" % (tmp, xrts)
+         tmp = "%s%s%s" % (tmp, sep, xrts)
+         splitter = splitter + " --- |"
          if withErrs:
-            tmp = "%s\td(%s)" % (tmp, xrts)
-
-      ans = ans + "\n" + tmp
-      fmtStr = "%s\t%2." + str(precision) + "f"
+            tmp = "%s%sd(%s)" % (tmp, sep, xrts)
+            splitter = splitter + " --- |"
+      ans = tmp + lend
+      if sep==" | ":
+            ans = ans + splitter+"\n"
+      fmtStr = "%s"+sep+"%2." + str(precision) + "f"
       for spec in specs:
          if res.has_key(spec):
             k = res[spec]
-            tmp = "%s" % spec
+            tmp = "%s%s" % (lst, spec)
             for xrts in xrtss:
                u = k.getKRatioU(xrts)
                stats[xrts].add(u.doubleValue())
                tmp = fmtStr % (tmp, u.doubleValue())
                if withErrs:
                   tmp = fmtStr % (tmp, u.uncertainty())
-
-            ans = ans + "\n" + tmp
-      tmp = "Average"
+            ans = ans + tmp + lend
+      tmp = lst + "Average"
       for xrts in xrtss:
          tmp = fmtStr % (tmp, stats[xrts].average())
          if withErrs:
-            tmp = "%s\t" % tmp
-
-      ans = ans + "\n" + tmp   
-      tmp = "Std. Dev."
+            tmp = "%s%s" % (tmp, sep)
+      ans = ans + tmp + lend 
+      tmp = lst + "Std. Dev."
       for xrts in xrtss:
          tmp = fmtStr % (tmp, stats[xrts].standardDeviation())
          if withErrs:
-            tmp = "%s\t" % tmp
-
-      ans = ans + "\n" + tmp   
-   return ans 
-      
+            tmp = "%s%s" % (tmp, sep)
+      ans = ans + tmp + lend 
+   return ans    
       
 def latexulate(specs, withErrs=False, normalize=False, prop=epq.SpectrumProperties.MicroanalyticalComposition, precision=2, massFrac=True, asOxides=False, total=True, stageCoords=tuple(), certified=None):
    """latexulate(specs,[withErrs=False],[normalize=False],[prop=epq.SpectrumProperties.MicroanalyticalComposition],[precision=2],[massFrac=True],[asOxides=False],[total=True],[stageCoords=()], certified = None)
