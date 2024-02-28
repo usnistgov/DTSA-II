@@ -753,23 +753,14 @@ public class JCommandLine extends JTextPane {
             cmd.append("print\n");
             cmd.append("print \"Running " + pyPath + "\"\n");
             cmd.append(DEF_OUT + "=\"" + fullDir + "\"\n");
-            cmd.append("_script=\"Not specified\"\n");
-            cmd.append("try:\n");
-            cmd.append("\tf=open(\"" + pyPath + "\")\n");
-            cmd.append("\ttry:\n");
-            cmd.append("\t\tglobals()[\"_script\"]=f.read()\n");
-            cmd.append("\tfinally:\n");
-            cmd.append("\t\tf.close()\n");
-            cmd.append("\t\tdel f\n");
-            cmd.append("\texecfile(\"" + pyPath + "\")\n");
-            cmd.append("finally:\n");
-            cmd.append("\tdo=jio.File(\"" + fullDir + "\")\n");
-            cmd.append("\tod=(do.list() if do and do.isDirectory() else None)\n");
-            cmd.append("\tif od and len(od)==0:\n");
-            cmd.append("\t\tjio.File(\"" + fullDir + "\").delete()\n");
-            // cmd.append("\tdel _script\n");
-            cmd.append("\tdel " + DEF_OUT + "\n");
+            cmd.append("f=open(\"" + pyPath + "\")\n");
+            cmd.append("globals()[\"_script\"]=f.read()\n");
+            cmd.append("f.close()\n");
+            cmd.append("del f\n");
+            cmd.append("execfile(\"" + pyPath + "\")\n");
             execute(cmd.toString());
+            // Note: delete() doesn't delete when the directory is not empty. We make use of this fact.
+            dir.delete();
          } else
             writeError(file.toString() + " does not appear to be a file.");
       }
