@@ -170,6 +170,9 @@ def suggestTransitionSets(mat, e0=20.0):
 
 def configureGun(gun):
     return { "Gun" : gun }
+    
+def fixColors(materials):
+	return { "Colors": materials }
 
 def configureBeam(x, y, z, szNm):
    """configureBeam(x,y,z, szNm)
@@ -339,6 +342,10 @@ def base(det, e0, withPoisson, nTraj, dose, sf, bf, name, buildSample, buildPara
         ti.setXRange(origin[0] - 0.5 * dim, origin[0] + 0.5 * dim)
         ti.setYRange(origin[2] - 0.1 * dim, origin[2] + 0.9 * dim)
         ti.setMaxTrajectories(xtraParams['TrajCount'])
+        # Fix colors
+        if xtraParams.has_key("Colors"):
+        	for mat in xtraParams["Colors"]:
+        		ti.assignColor(mat)
         monte.addActionListener(ti)
     defOut = (dtsa2.DefaultOutput if dtsa2.DefaultOutput else dtsa2.reportPath())
     do = ("%s\\%s" % (xtraParams["Output"], dtsa2.normalizeFilename(name)) if xtraParams.has_key("Output") else "%s/%s" % (defOut, dtsa2.normalizeFilename(name)))
