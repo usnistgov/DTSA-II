@@ -2411,7 +2411,7 @@ public class QuantificationWizard extends JWizardDialog {
                   final PrintWriter pw = new PrintWriter(sw);
                   final NumberFormat nf2 = new HalfUpFormat("0.0000");
                   // Header row
-                  pw.print("Spectrum\tQuantity");
+                  pw.print("Spectrum\t");
                   for (final Element el : mElements) {
                      pw.print("\t");
                      pw.print(el.toAbbrev());
