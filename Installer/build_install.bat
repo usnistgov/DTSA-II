@@ -1,5 +1,5 @@
-set "D2V=2024-01-05"
-set "NUM_VER=14.3.5.0"
+set "D2V=2024-02-28"
+set "NUM_VER=14.3.10.0"
 set "JDK_VER=21"
 set "BPATH=C:\Users\nritchie\repositories"
 set "NAME_VER=neptune"
@@ -7,7 +7,7 @@ cd %BPATH%
 
 del dtsa2_%NAME_VER%.jar
 del dtsa2_%NAME_VER%_nojre.jar
-del dtsa2_%NAME_VER%_full.jar 
+del dtsa2_%NAME_VER%_full.jar
 
 echo Neptune %D2V% > "DTSA-II\src\gov\nist\microanalysis\dtsa2\revision"
 echo Neptune %D2V% > "DTSA-II\target\classes\gov\nist\microanalysis\dtsa2\revision"
