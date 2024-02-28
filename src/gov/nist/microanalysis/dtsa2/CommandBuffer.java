@@ -33,7 +33,7 @@ public class CommandBuffer {
                while (fr.ready()) {
                   String line = fr.readLine();
                   if (line.length() > 0)
-                     mBuffer.add(line.replace("\\n", "\n"));
+                     mBuffer.add(line.replace("<!CRLF!>", "\n"));
                }
             } finally {
                fr.close();
@@ -89,7 +89,7 @@ public class CommandBuffer {
       FileWriter fw = new FileWriter(mArchive, java.nio.charset.Charset.forName("UTF8"));
       try {
          for (int i = Math.max(0, mBuffer.size() - mLength); i < mBuffer.size(); ++i) {
-            fw.write(mBuffer.get(i).replace("\n", "\\n"));
+            fw.write(mBuffer.get(i).replace("\n", "<!CRLF!>"));
             fw.write("\n");
          }
          fw.flush();
