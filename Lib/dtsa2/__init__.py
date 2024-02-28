@@ -695,11 +695,17 @@ def zaf(comp, det, e0, alg=epq.XPP1991(), mac=epq.MassAbsorptionCoefficient.Defa
       print "Take-off\t%g%s" % (jl.Math.toDegrees(epq.SpectrumUtils.getTakeOffAngle(props)), epq.SpectrumProperties.TakeOffAngle.getUnits())
       for sp in xtra.getPropertySet():
           print "%s\t%s" % (sp, xtra.getTextProperty(sp))
-      if stds:
-          conv = {}
-          for z, c in stds.iteritems():
-              conv[element(z)] = material(c)
-          stds = conv
+      conv = {}
+      for el in comp.getElementSet():
+           abbrev = el.toAbbrev()
+           if (stds!=None) and stds.has_key(abbrev):
+               std = material(stds[abbrev])
+           elif defaultStandards.has_key(abbrev):
+               std = material(defaultStandards[abbrev])
+           else:
+               std = material(abbrev)
+           conv[el] = std
+      stds = conv
       mode = mode.lower()
       if mode.startswith("w") or mode.startswith("ex"):
          print "\nIUPAC\tSeigbahn\tStandard\tEnergy\t ZAF\t  Z\t  A\t  F\tk-ratio"
