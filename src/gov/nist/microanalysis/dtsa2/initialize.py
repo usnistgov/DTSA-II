@@ -6,5 +6,5 @@
 # Author: Nicholas W. M. Ritchie
 from dtsa2 import *
 
-print "Welcome to DTSA-II's scripting interface.  Type 'help()' for more information."
-print "<Ctrl-Return> executes a command.  <Return> to create multi-line commands." 
+print "Welcome to DTSA-II's scripting interface.  Type 'help()' or 'dir()' for command assistance."
+print "<Ctrl-Return> (<Option-Return> on MacOS) executes a command.  <Return> to create multi-line commands." 
