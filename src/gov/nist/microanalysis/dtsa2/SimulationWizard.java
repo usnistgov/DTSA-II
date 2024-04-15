@@ -1168,7 +1168,7 @@ public class SimulationWizard extends JWizardDialog {
 							}
 							if ((ctr != null) && (mMode == SimulationMode.MCBulk)) {
 								final double[] size = Math2.v3(2.0 * sc, 2.0 * sc, 2.0 * sc);
-								final int[] dims = new int[] { 200, 200, 200 };
+								final int[] dims = new int[] { 200, 200, 200 }; // 4*200^3 = 32 MB  4*500^3 = 600 MB
 								mVoxelatedDetector = new VoxelatedDetector(origin, size, dims, false);
 								mVoxelatedDetector.addShells(xrtss);
 								ctr.addXRayListener(mVoxelatedDetector);

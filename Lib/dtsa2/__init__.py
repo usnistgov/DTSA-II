@@ -644,6 +644,8 @@ def majorTransitions(comp, e0, trs=(epq.XRayTransition.KA1, epq.XRayTransition.K
    xrts = []
    for elm in comp.getElementSet():
       for tr in trs:
+         if elm.atomicNumber<=6 and tr==epq.XRayTransition.KA1:
+         	tr = epq.XRayTransition.KA2      	 
          if epq.XRayTransition.exists(elm, tr):
             eTr = epq.FromSI.keV(epq.XRayTransition.getEnergy(elm, tr))
             if (eTr > 0.05) and (eTr < thresh * e0):
@@ -1832,9 +1834,10 @@ def tabulateProperties(specs, props=(epq.SpectrumProperties.BeamEnergy, epq.Spec
         print tmp
       
 def phirhoz(comp, e0, det=None, rhoZmax=None, nSteps=100, alg=epq.XPP1991()):
-   """phirhoz(comp, det, e0, dpz=None, nSteps=100, alg=epq.XPP1991())
+   """phirhoz(comp, e0, det=None, rhoZmax=None, nSteps=100, alg=epq.XPP1991())
    Computes the raw and absorbed phi(rhoz) curves for the specified composition material \
    at the specified beam energy and detected by the specified detector.
+   
    comp: material
    e0: beam energy (keV)
    det: detector (default d1)
@@ -1848,6 +1851,8 @@ def phirhoz(comp, e0, det=None, rhoZmax=None, nSteps=100, alg=epq.XPP1991()):
    xrts = majorTransitions(comp, e0)
    if rhoZmax == None:
       rhoZmax = epq.ElectronRange.KanayaAndOkayama1972.compute(comp, epq.ToSI.keV(e0))
+   else:
+      rhoZmax /= 100.0
    print "Material\t%s" % comp
    print "Beam energy\t%g keV" % e0
    print "Algorithm\t%s" % alg.getName()
