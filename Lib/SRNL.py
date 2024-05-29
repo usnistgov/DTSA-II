@@ -1,5 +1,5 @@
-_COMPANY_ = "Savannah River National Laboratory"
-_INSTRUMENT_="TESCAN MIRA4"
+_COMPANY = "SRNL"
+_INSTRUMENT_ = "TESCAN MIRA4"
 
 base = jl.System.getProperty("user.dir")
 sys.path.append("%s\\graf.jar" % base)
@@ -18,11 +18,11 @@ sedName = "SE"
 bseName = "BSE"
 _apaWrite = ( (epq.SpectrumProperties.MicroImage, 3), (epq.SpectrumProperties.MicroImage2, 2) )
 
-rootPath = "C:\\Users\\Tescan\\Documents\\DTSA-II_Reports\\Data"
+rootPath = "C:\\Users\\Tescan\\DTSA_DATA"
 setDefaultPath("%s\\Daily\\%s" % (rootPath, jtext.SimpleDateFormat("dd-MMM-yyyy").format(ju.Date())))
 defaultRulePath = "%s\\Standards\\Combined" % rootPath
 defaultVecPath = "%s\\Standards\\Combined\\%d keV" % (rootPath, DEFAULT_E0)
 nullImagePath = "%s\\Standards\\Null images" % rootPath
 keyPath = "%s\\Standards\\Null images" % rootPath
 defaultArchivePath = None
-IMAGE_MAGICK = "C:\\Program Files\\ImageMagick-6.9.13-Q16"
+IMAGE_MAGICK = "C:\\Program Files\\ImageMagick-6.9.12-Q16"
