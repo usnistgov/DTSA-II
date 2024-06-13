@@ -2,7 +2,7 @@
 <project name="izpack" default="compile">
    
   <property name="izpack-dist" value="C:/Program Files (x86)/IzPack"/>
-  <property name="izpack-installer" value="dtsa2_jupiter.jar"/>
+  <property name="izpack-installer" value="dtsa2_oberon.jar"/>
 	
   <path id="lib.path">
 	<fileset dir="${izpack-dist}/lib" includes="*.jar"/>

@@ -1,20 +1,20 @@
-set "D2V=2024-05-28"
-set "NUM_VER=14.3.13.0"
+set "D2V=2024-06-11"
+set "NUM_VER=15.1.1.0"
 set "JDK_VER=21"
 set "BPATH=C:\Users\nritchie\repositories"
-set "NAME_VER=neptune"
+set "NAME_VER=Oberon"
 cd %BPATH%
 
 del dtsa2_%NAME_VER%.jar
 del dtsa2_%NAME_VER%_nojre.jar
 del dtsa2_%NAME_VER%_full.jar
 
-echo Neptune %D2V% > "DTSA-II\src\gov\nist\microanalysis\dtsa2\revision"
-echo Neptune %D2V% > "DTSA-II\target\classes\gov\nist\microanalysis\dtsa2\revision"
-echo Neptune %D2V% > "epq\target\classes\gov\nist\microanalysis\EPQLibrary\revision"
-echo Neptune %D2V% > "epq\src\gov\nist\microanalysis\EPQLibrary\revision"
-echo Neptune %D2V% > "graf\src\gov\nist\microanalysis\Graf\revision"
-echo Neptune %D2V% > "graf\target\classes\gov\nist\microanalysis\Graf\revision"
+echo %NAME_VER% %D2V% > "DTSA-II\src\gov\nist\microanalysis\dtsa2\revision"
+echo %NAME_VER% %D2V% > "DTSA-II\target\classes\gov\nist\microanalysis\dtsa2\revision"
+echo %NAME_VER% %D2V% > "epq\target\classes\gov\nist\microanalysis\EPQLibrary\revision"
+echo %NAME_VER% %D2V% > "epq\src\gov\nist\microanalysis\EPQLibrary\revision"
+echo %NAME_VER% %D2V% > "graf\src\gov\nist\microanalysis\Graf\revision"
+echo %NAME_VER% %D2V% > "graf\target\classes\gov\nist\microanalysis\Graf\revision"
 
 cd %BPATH%\DTSA-II
 jar cfm "%BPATH%\DTSA-II\Installer\DTSA-II Build\dtsa2.jar" MANIFEST.MF LicenseFile.txt -C "target\classes" . 

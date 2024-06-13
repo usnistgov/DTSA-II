@@ -25,11 +25,11 @@
   </jre>
   <versionInfo>
     <fileVersion>NUMBER_VERSION</fileVersion>
-    <txtFileVersion>Neptune DATE_VERSION</txtFileVersion>
+    <txtFileVersion>Oberon DATE_VERSION</txtFileVersion>
     <fileDescription>NIST MMSD Relocate</fileDescription>
     <copyright>Not subject to copyright</copyright>
     <productVersion>NUMBER_VERSION</productVersion>
-    <txtProductVersion>Neptune DATE_VERSION</txtProductVersion>
+    <txtProductVersion>Oberon DATE_VERSION</txtProductVersion>
     <productName>MMSD Relocate</productName>
     <companyName>NIST</companyName>
     <internalName>NIST MMSD Relocate</internalName>

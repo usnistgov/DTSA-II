@@ -26,12 +26,12 @@
   </jre>
   <versionInfo>
     <fileVersion>NUMBER_VERSION</fileVersion>
-    <txtFileVersion>Neptune DATE_VERSION</txtFileVersion>
-    <fileDescription>NIST DTSA-II Neptune DATE_VERSION</fileDescription>
+    <txtFileVersion>Oberon DATE_VERSION</txtFileVersion>
+    <fileDescription>NIST DTSA-II Oberon DATE_VERSION</fileDescription>
     <copyright>Not subject to copyright (US government work)</copyright>
     <productVersion>NUMBER_VERSION</productVersion>
-    <txtProductVersion>Neptune DATE_VERSION</txtProductVersion>
-    <productName>NIST DTSA-II Neptune</productName>
+    <txtProductVersion>Oberon DATE_VERSION</txtProductVersion>
+    <productName>NIST DTSA-II Oberon</productName>
     <companyName>National Insitute of Standards and Technology</companyName>
     <internalName>DTSA-II</internalName>
     <originalFilename>DTSA-II.exe</originalFilename>

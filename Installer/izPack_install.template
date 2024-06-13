@@ -5,7 +5,7 @@
     <!-- The script doesn't work within Eclipse but can be build from the command line 
     > c:
     > cd C:\Users\nritchie\repositories\DTSA-II\Installer
-    >"C:\Program Files (x86)\IzPack\bin\compile.bat" -h ${IZPACK_HOME} izPack_install_full.xml -b . -o dtsa2_neptune_full.jar -k standard 
+    >"C:\Program Files (x86)\IzPack\bin\compile.bat" -h ${IZPACK_HOME} izPack_install_full.xml -b . -o dtsa2_oberon_full.jar -k standard 
     -->
     <variables>
         <variable name="TargetPanel.dir.windows" value="$USER_HOME\AppData\Local\NIST\$APP_NAME $APP_VER"/>
@@ -20,7 +20,7 @@
         <property name="info.appName" value="DTSA-II"/>
         <property name="info.url" value="http://www.cstl.nist.gov/div837/837.02/epq/dtsa2/index.html"/>
         <property name="info.company.name" value="NIST"/>
-        <property name="info.version" value="Neptune"/>
+        <property name="info.version" value="Oberon"/>
         <property name="info.release-date" value="DATE_VERSION"/>
     </properties>
     <info>
