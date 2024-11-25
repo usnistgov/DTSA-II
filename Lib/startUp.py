@@ -2,7 +2,7 @@
 # Name:     startUp.py
 # Purpose:  This script initializes the SEMantics library.   It optionally connects to the
 #   TESCAN SEM and provides a mechanism to control the SEM, collect data and process SEM data.
-# Modified: 15-Nov-2023
+# Modified: 22-Nov-2024
 # This file is custom configured for each instrument.  The script looks for
 # this configuration in the "config.py" file in the same directory as this script.
 # A handful of configuration files are available labs/instruments for which NWMR has data.
@@ -40,6 +40,7 @@ import java.util.concurrent as jutilc
 import java.util.prefs.Preferences as jupref
 import time
 import os
+import random
 import java.lang as jl
 import java.awt.image as jai
 import gov.nist.microanalysis.Graf.Zeppelin as gzep
@@ -1605,7 +1606,7 @@ areaCriterion(...), maxCriterion(...) build common criteria."""
 				tmp = tmp + u"       Project: %s\n" % self._project
 				tmp = tmp + u"        Sample: %s\n" % self._sample
 				tmp = tmp + u"      Analysis: %s\n" % self._analysis
-				tmp = tmp + u"    Instrument: %s's TESCAN MIRA3\n" % (_COMPANY_, )
+				tmp = tmp + u"    Instrument: %s - %s\n" % (_COMPANY_, _INSTRUMENT_)
 				tmp = tmp + u"      Operator: %s\n" % self._analyst
 				tmp = tmp + u"Search and Measure ==============================\n"
 				tmp = tmp + u"           FOV: %g mm × %g mm FOV\n" % (self._fov, self._fov)
@@ -1672,7 +1673,7 @@ areaCriterion(...), maxCriterion(...) build common criteria."""
 				tmp = tmp + u"  Project & %s\\\\\n" % self._project
 				tmp = tmp + u"  Sample & %s\\\\\n" % self._sample
 				tmp = tmp + u"  Analysis & %s\\\\\n" % self._analysis
-				tmp = tmp + u"  Instrument & TESCAN MIRA3 at %s \\\\\n" % (_COMPANY_, )
+				tmp = tmp + u"  %s - %s\\\\\n" % (_COMPANY_, _INSTRUMENT_ )
 				tmp = tmp + u"  Operator & %s\\\\\n" % self._analyst
 				tmp = tmp + u"  \\colspan{2}{Search and Measure}\\\\\n"
 				tmp = tmp + u"  FOV & $\\SI{%g}{\\milli\\meter} \\times \\SI{%g}{\\milli\\meter}$ FOV\\\\\n" % (self._fov, self._fov)
@@ -1874,7 +1875,7 @@ areaCriterion(...), maxCriterion(...) build common criteria."""
 							print "\nAnalysis terminated prematurely by operator at field %d.\n" % field
 							tos2.println("\nAnalysis terminated prematurely by operator at field %d.\n" % field )
 							break
-					self.debug("Tile %d - 06" % (i, ))
+						self.debug("Tile %d - 06" % (i, ))
 				except jl.Throwable, th:
 					print str(th)
 					th.printStackTrace()
@@ -2629,6 +2630,87 @@ results are written to the defaultDir."""
 		el.stop()
 		if offenze and (not terminated):
 			turnOff()
+			
+			
+def collectStandards2(sample, pts, liveTime=60.0, fov=0.005, disp = True, combine=True, offenze=True):
+		"""collectStandards2(sample, pts, liveTime=60.0, fov=0.005, combine=True, offenze)
+
+Like collectStandards(...) but collects the spectra in randomized order.  This experiment design trick allows you to track instrumental drift.
+Collect standard spectra from the named sample at the specified points for the specified livetime.
+"pts" is a list containing a tuple, the first element of which is a material name and the second element 
+of which is a list of StageCoordinate objects. 
+
+"combine=True" to build a spectrum representing the sum of the spectra.
+"offenze" turns the instrument power off at the end of the operation."""
+		global faraday
+		global lastPCUpdate
+		lastPCUpdate=None   # force PC update initially
+		if not globals().has_key("faraday"):
+			print "Please define the global variable 'faraday=stg.getPosition()' for the location of the faraday cup."
+			return
+		completed = 0
+		startPt = _stg.getPosition()
+		prev = startPt.clone()
+		analyses = []
+		for item in pts:
+			for i, pnt in enumerate(item[1]):
+				analyses.append( ( item[0], "%s %s[%d]" % (sample, item[0], i), pnt ) )
+		random.shuffle(analyses)
+		el = Elapse(len(analyses))
+		for ( item0, name, pnt) in analyses:
+			if terminated:
+				break
+			try:
+				comp = material(item0)
+			except:
+				comp = None
+			done = False
+			while not (done or terminated):
+				try:
+					newPt = startPt.clone()
+					newPt.set(X_AXIS, pnt.get(X_AXIS))
+					newPt.set(Y_AXIS, pnt.get(Y_AXIS))
+					newPt.set(Z_AXIS, pnt.get(Z_AXIS))
+					newPt.set(R_AXIS, pnt.get(R_AXIS))
+					_stg.moveTo(newPt)
+					collectImages(name, 0.256, (512, 512), writeMask=SAVE_IMAGE_MASK)
+					updatedPC(200)
+					specs = collect(liveTime, name=name, pc=True, mode='L', disp=disp, forcePC=False, fov=fov, image=False)
+					if combine and len(specs)>1:
+						sum=epq.SpectrumMath(specs[0])
+						for sp in specs[1:]:
+							sum.add(sp,1.0)
+						epq.SpectrumUtils.rename(sum, "%s[all]" % (name))
+						sps = sum.getProperties()
+						sps.setDetector(pt_det_all)
+						sps.setTextProperty(sps.DetectorMode, "%s" % _pt.getResolutionMode(0))
+						specs=list(specs)
+						specs.append(sum)
+					clear()
+					display(specs)
+				except jl.Throwable, ex:
+					print "Failed: retrying..."
+					print ex
+					time.sleep(10.0)
+					_stg.moveTo(prev)
+					done = False
+				else:
+					if terminated:
+						break
+					for spec in specs:
+						sp = spec.getProperties()
+						if comp:
+							sp.setCompositionProperty(epq.SpectrumProperties.StandardComposition, comp)
+						sp.setObjectProperty(epq.SpectrumProperties.StagePosition, _stg.getPosition())
+					write(specs, "%s" % name, fmt="msa")
+					prev = pnt
+					done = True
+			completed = completed + 1
+			el.update(completed)
+		el.stop()
+		if offenze and (not terminated):
+			turnOff()
+			
 
 def remap(oldFids, newFids, pts):
 	"""remap(oldFids, newFids, pts):

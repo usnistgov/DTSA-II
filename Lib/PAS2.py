@@ -1,5 +1,5 @@
 _COMPANY_ =  "ManTech PAS"
-_INSTRUMENT_ = "X CC 004"
+_INSTRUMENT_ = "TESCAN MIRA4 S/N 122-0125"
 
 base = jl.System.getProperty("user.dir")
 sys.path.append("%s\\graf.jar" % base)
@@ -8,7 +8,7 @@ sys.path.append("%s\\semantics.jar" % base)
 
 defaultBounds = (-40.0, -30.0, 40.0, 30.0)
 BLANKER_INDEX = 1
-SAVE_FIELD_MASK = 0x0
+SAVE_FIELD_MASK = 0x0300
 DEFAULT_E0 = 25
 availableDets = ( True, )*3
 _edsResolution="MediumLE"

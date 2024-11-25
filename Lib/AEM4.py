@@ -22,7 +22,7 @@ _apaWrite = ( (epq.SpectrumProperties.MicroImage, 3), (epq.SpectrumProperties.Mi
 rootPath = "C:\\Users\\Tescan\\Documents\\Data"
 setDefaultPath("%s\\Daily\\%s" % (rootPath, jtext.SimpleDateFormat("dd-MMM-yyyy").format(ju.Date())))
 defaultRulePath = "%s\\Standards\\Rule" % rootPath
-defaultVecPath = "%s\\Standards\\Combined\\% keV" % ( rootPath, DEFAULT_E0 )
+defaultVecPath = "%s\\Standards\\Combined\\%d keV" % ( rootPath, DEFAULT_E0 )
 nullImagePath = "%s\\NullImages" % base
 keyPath = nullImagePath
 defaultArchivePath = None

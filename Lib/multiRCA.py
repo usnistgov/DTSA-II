@@ -213,8 +213,6 @@ if _ts.hvGetBeam()<>1:
 	print "ERROR: Electron beam not on!"
 	run = False
 
-# Check Z motions to reduce risk of collision
-
 if run:
 	results=[]
 	try:
