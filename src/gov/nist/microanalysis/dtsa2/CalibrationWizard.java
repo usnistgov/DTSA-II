@@ -745,7 +745,7 @@ public class CalibrationWizard extends JWizardDialog {
          jTextField_FWHM.addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {
-               mFWHM = parseDouble(jTextField_FWHM, 1.0, 1000.0, mFWHM, "0.0");
+               mFWHM = parseDouble(jTextField_FWHM, 120.23, 1000.0, mFWHM, "0.0");
             }
          });
          pb.addLabel("eV", cc.xy(5, 3));

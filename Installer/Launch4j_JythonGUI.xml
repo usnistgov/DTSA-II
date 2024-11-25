@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch4jConfig>
+  <dontWrapJar>true</dontWrapJar>
+  <headerType>gui</headerType>
+  <jar>epq.jar</jar>
+  <outfile>C:\Users\nritchie\repositories\DTSA-II\Installer\DTSA-II Build\JythonGUI.exe</outfile>
+  <errTitle>NIST DTSA-II</errTitle>
+  <cmdLine></cmdLine>
+  <chdir></chdir>
+  <priority>normal</priority>
+  <downloadUrl>https://adoptium.net/temurin/releases/?version=21</downloadUrl>
+  <supportUrl>http://www.cstl.nist.gov/div837/837.02/epq/dtsa2/index.html</supportUrl>
+  <stayAlive>false</stayAlive>
+  <restartOnCrash>false</restartOnCrash>
+  <manifest></manifest>
+  <icon>C:\Users\nritchie\repositories\DTSA-II\trixy.ico</icon>
+  <classPath>
+    <mainClass>gov.nist.microanalysis.JythonGUI</mainClass>
+    <cp>commons-math-2.2.jar</cp>
+    <cp>derby-10.16.1.1.jar</cp>
+    <cp>derbyclient-10.16.1.1.jar</cp>
+    <cp>derbynet-10.16.1.1.jar</cp>
+    <cp>derbyshared-10.16.1.1.jar</cp>
+    <cp>derbytools-10.16.1.1.jar</cp>
+    <cp>hamcrest-core-1.3.jar</cp>
+    <cp>jai-imageio-core-1.4.0.jar</cp>
+    <cp>jama-1.0.3.jar</cp>
+    <cp>jgoodies-common-1.8.0.jar</cp>
+    <cp>jgoodies-forms-1.8.0.jar</cp>
+    <cp>jna-5.12.1.jar</cp>
+    <cp>junit-4.13.2.jar</cp>
+    <cp>jython-standalone-2.7.4.jar</cp>
+    <cp>mxparser-1.2.2.jar</cp>
+    <cp>xmlpull-1.1.3.1.jar</cp>
+    <cp>xstream-1.4.19.jar</cp>
+  </classPath>
+  <jre>
+    <path>java-runtime</path>
+    <requiresJdk>false</requiresJdk>
+    <requires64Bit>true</requires64Bit>
+    <minVersion>1.20.0</minVersion>
+    <maxVersion></maxVersion>
+    <initialHeapPercent>10</initialHeapPercent>
+    <maxHeapPercent>70</maxHeapPercent>
+    <opt>-XX:+UseZGC -XX:+ZGenerational</opt>
+  </jre>
+  <versionInfo>
+    <fileVersion>15.1.4.0</fileVersion>
+    <txtFileVersion>Oberon 2024-10-15</txtFileVersion>
+    <fileDescription>NIST DTSA-II Oberon 2024-10-15</fileDescription>
+    <copyright>Not subject to copyright (US government work)</copyright>
+    <productVersion>15.1.4.0</productVersion>
+    <txtProductVersion>Oberon 2024-10-15</txtProductVersion>
+    <productName>NIST DTSA-II Oberon</productName>
+    <companyName>National Insitute of Standards and Technology</companyName>
+    <internalName>JythonGUI</internalName>
+    <originalFilename>JythonGUI.exe</originalFilename>
+    <trademarks></trademarks>
+    <language>ENGLISH_US</language>
+  </versionInfo>
+</launch4jConfig>

@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
-Class-Path: flatlaf-3.0.jar hamcrest-core-1.3.jar jama-1.0.3.jar jcalendar-1.4.jar jgoodies-common-1.8.0.jar jgoodies-forms-1.8.0.jar junit-4.13.2.jar jython-standalone-2.7.3.jar mxparser-1.2.2.jar xmlpull-1.1.3.1.jar xstream-1.4.19.jar epq.jar fastQuant.jar semantics.jar
+Class-Path: flatlaf-3.0.jar hamcrest-core-1.3.jar jama-1.0.3.jar jcalendar-1.4.jar jgoodies-common-1.8.0.jar jgoodies-forms-1.8.0.jar junit-4.13.2.jar jython-standalone-2.7.4.jar mxparser-1.2.2.jar xmlpull-1.1.3.1.jar xstream-1.4.19.jar epq.jar fastQuant.jar semantics.jar
 Add-Opens: java.base/java.lang java.base/java.util java.desktop/java.awt
 Main-Class: gov.nist.microanalysis.dtsa2.DTSA2
 SplashScreen-Image: Splash.png

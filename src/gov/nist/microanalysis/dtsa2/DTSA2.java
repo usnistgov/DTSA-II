@@ -12,7 +12,6 @@ import java.util.prefs.Preferences;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
-import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 import javax.swing.border.Border;
@@ -67,28 +66,6 @@ public class DTSA2 {
 
    private static final String STANDARDS_DB2 = "standards.sd2.xml";
    private static final String STANDARDS_BAK2 = "standards.sd2.bak";
-
-   static class BuildSession extends SwingWorker<Session, Integer> {
-
-      /**
-       * @see javax.swing.SwingWorker#doInBackground()
-       */
-      @Override
-      protected Session doInBackground() throws Exception {
-         final String path = HTMLReport.getBasePath() + File.separatorChar + "Database v2";
-         final Session ses = new Session(path);
-         if (ses.isNew())
-            try {
-               ses.defaultInitialization();
-            } catch (final SQLException e) {
-               e.printStackTrace();
-            }
-         ses.getDetectors();
-         ReferenceDatabase.getInstance(ses);
-         return ses;
-      }
-
-   }
 
    static public final String APP_NAME = "NIST DTSA-II";
    static private final String SPECTRUM_DIR = "Default spectrum directory";
@@ -197,9 +174,17 @@ public class DTSA2 {
    static public synchronized Session getSession() {
       try {
          if (mSession == null) {
-            final BuildSession sb = new BuildSession();
-            sb.execute();
-            mSession = sb.get();
+            final String path = HTMLReport.getBasePath() + File.separatorChar + "Database v2";
+            final Session ses = new Session(path);
+            if (ses.isNew())
+               try {
+                  ses.defaultInitialization();
+               } catch (final SQLException e) {
+                  e.printStackTrace();
+               }
+            ses.getDetectors();
+            ReferenceDatabase.getInstance(ses);
+            mSession = ses;
          }
       } catch (final Exception e) {
          ErrorDialog.createErrorMessage(null, APP_NAME + " Database", e);
@@ -284,10 +269,8 @@ public class DTSA2 {
       JFrame.setDefaultLookAndFeelDecorated(false);
 
       // Due to additional security concerns, JRE versions after 16, require an
-      // "Add-Opens"
-      // statement to instantiate objects from XML using XStream. This can
-      // either be
-      // the form of additional command line arguments:
+      // "Add-Opens" statement to instantiate objects from XML using XStream.
+      // This can either be the form of additional command line arguments:
       // > java --add-opens java.base/java.lang=ALL-UNNAMED --add-opens
       // java.base/java.util=ALL-UNNAMED -jar dtsa2.jar
       // or included in the manifest using the ":Add-Opens" command.

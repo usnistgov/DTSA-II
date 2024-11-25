@@ -20,6 +20,5 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/Graf"/>
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/EPQ"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/FastQuant"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/SEMantics"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

@@ -22,10 +22,10 @@ import java.util.prefs.Preferences;
 
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.filechooser.FileSystemView;
 
 import gov.nist.microanalysis.EPQLibrary.EPQException;
 import gov.nist.microanalysis.EPQTools.ErrorDialog;
-import gov.nist.microanalysis.dtsa2.DTSA2.OS;
 
 /**
  * <p>
@@ -133,44 +133,49 @@ public class HTMLReport {
    }
 
    public static String getBasePath() {
-      String tmp = Preferences.userNodeForPackage(HTMLReport.class).get(sfBASE_PATH, null);
-      File tmpFile = tmp != null ? new File(tmp) : null;
+      final String tmp = Preferences.userNodeForPackage(HTMLReport.class).get(sfBASE_PATH, null);
+      final File tmpFile = tmp != null ? new File(tmp) : null;
       if ((tmp == null) || !(tmpFile.exists() && tmpFile.isDirectory() && tmpFile.canWrite())) {
          final JFileChooser fc = new JFileChooser();
-         fc.setDialogType(JFileChooser.SAVE_DIALOG);
-         fc.setDialogTitle("Select a location to store " + DTSA2.APP_NAME + " reports,");
-         fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-         String def = System.getProperty("user.home", null);
-         assert def != null : "user.home is not defined!!!";
-         if (DTSA2.getOS() == OS.OS_WINDOWS)
-            def = def + File.separator + "My Documents";
-         def = def + "\\" + "DTSA-II Reports";
-         File file = new File(def);
-         final boolean made = !file.exists();
-         if (made)
-            file.mkdirs();
-         if (def != null)
-            fc.setCurrentDirectory(file);
-         boolean ok = false;
-         while (!ok) {
-            if (fc.showDialog(null, "Select") == JFileChooser.APPROVE_OPTION) {
-               file = fc.getSelectedFile();
+         final File file = new File(FileSystemView.getFileSystemView().getDefaultDirectory(), "DTSA-II Reports");
+         final boolean made = file.mkdirs();
+         try {
+            if (file.isDirectory()) {
                try {
-                  ok = false;
-                  if (file.exists() && file.canWrite()) {
-                     File tester = File.createTempFile("test", ".txt", file);
-                     ok = tester.exists();
-                     tester.delete();
-                     tmp = file.getCanonicalPath();
-                     Preferences.userNodeForPackage(HTMLReport.class).put(sfBASE_PATH, tmp);
-                  }
-               } catch (IOException e) {
-                  ErrorDialog.createErrorMessage(null, "Report Directory Creation Error", "The report directory specified is not writable.",
-                        e.getMessage());
+                  fc.setCurrentDirectory(file);
+               } catch (Exception e) {
+                  fc.setCurrentDirectory(null);
                }
-               if (made)
-                  file.delete();
             }
+            fc.setDialogType(JFileChooser.SAVE_DIALOG);
+            fc.setDialogTitle("Select a location to store " + DTSA2.APP_NAME + " reports,");
+            // There appears to be a bug with setCurrentDirectory if setFileSelectionMode(DIRECTORIES_ONLY) is called first.
+            fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+            boolean ok = false;
+            while (!ok) {
+               if (fc.showDialog(null, "Select") == JFileChooser.APPROVE_OPTION) {
+                  final File result = fc.getSelectedFile();
+                  try {
+                     ok = false;
+                     if (result.exists() && result.canWrite()) {
+                        final File tester = File.createTempFile("test", ".txt", result);
+                        try {
+                           ok = tester.isFile();
+                        }
+                        finally {
+                           tester.delete();
+                        }
+                        Preferences.userNodeForPackage(HTMLReport.class).put(sfBASE_PATH, result.getCanonicalPath());
+                     }
+                  } catch (IOException e) {
+                     ErrorDialog.createErrorMessage(null, "Report Directory Creation Error", "The report directory specified is not writable.",
+                           e.getMessage());
+                  }
+               }
+            }
+         } finally {
+            if (made)
+               file.delete();
          }
       }
       return tmp;
