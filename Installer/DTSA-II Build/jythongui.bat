@@ -1,0 +1,1 @@
+java-runtime\bin\java -cp JythonGUI.jar  gov.nist.microanalysis.JythonGUI.JythonApp

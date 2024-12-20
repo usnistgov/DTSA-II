@@ -6,4 +6,4 @@
 # ----- Change to the directory in which dtsa2.jar is located -----------------
 cd $INSTALL_PATH
 # ----- Execute The Requested Command -----------------------------------------
-exec java -Xmx256m -Xss1024k -jar dtsa2.jar
+exec java -Xmx512m -Xss2048k -jar dtsa2.jar

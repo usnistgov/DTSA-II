@@ -1,14 +1,11 @@
 eclipse.preferences.version=1
 encoding//Installer/build_install.bat=UTF-8
 encoding//Installer/izPack_install.template=UTF-8
-encoding//Lib/bbb.py=utf-8
 encoding//Lib/dtsa2/__init__.py=utf-8
 encoding//Lib/dtsa2/dbTools.py=utf-8
 encoding//Lib/dtsa2/lehigh.py=utf-8
 encoding//Lib/dtsa2/mcSimulate3.py=utf-8
 encoding//Lib/dtsa2/minBeamEnergy.py=utf-8
-encoding//Lib/multiRCA.py=utf-8
-encoding//Lib/startUp.py=utf-8
 encoding//src/gov/nist/microanalysis/dtsa2/DTSA2.java=UTF-8
 encoding//src/gov/nist/microanalysis/dtsa2/initialize.py=utf-8
 encoding/<project>=UTF-8

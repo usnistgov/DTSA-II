@@ -1,13 +1,29 @@
-set "D2V=2024-11-22"
-set "NUM_VER=15.1.7.0"
+REM This script rebuilds DTSA-II (including EPQ), SEMantics, Graf, FastQuant, and the NIST K-Glass Database
+REM It requires:  
+REM   * A Java Development Kit (version 21 or above)
+REM   * IZ-Pack (version 5 or above) [https://izpack.org/]
+REM   * Gnu SED [https://www.gnu.org/software/sed/]
+REM   * Launch4J [https://launch4j.sourceforge.net/]
+REM   * Maven [https://maven.apache.org/]
+REM Output:
+REM   * An installation JAR containing all the applications (_full.jar)
+REM   * An installation JAR containing the core DTSA-II applications plus a Windows JRE (.jar)  
+REM   * An installation JAR containing the core DTSA-II applications (_nojre.jar)  
+
+set "D2V=2024-12-20"
+set "NUM_VER=15.1.13"
 set "JDK_VER=21"
 set "BPATH=C:\Users\nritchie\repositories"
 set "NAME_VER=Oberon"
-cd %BPATH%
+set "IZPACK_HOME=C:\izpack\bin"
+set "L4J_PATH=C:\Program Files (x86)\Launch4j"
+set "SED_PATH=C:\Program Files (x86)\GnuWin32\bin"
+set "DTSA_ARCHIVE_PATH=V:\internal\643_violet\DTSA-II Latest"
 
-del dtsa2_%NAME_VER%.jar
-del dtsa2_%NAME_VER%_nojre.jar
-del dtsa2_%NAME_VER%_full.jar
+cd %BPATH%
+del DTSA-II\Installer\dtsa2_%NAME_VER%.jar
+del DTSA-II\Installer\dtsa2_%NAME_VER%_nojre.jar
+del DTSA-II\Installer\dtsa2_%NAME_VER%_full.jar
 
 echo %NAME_VER% %D2V% > "DTSA-II\src\gov\nist\microanalysis\dtsa2\revision"
 echo %NAME_VER% %D2V% > "DTSA-II\target\classes\gov\nist\microanalysis\dtsa2\revision"
@@ -16,66 +32,120 @@ echo %NAME_VER% %D2V% > "epq\src\gov\nist\microanalysis\EPQLibrary\revision"
 echo %NAME_VER% %D2V% > "graf\src\gov\nist\microanalysis\Graf\revision"
 echo %NAME_VER% %D2V% > "graf\target\classes\gov\nist\microanalysis\Graf\revision"
 
-cd %BPATH%\DTSA-II
-jar cfm "%BPATH%\DTSA-II\Installer\DTSA-II Build\dtsa2.jar" MANIFEST.MF LicenseFile.txt -C "target\classes" . 
 
+REM Build relocation application from the EPQ source
 cd %BPATH%\epq
-jar cfm "%BPATH%\DTSA-II\Installer\DTSA-II Build\epq.jar" "MANIFEST.txt" "revision" -C "target\classes" "gov\nist\microanalysis\Utility" -C "target\classes" "gov\nist\microanalysis\EPQLibrary\Henke93" -C "target\classes" "gov\nist\microanalysis\EPQLibrary\SalvatXion" -C "target\classes" "gov\nist\microanalysis\EPQLibrary\Detector" -C "target\classes" "gov\nist\microanalysis\EPQTools\ClipArt" "epq.ico" -C "target\classes" "flanagan\math" -C "target\classes" "gov\nist\microanalysis\EPQDatabase" -C "target\classes" "gov\nist\microanalysis\EPQTests\TestData" -C "src" "RelocationUtilitySplash.png" -C "target\classes" "gov\nist\microanalysis\NISTMonte\Gen3" "EPQ.html" -C "target\classes" "flanagan\interpolation" -C "target\classes" "gov\nist\microanalysis\EPQTests" -C "target\classes" "gov\nist\microanalysis\EPQTools" -C "target\classes" "gov\nist\microanalysis\EPQLibrary" -C "target\classes" "gov\nist\microanalysis\EPQLibrary\NistXSec" -C "target\classes" "gov\nist\microanalysis\EPQImage" -C "target\classes" "gov\nist\microanalysis\NISTMonte" -C "target\classes" "gov\nist\microanalysis\EPQTests\TestData\STEM" -C "target\classes" "gov\nist\microanalysis\EPQLibrary\CzyzewskiXSec" -C "target\classes" "gov\nist\microanalysis\EPQLibrary\BergerSeltzerBrem" -C "target\classes" "gov\nist\microanalysis\EPQLibrary\CitMAC" -C "target\classes" "gov\nist\nanoscalemetrology\JMONSEL" -C "target\classes" "gov\nist\nanoscalemetrology\JMONSEL" -C "target\classes" "gov\nist\nanoscalemetrology\JMONSELutils" -C "target\classes" "gov\nist\nanoscalemetrology\MONSELtests" -C "target\classes" "gov\nist\microanalysis\JythonGUI"
-REM jar cfm "%BPATH%\DTSA-II\Installer\DTSA-II Build\epq.jar" "MANIFEST.txt" "revision" -C "target\classes" "gov\nist\microanalysis\Utility" -C "target\classes" "gov\nist\microanalysis\EPQLibrary\Henke93" -C "target\classes" "gov\nist\microanalysis\EPQLibrary\SalvatXion" -C "target\classes" "gov\nist\microanalysis\EPQLibrary\Detector" -C "target\classes" "gov\nist\microanalysis\EPQTools\ClipArt" "epq.ico" -C "target\classes" "flanagan\math" -C "target\classes" "gov\nist\microanalysis\EPQDatabase" -C "target\classes" "gov\nist\microanalysis\EPQTests\TestData" -C "src" "RelocationUtilitySplash.png" -C "target\classes" "gov\nist\microanalysis\NISTMonte\Gen3" "EPQ.html" -C "target\classes" "flanagan\interpolation" -C "target\classes" "gov\nist\microanalysis\EPQTests" -C "target\classes" "gov\nist\microanalysis\EPQTools" -C "target\classes" "gov\nist\microanalysis\EPQLibrary" -C "target\classes" "gov\nist\microanalysis\EPQLibrary\NistXSec" -C "target\classes" "gov\nist\microanalysis\EPQImage" -C "target\classes" "gov\nist\microanalysis\NISTMonte" -C "target\classes" "gov\nist\microanalysis\EPQTests\TestData\STEM" -C "target\classes" "gov\nist\microanalysis\EPQLibrary\CzyzewskiXSec" -C "target\classes" "gov\nist\microanalysis\EPQLibrary\BergerSeltzerBrem" -C "target\classes" "gov\nist\microanalysis\EPQLibrary\CitMAC"  
+"%SED_PATH%\sed.exe" -e "s/NUMBER_VERSION/%NUM_VER%/g" pom.relocate.template > pom.xml
+call mvn clean
+call mvn package
+call mvn install
 
+REM Build EPQ library from the EPQ source
+cd %BPATH%\epq
+"%SED_PATH%\sed.exe" -e "s/NUMBER_VERSION/%NUM_VER%/g" pom.template > pom.xml
+call mvn clean
+call mvn package
+call mvn install
+
+REM Build DTSA-II application from the DTSA-II source
+cd %BPATH%\DTSA-II
+"%SED_PATH%\sed.exe" -e "s/NUMBER_VERSION/%NUM_VER%/g" pom.template > pom.xml
+call mvn clean
+call mvn package
+call mvn install
+
+REM Build FastQuant library
+cd %BPATH%\FastQuant
+"%SED_PATH%\sed.exe" -e "s/NUMBER_VERSION/%NUM_VER%/g" pom.template > pom.xml
+call mvn clean
+call mvn package
+call mvn install
+
+REM Build the Graf application
 cd %BPATH%\graf
-jar cfm "%BPATH%\DTSA-II\Installer\DTSA-II Build\graf.jar" "manifest.mf" "license.txt" -C "target\classes" .
+"%SED_PATH%\sed.exe" -e "s/NUMBER_VERSION/%NUM_VER%/g" pom.template > pom.xml
+call mvn clean
+call mvn package
+call mvn install
 
+REM Build the SEMantics library
 cd %BPATH%\semantics
-jar cfm "%BPATH%\DTSA-II\Installer\DTSA-II Build\semantics.jar" "manifest.mf" "license.txt" -C "target\classes" . 
+"%SED_PATH%\sed.exe" -e "s/NUMBER_VERSION/%NUM_VER%/g" pom.template > pom.xml
+call mvn clean
+call mvn package
+call mvn install
 
+REM Build the NIST Glass Database application
 cd %BPATH%\nist-glass-database
-jar cfm "%BPATH%\DTSA-II\Installer\DTSA-II Build\NISTGlassDB.jar" "manifest.mf" "license.txt" -C "target\classes" . 
+"%SED_PATH%\sed.exe" -e "s/NUMBER_VERSION/%NUM_VER%/g" pom.template > pom.xml
+call mvn clean
+call mvn package
+call mvn install
 
-call "%BPATH%\DTSA-II\Installer\DTSA-II Build\buildjre.bat"
+REM Build the Jython GUI application
+cd %BPATH%\JythonGUI
+"%SED_PATH%\sed.exe" -e "s/NUMBER_VERSION/%NUM_VER%/g" pom.template > pom.xml
+call mvn clean
+call mvn package
+call mvn install
 
-"C:\Program Files (x86)\GnuWin32\bin\sed.exe" -e "s/NUMBER_VERSION/%NUM_VER%/" -e "s/DATE_VERSION/%D2V%/" -e "s/JDK_VERSION/%JDK_VER%/" "%BPATH%\DTSA-II\Installer\Launch4j_config.template" > "%BPATH%\DTSA-II\Installer\Launch4j_config.xml"
-call "C:\Program Files (x86)\Launch4j\launch4jc.exe" "%BPATH%\DTSA-II\Installer\Launch4j_config.xml"
+REM Build a JRE to include with the install
+call "%BPATH%\DTSA-II\Installer\buildjre.bat"
+
+REM Delete old artifacts
+del "%BPATH%\DTSA-II\Installer\DTSA-II Build\DTSA-II.exe"
+del "%BPATH%\DTSA-II\Installer\DTSA-II Build\GlassDatabase.exe"
+del "%BPATH%\DTSA-II\Installer\DTSA-II Build\Graf.exe"
+del "%BPATH%\DTSA-II\Installer\DTSA-II Build\Relocate.exe"
+
+REM Build "DTSA-II.exe" (Windows executable)
+"%SED_PATH%\sed.exe" -e "s/BASE_PATH/%BPATH%/g" -e "s/NUMBER_VERSION/%NUM_VER%/g" -e "s/NAME_VERSION/%NAME_VER%/g" -e "s/DATE_VERSION/%D2V%/g" -e "s/JDK_VERSION/%JDK_VER%/g" "%BPATH%\DTSA-II\Installer\Launch4j_config.template" > "%BPATH%\DTSA-II\Installer\Launch4j_config.xml"
+call "%L4J_PATH%\\launch4jc.exe" "%BPATH%\DTSA-II\Installer\Launch4j_config.xml"
 del "%BPATH%\DTSA-II\Installer\Launch4j_config.xml"
 
-"C:\Program Files (x86)\GnuWin32\bin\sed.exe" -e "s/NUMBER_VERSION/%NUM_VER%/" -e "s/DATE_VERSION/%D2V%/" -e "s/JDK_VERSION/%JDK_VER%/" "%BPATH%\DTSA-II\Installer\Launch4j_config_g1.template" > "%BPATH%\DTSA-II\Installer\Launch4j_config_g1.xml"
-call "C:\Program Files (x86)\Launch4j\launch4jc.exe" "%BPATH%\DTSA-II\Installer\Launch4j_config_g1.xml"
-del "%BPATH%\DTSA-II\Installer\Launch4j_config_g1.xml"
-
-"C:\Program Files (x86)\GnuWin32\bin\sed.exe" -e "s/NUMBER_VERSION/%NUM_VER%/" -e "s/DATE_VERSION/%D2V%/" -e "s/JDK_VERSION/%JDK_VER%/" "%BPATH%\DTSA-II\Installer\Launch4j_relocate.template" > "%BPATH%\DTSA-II\Installer\Launch4j_relocate.xml"
-call "C:\Program Files (x86)\Launch4j\launch4jc.exe" "%BPATH%\DTSA-II\Installer\Launch4j_relocate.xml"
+REM Build "Relocate.exe" (Windows executable)
+"%SED_PATH%\sed.exe" -e "s/BASE_PATH/%BPATH%/g" -e "s/NUMBER_VERSION/%NUM_VER%/g" -e "s/NAME_VERSION/%NAME_VER%/g" -e "s/DATE_VERSION/%D2V%/g" -e "s/JDK_VERSION/%JDK_VER%/g" "%BPATH%\DTSA-II\Installer\Launch4j_relocate.template" > "%BPATH%\DTSA-II\Installer\Launch4j_relocate.xml"
+call "%L4J_PATH%\launch4jc.exe" "%BPATH%\DTSA-II\Installer\Launch4j_relocate.xml"
 del "%BPATH%\DTSA-II\Installer\Launch4j_relocate.xml"
 
-REM "C:\Program Files (x86)\GnuWin32\bin\sed.exe" -e "s/NUMBER_VERSION/%NUM_VER%/" -e "s/DATE_VERSION/%D2V%/" -e "s/JDK_VERSION/%JDK_VER%/" "%BPATH%\DTSA-II\Installer\Launch4j_JythonGUI.template" > "%BPATH%\DTSA-II\Installer\Launch4j_JythonGUI.xml"
-REM call "C:\Program Files (x86)\Launch4j\launch4jc.exe" "%BPATH%\DTSA-II\Installer\Launch4j_JythonGUI.xml"
-REM del "%BPATH%\DTSA-II\Installer\Launch4j_JythonGUI.xml"
+REM Build "JythonGUI.exe" (Windows executable)
+"%SED_PATH%\sed.exe" -e "s/NUMBER_VERSION/%NUM_VER%/g" -e "s/DATE_VERSION/%D2V%/g" -e "s/JDK_VERSION/%JDK_VER%/g" "%BPATH%\DTSA-II\Installer\Launch4j_JythonGUI.template" > "%BPATH%\DTSA-II\Installer\Launch4j_JythonGUI.xml"
+call "%L4J_PATH%\launch4jc.exe" "%BPATH%\DTSA-II\Installer\Launch4j_JythonGUI.xml"
+del "%BPATH%\DTSA-II\Installer\Launch4j_JythonGUI.xml"
 
-"C:\Program Files (x86)\GnuWin32\bin\sed.exe" -e "s/NUMBER_VERSION/%NUM_VER%/" -e "s/DATE_VERSION/%D2V%/" -e "s/JDK_VERSION/%JDK_VER%/" "%BPATH%\graf\Launch4j config.template" > "%BPATH%\graf\Launch4j config.xml"
-call "C:\Program Files (x86)\Launch4j\launch4jc.exe" "%BPATH%\graf\Launch4j config.xml"
+REM Build "Graf.exe" (Windows executable)
+"%SED_PATH%\sed.exe" -e "s/BASE_PATH/%BPATH%/g" -e "s/NUMBER_VERSION/%NUM_VER%/g" -e "s/NAME_VERSION/%NAME_VER%/g" -e "s/DATE_VERSION/%D2V%/g" -e "s/JDK_VERSION/%JDK_VER%/g" "%BPATH%\graf\Launch4j config.template" > "%BPATH%\graf\Launch4j config.xml"
+call "%L4J_PATH%\launch4jc.exe" "%BPATH%\graf\Launch4j config.xml"
 del "%BPATH%\graf\Launch4j config.xml"
 
-"C:\Program Files (x86)\GnuWin32\bin\sed.exe" -e "s/NUMBER_VERSION/%NUM_VER%/" -e "s/DATE_VERSION/%D2V%/" -e "s/JDK_VERSION/%JDK_VER%/" "%BPATH%\nist-glass-database\installer\launch4j.template" > "%BPATH%\nist-glass-database\installer\launch4j.xml"
-call "C:\Program Files (x86)\Launch4j\launch4jc.exe" "%BPATH%\nist-glass-database\installer\launch4j.xml"
+REM Build "GlassDatabase.exe" (Windows executable)
+"%SED_PATH%\sed.exe" -e "s/BASE_PATH/%BPATH%/g" -e "s/NUMBER_VERSION/%NUM_VER%/g" -e "s/NAME_VERSION/%NAME_VER%/g" -e "s/DATE_VERSION/%D2V%/g" -e "s/JDK_VERSION/%JDK_VER%/g" "%BPATH%\nist-glass-database\installer\launch4j.template" > "%BPATH%\nist-glass-database\installer\launch4j.xml"
+call "%L4J_PATH%\launch4jc.exe" "%BPATH%\nist-glass-database\installer\launch4j.xml"
 del "%BPATH%\nist-glass-database\installer\launch4j.xml"
 
+REM Build full installer (DTSA-II & SEMantics & Graf)
 cd %BPATH%\DTSA-II\Installer
-"C:\Program Files (x86)\GnuWin32\bin\sed.exe" "s/DATE_VERSION/%D2V%/" "%BPATH%\DTSA-II\Installer\izPack_install.template" > "%BPATH%\DTSA-II\Installer\izPack_install.xml"
-call "C:\Program Files\IzPack\bin\compile.bat" -h ${IZPACK_HOME} izPack_install.xml -b . -o dtsa2_%NAME_VER%.jar -k standard
-del "%BPATH%\DTSA-II\Installer\izPack_install.xml"
-
-"C:\Program Files (x86)\GnuWin32\bin\sed.exe" "s/DATE_VERSION/%D2V%/" "%BPATH%\DTSA-II\Installer\izPack_install_full.template" > "%BPATH%\DTSA-II\Installer\izPack_install_full.xml"
-call "C:\Program Files\IzPack\bin\compile.bat" -h ${IZPACK_HOME} izPack_install_full.xml -b . -o dtsa2_%NAME_VER%_full.jar -k standard
+"%SED_PATH%\sed.exe" -e "s/NUMBER_VERSION/%NUM_VER%/g" -e "s/DATE_VERSION/%D2V%/g" -e "s/NAME_VERSION/%NAME_VER%/g" "%BPATH%\DTSA-II\Installer\izPack_install_full.template" > "%BPATH%\DTSA-II\Installer\izPack_install_full.xml"
+call "%IZPACK_HOME%\compile.bat" -h ${IZPACK_HOME} izPack_install_full.xml -b . -o dtsa2_%NAME_VER%_full.jar -k standard
 del "%BPATH%\DTSA-II\Installer\izPack_install_full.xml"
 
-"C:\Program Files (x86)\GnuWin32\bin\sed.exe" "s/DATE_VERSION/%D2V%/" "%BPATH%\DTSA-II\Installer\izPack_install_nojre.template" > "%BPATH%\DTSA-II\Installer\izPack_install_nojre.xml"
-call "C:\Program Files\IzPack\bin\compile.bat" -h ${IZPACK_HOME} izPack_install_nojre.xml -b . -o dtsa2_%NAME_VER%_nojre.jar -k standard
+REM Build basic installer (DTSA-II)
+"%SED_PATH%\sed.exe" -e "s/NUMBER_VERSION/%NUM_VER%/g" -e "s/DATE_VERSION/%D2V%/g" -e "s/NAME_VERSION/%NAME_VER%/g" "%BPATH%\DTSA-II\Installer\izPack_install.template" > "%BPATH%\DTSA-II\Installer\izPack_install.xml"
+call "%IZPACK_HOME%\compile.bat" -h ${IZPACK_HOME} izPack_install.xml -b . -o dtsa2_%NAME_VER%.jar -k standard
+del "%BPATH%\DTSA-II\Installer\izPack_install.xml"
+
+REM Build basic installer (no JRE) (DTSA-II)
+"%SED_PATH%\sed.exe" -e "s/NUMBER_VERSION/%NUM_VER%/g" -e "s/DATE_VERSION/%D2V%/g" -e "s/NAME_VERSION/%NAME_VER%/g" "%BPATH%\DTSA-II\Installer\izPack_install_nojre.template" > "%BPATH%\DTSA-II\Installer\izPack_install_nojre.xml"
+call "%IZPACK_HOME%\compile.bat" -h ${IZPACK_HOME} izPack_install_nojre.xml -b . -o dtsa2_%NAME_VER%_nojre.jar -k standard
 del "%BPATH%\DTSA-II\Installer\izPack_install_nojre.xml"
 
-copy dtsa2_%NAME_VER%.jar "V:\internal\643_violet\DTSA-II Latest"
-copy dtsa2_%NAME_VER%_nojre.jar "V:\internal\643_violet\DTSA-II Latest"
-copy dtsa2_%NAME_VER%_full.jar "V:\internal\643_violet\DTSA-II Latest"
-copy dtsa2_%NAME_VER%_full.jar "V:\internal\643_violet\DTSA-II Latest\dtsa2_%NAME_VER%_full_%NUM_VER%.jar"
-copy dtsa2_%NAME_VER%.jar "V:\internal\643_violet\DTSA-II Latest\dtsa2_prerelease.jar"
-copy dtsa2_%NAME_VER%_nojre.jar "V:\internal\643_violet\DTSA-II Latest\dtsa2_prerelease_nojre.jar"
+REM Copy the resulting installers to the archive
+cd %BPATH%\DTSA-II\Installer
+copy dtsa2_%NAME_VER%.jar "%DTSA_ARCHIVE_PATH%\dtsa2_%NAME_VER%.jar"
+copy dtsa2_%NAME_VER%_nojre.jar "%DTSA_ARCHIVE_PATH%\dtsa2_%NAME_VER%_nojre.jar"
+copy dtsa2_%NAME_VER%_full.jar "%DTSA_ARCHIVE_PATH%\dtsa2_%NAME_VER%_full.jar"
+copy dtsa2_%NAME_VER%_full.jar "%DTSA_ARCHIVE_PATH%\dtsa2_%NAME_VER%_full_%NUM_VER%.jar"
+copy dtsa2_%NAME_VER%.jar "%DTSA_ARCHIVE_PATH%\dtsa2_prerelease.jar"
+copy dtsa2_%NAME_VER%_nojre.jar "%DTSA_ARCHIVE_PATH%\dtsa2_prerelease_nojre.jar"
 
 cd %BPATH%\DTSA-II\Installer

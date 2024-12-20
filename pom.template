@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>gov.nist.microanalysis</groupId>
 	<artifactId>dtsa2</artifactId>
-	<version>15.1.13</version>
+	<version>NUMBER_VERSION</version>
 	<name>NIST DTSA-II</name>
 	<description>An application for analysis of electron excited X-ray spectra.</description>
 	<properties>
@@ -43,7 +43,7 @@
 						</manifest>
 						<manifestEntries>
 							<SplashScreen-Image>Splash.png</SplashScreen-Image>
-							<Class-Path>FastQuant-15.1.13.jar semantics-15.1.13.jar</Class-Path> 
+							<Class-Path>FastQuant-NUMBER_VERSION.jar semantics-NUMBER_VERSION.jar</Class-Path> 
 							<Add-Opens>java.base/java.lang java.base/java.util java.desktop/java.awt</Add-Opens>
 						</manifestEntries>
 					</archive>
@@ -95,7 +95,7 @@
 		<dependency>
 			<groupId>gov.nist.microanalysis</groupId>
 			<artifactId>epq</artifactId>
-			<version>15.1.13</version>
+			<version>NUMBER_VERSION</version>
 		</dependency>
 	</dependencies>
 </project>
