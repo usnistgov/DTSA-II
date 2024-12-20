@@ -2,8 +2,8 @@
 <launch4jConfig>
   <dontWrapJar>true</dontWrapJar>
   <headerType>gui</headerType>
-  <jar>epq.jar</jar>
-  <outfile>C:\Users\nritchie\repositories\DTSA-II\Installer\DTSA-II Build\JythonGUI.exe</outfile>
+  <jar>epq-NUMBER_VERSION.jar</jar>
+  <outfile>DTSA-II Build\JythonGUI.exe</outfile>
   <errTitle>NIST JythonGUI</errTitle>
   <cmdLine>gov.nist.microanalysis.JythonGUI.JythonApp</cmdLine>
   <chdir></chdir>
@@ -25,11 +25,11 @@
     <opt>-XX:+UseZGC -XX:+ZGenerational</opt>
   </jre>
   <versionInfo>
-    <fileVersion>NUMBER_VERSION</fileVersion>
+    <fileVersion>NUMBER_VERSION.0</fileVersion>
     <txtFileVersion>Oberon DATE_VERSION</txtFileVersion>
     <fileDescription>NIST DTSA-II Oberon DATE_VERSION</fileDescription>
     <copyright>Not subject to copyright (US government work)</copyright>
-    <productVersion>NUMBER_VERSION</productVersion>
+    <productVersion>NUMBER_VERSION.0</productVersion>
     <txtProductVersion>Oberon DATE_VERSION</txtProductVersion>
     <productName>NIST DTSA-II Oberon</productName>
     <companyName>National Insitute of Standards and Technology</companyName>

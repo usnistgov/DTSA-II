@@ -2,8 +2,8 @@
 <launch4jConfig>
   <dontWrapJar>true</dontWrapJar>
   <headerType>gui</headerType>
-  <jar>dtsa2.jar</jar>
-  <outfile>C:\Users\nritchie\repositories\DTSA-II\Installer\DTSA-II Build\DTSA-II.exe</outfile>
+  <jar>dtsa2-NUMBER_VERSION.jar</jar>
+  <outfile>DTSA-II Build/DTSA-II.exe</outfile>
   <errTitle>NIST DTSA-II</errTitle>
   <cmdLine></cmdLine>
   <chdir></chdir>
@@ -13,26 +13,26 @@
   <stayAlive>false</stayAlive>
   <restartOnCrash>false</restartOnCrash>
   <manifest></manifest>
-  <icon>C:\Users\nritchie\repositories\DTSA-II\trixy.ico</icon>
+  <icon>../trixy.ico</icon>
   <jre>
     <path>java-runtime</path>
     <requiresJdk>false</requiresJdk>
     <requires64Bit>true</requires64Bit>
-    <minVersion>1.20.0</minVersion>
+    <minVersion>1.21.0</minVersion>
     <maxVersion></maxVersion>
     <initialHeapPercent>10</initialHeapPercent>
     <maxHeapPercent>70</maxHeapPercent>
 	<opt>-XX:+UseZGC -XX:+ZGenerational</opt>
   </jre>
   <versionInfo>
-    <fileVersion>NUMBER_VERSION</fileVersion>
-    <txtFileVersion>Oberon DATE_VERSION</txtFileVersion>
-    <fileDescription>NIST DTSA-II Oberon DATE_VERSION</fileDescription>
+    <fileVersion>NUMBER_VERSION.0</fileVersion>
+    <txtFileVersion>NAME_VERSION DATE_VERSION</txtFileVersion>
+    <fileDescription>NIST DTSA-II NAME_VERSION DATE_VERSION</fileDescription>
     <copyright>Not subject to copyright (US government work)</copyright>
-    <productVersion>NUMBER_VERSION</productVersion>
-    <txtProductVersion>Oberon DATE_VERSION</txtProductVersion>
-    <productName>NIST DTSA-II Oberon</productName>
-    <companyName>National Insitute of Standards and Technology</companyName>
+    <productVersion>NUMBER_VERSION.0</productVersion>
+    <txtProductVersion>NAME_VERSION DATE_VERSION</txtProductVersion>
+    <productName>NIST DTSA-II NAME_VERSION</productName>
+    <companyName>National Institute of Standards and Technology</companyName>
     <internalName>DTSA-II</internalName>
     <originalFilename>DTSA-II.exe</originalFilename>
     <trademarks></trademarks>
