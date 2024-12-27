@@ -147,23 +147,23 @@
         </pack> 
         <pack name="SEMantics" preselected="yes" required="no">
             <description>An application for automating a TESCAN SEM through DTSA-II.</description>
-            <file override="update" src="$JARPATH/gov/nist/microanalysis/semantics/NUMBER_VERSION/semantics-NUMBER_VERSION.jar" targetdir="$INSTALL_PATH/"/>
+            <file override="update" src="$JARPATH/gov/nist/microanalysis/SEMantics/NUMBER_VERSION/SEMantics-NUMBER_VERSION.jar" targetdir="$INSTALL_PATH/"/>
             <file override="update" src="$JARPATH/gov/nist/microanalysis/graf/NUMBER_VERSION/graf-NUMBER_VERSION.jar" targetdir="$INSTALL_PATH/"/>
             <file override="update" src="$BUILDPATH/Graf.exe" targetdir="$INSTALL_PATH/"/>
             <file override="update" src="$SEMANTICSPATH/Scripts/startUp.py" targetdir="$INSTALL_PATH/semantics"/>
             <file override="update" src="$SEMANTICSPATH/Scripts/multiRCA.py" targetdir="$INSTALL_PATH/semantics"/>
             <file override="update" src="$SEMANTICSPATH/Scripts/bbb.py" targetdir="$INSTALL_PATH/Lib/semantics"/>
             <file override="update" src="$SEMANTICSPATH/Scripts/to10dash1.py" targetdir="$INSTALL_PATH/Lib/dtsa2"/>
-            <file override="update" src="$SEMANTICSPATH/Scripts/AEM1.py" targetdir="$INSTALL_PATH/Lib/semantics"/>
-            <file override="update" src="$SEMANTICSPATH/Scripts/AEM4.py" targetdir="$INSTALL_PATH/Lib/semantics"/>
-            <file override="update" src="$SEMANTICSPATH/Scripts/Gryphon.py" targetdir="$INSTALL_PATH/Lib/semantics"/>
-            <file override="update" src="$SEMANTICSPATH/Scripts/McCrone1.py" targetdir="$INSTALL_PATH/Lib/semantics"/>
-            <file override="update" src="$SEMANTICSPATH/Scripts/NIST3.py" targetdir="$INSTALL_PATH/Lib/semantics"/>
-            <file override="update" src="$SEMANTICSPATH/Scripts/ORNL.py" targetdir="$INSTALL_PATH/Lib/semantics"/>
-            <file override="update" src="$SEMANTICSPATH/Scripts/PAS.py" targetdir="$INSTALL_PATH/Lib/semantics"/>
-            <file override="update" src="$SEMANTICSPATH/Scripts/PAS2.py" targetdir="$INSTALL_PATH/Lib/semantics"/>
-            <file override="update" src="$SEMANTICSPATH/Scripts/PNNL.py" targetdir="$INSTALL_PATH/Lib/semantics"/>
-            <file override="update" src="$SEMANTICSPATH/Scripts/SRNL.py" targetdir="$INSTALL_PATH/Lib/semantics"/>
+            <file override="update" src="$SEMANTICSPATH/Scripts/AEM1.py" targetdir="$INSTALL_PATH/semantics"/>
+            <file override="update" src="$SEMANTICSPATH/Scripts/AEM4.py" targetdir="$INSTALL_PATH/semantics"/>
+            <file override="update" src="$SEMANTICSPATH/Scripts/Gryphon.py" targetdir="$INSTALL_PATH/semantics"/>
+            <file override="update" src="$SEMANTICSPATH/Scripts/McCrone1.py" targetdir="$INSTALL_PATH/semantics"/>
+            <file override="update" src="$SEMANTICSPATH/Scripts/NIST3.py" targetdir="$INSTALL_PATH/semantics"/>
+            <file override="update" src="$SEMANTICSPATH/Scripts/ORNL.py" targetdir="$INSTALL_PATH/semantics"/>
+            <file override="update" src="$SEMANTICSPATH/Scripts/PAS.py" targetdir="$INSTALL_PATH/semantics"/>
+            <file override="update" src="$SEMANTICSPATH/Scripts/PAS2.py" targetdir="$INSTALL_PATH/semantics"/>
+            <file override="update" src="$SEMANTICSPATH/Scripts/PNNL.py" targetdir="$INSTALL_PATH/semantics"/>
+            <file override="update" src="$SEMANTICSPATH/Scripts/SRNL.py" targetdir="$INSTALL_PATH/semantics"/>
         </pack>
     </packs>
     <listeners>

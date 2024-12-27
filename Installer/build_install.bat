@@ -1,17 +1,19 @@
 REM This script rebuilds DTSA-II (including EPQ), SEMantics, Graf, FastQuant, and the NIST K-Glass Database
 REM It requires:  
 REM   * A Java Development Kit (version 21 or above)
-REM   * IZ-Pack (version 5 or above) [https://izpack.org/]
+REM   * IZ-Pack (version 5 or above) [https://izpack.org/] (Don't install in "Program Files" as the path 
+REM     becomes too long and won't build.)
 REM   * Gnu SED [https://www.gnu.org/software/sed/]
 REM   * Launch4J [https://launch4j.sourceforge.net/]
 REM   * Maven [https://maven.apache.org/]
+REM  Update the paths below to reflect the location of these executables on your system.
 REM Output:
 REM   * An installation JAR containing all the applications (_full.jar)
 REM   * An installation JAR containing the core DTSA-II applications plus a Windows JRE (.jar)  
 REM   * An installation JAR containing the core DTSA-II applications (_nojre.jar)  
 
-set "D2V=2024-12-20"
-set "NUM_VER=15.1.13"
+set "D2V=2024-12-27"
+set "NUM_VER=15.1.14"
 set "JDK_VER=21"
 set "BPATH=C:\Users\nritchie\repositories"
 set "NAME_VER=Oberon"
