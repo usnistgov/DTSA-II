@@ -12,21 +12,25 @@ REM   * An installation JAR containing all the applications (_full.jar)
 REM   * An installation JAR containing the core DTSA-II applications plus a Windows JRE (.jar)  
 REM   * An installation JAR containing the core DTSA-II applications (_nojre.jar)  
 
-set "D2V=2024-12-27"
-set "NUM_VER=15.1.14"
-set "JDK_VER=21"
-set "BPATH=C:\Users\nritchie\repositories"
+REM Version information
+set "D2V=2024-12-30"
+set "NUM_VER=15.1.15"
 set "NAME_VER=Oberon"
+
+REM Build paths
+set "JDK_VER=21"
+set "JDK_PATH=C:\Program Files\Eclipse Adoptium\jdk-21.0.5.11-hotspot"
+set "BPATH=C:\Users\nritchie\repositories"
 set "IZPACK_HOME=C:\izpack\bin"
 set "L4J_PATH=C:\Program Files (x86)\Launch4j"
 set "SED_PATH=C:\Program Files (x86)\GnuWin32\bin"
 set "DTSA_ARCHIVE_PATH=V:\internal\643_violet\DTSA-II Latest"
 
+REM Eliminate old versions of the .jar file so only fresh ones exist upon script completion
 cd %BPATH%
-del DTSA-II\Installer\dtsa2_%NAME_VER%.jar
-del DTSA-II\Installer\dtsa2_%NAME_VER%_nojre.jar
-del DTSA-II\Installer\dtsa2_%NAME_VER%_full.jar
+del DTSA-II\Installer\dtsa2_*.jar
 
+REM Update the application version numbers
 echo %NAME_VER% %D2V% > "DTSA-II\src\gov\nist\microanalysis\dtsa2\revision"
 echo %NAME_VER% %D2V% > "DTSA-II\target\classes\gov\nist\microanalysis\dtsa2\revision"
 echo %NAME_VER% %D2V% > "epq\target\classes\gov\nist\microanalysis\EPQLibrary\revision"
