@@ -103,7 +103,6 @@
             <description>Power tools for x-ray microanalysis.</description>
             <file override="update" src="$JARPATH/gov/nist/microanalysis/dtsa2/NUMBER_VERSION/dtsa2-NUMBER_VERSION.jar" targetdir="$INSTALL_PATH/"/>
             <fileset dir="$BUILDPATH/../../Lib/dtsa2" targetdir="$INSTALL_PATH/Lib/dtsa2" excludes="*/.class"/>
-            <file override="update" src="$JARPATH/gov/nist/microanalysis/FastQuant/NUMBER_VERSION/FastQuant-NUMBER_VERSION.jar" targetdir="$INSTALL_PATH/"/>
             <file override="update" src="$BUILDPATH/DTSA-II.exe" targetdir="$INSTALL_PATH/"/>
             <file override="update" src="$BUILDPATH/Basic scripting in DTSA-II.pdf" targetdir="$INSTALL_PATH/doc/"/>
             <file override="update" src="$BUILDPATH/Introduction to DTSA-II.pdf" targetdir="$INSTALL_PATH/doc/"/>
@@ -113,21 +112,15 @@
             <file override="update" src="$BUILDPATH/MT4_Standards_based_Quantication_Part2.pdf" targetdir="$INSTALL_PATH/doc/"/>
             <file override="update" src="$BUILDPATH/Newbury2014_Limits_of_Quantitative_EDS.pdf" targetdir="$INSTALL_PATH/doc/"/>
             <file override="update" src="$BUILDPATH/Standard Bundles.pdf" targetdir="$INSTALL_PATH/doc/"/>
-            <file override="update" src="$JARPATH/gov/nist/microanalysis/JythonGUI/NUMBER_VERSION/JythonGUI-NUMBER_VERSION.jar" targetdir="$INSTALL_PATH/"/>
-            <file override="update" src="$BUILDPATH/jythongui.bat" targetdir="$INSTALL_PATH"/>            
         </pack>
         <pack name="NIST Relocation Application" preselected="no" required="no">
             <description>Coordinate translation application for relocating features on translated, scaled and rotated coordinate systems.</description>
             <file override="update" src="$JARPATH/gov/nist/microanalysis/relocate/NUMBER_VERSION/relocate-NUMBER_VERSION.jar" targetdir="$INSTALL_PATH/"/>
             <file override="update" src="$BUILDPATH/Relocate.exe" targetdir="$INSTALL_PATH/"/>
         </pack>
-        <pack name="NIST Glass Database" preselected="no" required="no">
-            <description>An applications for searching the NIST Glass database. Most non-NIST people don't have access to these glasses so the program is of little use to them.</description>
-            <file override="update" src="$JARPATH/gov/nist/microanalysis/NISTGlassDB/NUMBER_VERSION/NISTGlassDB-NUMBER_VERSION.jar" targetdir="$INSTALL_PATH/"/>
-            <file override="update" src="$BUILDPATH/GlassDatabase.exe" targetdir="$INSTALL_PATH/"/>
-        </pack>
         <pack name="NIST Graf Application" preselected="yes" required="no">
             <description>Data analysis for RJ Lee Group / ASPEX automated particle analysis data files.  DON'T INSTALL THIS UNLESS YOU KNOW YOU NEED IT!</description>
+            <file override="update" src="$JARPATH/gov/nist/microanalysis/FastQuant/NUMBER_VERSION/FastQuant-NUMBER_VERSION.jar" targetdir="$INSTALL_PATH/"/>
             <file override="update" src="$JARPATH/gov/nist/microanalysis/graf/NUMBER_VERSION/graf-NUMBER_VERSION.jar" targetdir="$INSTALL_PATH/"/>
             <file override="update" src="$BUILDPATH/Graf.exe" targetdir="$INSTALL_PATH/"/>
             <file override="update" src="$JARPATH/commons-beanutils/commons-beanutils/1.9.4/commons-beanutils-1.9.4.jar" targetdir="$INSTALL_PATH/"/>
@@ -164,7 +157,23 @@
             <file override="update" src="$SEMANTICSPATH/Scripts/PAS2.py" targetdir="$INSTALL_PATH/semantics"/>
             <file override="update" src="$SEMANTICSPATH/Scripts/PNNL.py" targetdir="$INSTALL_PATH/semantics"/>
             <file override="update" src="$SEMANTICSPATH/Scripts/SRNL.py" targetdir="$INSTALL_PATH/semantics"/>
+            <file override="update" src="$SEMANTICSPATH/Detectors/EDAX All.xdet" targetdir="$INSTALL_PATH/semantics/Detectors"/>
+            <file override="update" src="$SEMANTICSPATH/Detectors/EDAX Det 1.xdet" targetdir="$INSTALL_PATH/semantics/Detectors"/>
+            <file override="update" src="$SEMANTICSPATH/Detectors/EDAX Det 2.xdet" targetdir="$INSTALL_PATH/semantics/Detectors"/>
+            <file override="update" src="$SEMANTICSPATH/Detectors/EDAX Det 3.xdet" targetdir="$INSTALL_PATH/semantics/Detectors"/>
+            <file override="update" src="$SEMANTICSPATH/Detectors/EDAX Det 4.xdet" targetdir="$INSTALL_PATH/semantics/Detectors"/>
+            <file override="update" src="$SEMANTICSPATH/TestScripts/NullImages.zip" targetdir="$INSTALL_PATH/semantics"/>
         </pack>
+        <pack name="NIST Glass Database" preselected="no" required="no">
+            <description>An applications for searching the NIST Glass database. Most non-NIST people don't have access to these glasses so the program is of little use to them.</description>
+            <file override="update" src="$JARPATH/gov/nist/microanalysis/NISTGlassDB/NUMBER_VERSION/NISTGlassDB-NUMBER_VERSION.jar" targetdir="$INSTALL_PATH/"/>
+            <file override="update" src="$BUILDPATH/GlassDatabase.exe" targetdir="$INSTALL_PATH/"/>
+        </pack>
+        <pack name="Jython GUI" preselected="no" required="no>
+        	<description>An application for running Jython scripts using the EPQ library outside of DTSA-II. (You probably don't want this...)</description>
+            <file override="update" src="$JARPATH/gov/nist/microanalysis/JythonGUI/NUMBER_VERSION/JythonGUI-NUMBER_VERSION.jar" targetdir="$INSTALL_PATH/"/>
+            <file override="update" src="$BUILDPATH/jythongui.bat" targetdir="$INSTALL_PATH"/>
+        </pack>            
     </packs>
     <listeners>
         <listener classname="RegistryInstallerListener" stage="install" >
