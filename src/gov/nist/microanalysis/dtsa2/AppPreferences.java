@@ -16,6 +16,7 @@ import java.text.DateFormat;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.prefs.Preferences;
@@ -639,6 +640,14 @@ public class AppPreferences {
 				} catch (final EPQException e) {
 					e.printStackTrace();
 				}
+			}
+			for(final ElectronProbe ep : mSession.getElectronProbes().keySet()) {
+            InstrumentPanel ip = ei.get(ep);
+            if (ip == null) {
+               ip = new InstrumentPanel(getPreferenceDialog(), ep);
+               addChildPanel(ip);
+               ei.put(ep, ip);
+            }
 			}
 		}
 	}

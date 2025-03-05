@@ -156,6 +156,9 @@ public class HTMLReport {
                if (fc.showDialog(null, "Select") == JFileChooser.APPROVE_OPTION) {
                   final File result = fc.getSelectedFile();
                   try {
+                     if(!result.exists()) {
+                        result.mkdirs();
+                     }
                      ok = false;
                      if (result.exists() && result.canWrite()) {
                         final File tester = File.createTempFile("test", ".txt", result);
@@ -166,6 +169,7 @@ public class HTMLReport {
                            tester.delete();
                         }
                         Preferences.userNodeForPackage(HTMLReport.class).put(sfBASE_PATH, result.getCanonicalPath());
+                        return result.getCanonicalPath();
                      }
                   } catch (IOException e) {
                      ErrorDialog.createErrorMessage(null, "Report Directory Creation Error", "The report directory specified is not writable.",
