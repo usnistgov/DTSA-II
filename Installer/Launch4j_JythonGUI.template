@@ -2,10 +2,10 @@
 <launch4jConfig>
   <dontWrapJar>true</dontWrapJar>
   <headerType>gui</headerType>
-  <jar>epq-NUMBER_VERSION.jar</jar>
+  <jar>JythonGUI-NUMBER_VERSION.jar</jar>
   <outfile>DTSA-II Build\JythonGUI.exe</outfile>
   <errTitle>NIST JythonGUI</errTitle>
-  <cmdLine>gov.nist.microanalysis.JythonGUI.JythonApp</cmdLine>
+  <cmdLine></cmdLine>
   <chdir></chdir>
   <priority>normal</priority>
   <downloadUrl>https://adoptium.net/temurin/releases/?version=21</downloadUrl>
@@ -32,7 +32,7 @@
     <productVersion>NUMBER_VERSION.0</productVersion>
     <txtProductVersion>Oberon DATE_VERSION</txtProductVersion>
     <productName>NIST DTSA-II Oberon</productName>
-    <companyName>National Insitute of Standards and Technology</companyName>
+    <companyName>National Institute of Standards and Technology</companyName>
     <internalName>JythonGUI</internalName>
     <originalFilename>JythonGUI.exe</originalFilename>
     <trademarks></trademarks>

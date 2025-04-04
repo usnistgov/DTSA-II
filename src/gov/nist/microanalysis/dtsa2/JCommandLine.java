@@ -755,12 +755,19 @@ public class JCommandLine extends JTextPane {
             cmd.append(DEF_OUT + "=\"" + fullDir + "\"\n");
             cmd.append("f=open(\"" + pyPath + "\")\n");
             cmd.append("globals()[\"_script\"]=f.read()\n");
+            // Add the parent directory to the path so the script can load libraries from it...
+            cmd.append("sys.path.append(\""+file.getParent().replaceAll("\\\\", "/")+"\")\n");
             cmd.append("f.close()\n");
             cmd.append("del f\n");
-            cmd.append("execfile(\"" + pyPath + "\")\n");
+            cmd.append("try:");
+            cmd.append(" execfile(\"" + pyPath + "\")\n");
+            cmd.append("finally:");
+            // Remove the parent directory so the path doesn't grow unmanageably
+            cmd.append(" sys.path.remove(\""+file.getParent().replaceAll("\\\\", "/")+"\")\n");
             execute(cmd.toString());
             // Note: delete() doesn't delete when the directory is not empty. We make use of this fact.
             dir.delete();
+            
          } else
             writeError(file.toString() + " does not appear to be a file.");
       }

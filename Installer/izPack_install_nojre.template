@@ -88,7 +88,7 @@
             <file override="update" src="$JARPATH/org/python/jython-standalone/2.7.4/jython-standalone-2.7.4.jar" targetdir="$INSTALL_PATH/"/>
             <file override="update" src="$JARPATH/io/github/x-stream/mxparser/1.2.2/mxparser-1.2.2.jar" targetdir="$INSTALL_PATH"/>
             <file override="update" src="$JARPATH/xmlpull/xmlpull/1.1.3.1/xmlpull-1.1.3.1.jar" targetdir="$INSTALL_PATH/"/>
-            <file override="update" src="$JARPATH/com/thoughtworks/xstream/xstream/1.4.19/xstream-1.4.19.jar" targetdir="$INSTALL_PATH/"/>
+            <file override="update" src="$JARPATH/com/thoughtworks/xstream/xstream/1.4.21/xstream-1.4.21.jar" targetdir="$INSTALL_PATH/"/>
             <!-- Not in EPQ but in DTSA-II -->
             <file override="update" src="$JARPATH/com/toedter/jcalendar/1.4/jcalendar-1.4.jar" targetdir="$INSTALL_PATH/"/>
             <file override="update" src="$JARPATH/com/formdev/flatlaf/3.0/flatlaf-3.0.jar" targetdir="$INSTALL_PATH/"/>

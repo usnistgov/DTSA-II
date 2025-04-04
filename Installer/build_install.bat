@@ -15,7 +15,7 @@ REM   * An installation JAR containing the core DTSA-II applications (_nojre.jar
 ECHO OFF
 REM Setting "FULL_BUILD=True" only works if NIST-only internal projects graf/SEMantics/FastQuant/Glass Database 
 REM are available. (Unless you work at NIST, the answer is likely 'no.')
-SET "FULL_BUILD=False"
+SET "FULL_BUILD=True"
 
 if [%FULL_BUILD%] == [True] (
 ECHO ***** Performing Full Build *****
@@ -24,8 +24,8 @@ ECHO ***** Performing DTSA-II and Relocate-only Build *****
 )
 
 REM Version information
-SET "D2V=2025-3-5"
-SET "NUM_VER=15.1.17"
+SET "D2V=2025-4-4"
+SET "NUM_VER=15.1.19"
 SET "NAME_VER=Oberon"
 
 REM Build paths

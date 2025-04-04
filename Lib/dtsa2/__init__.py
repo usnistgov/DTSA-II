@@ -203,7 +203,7 @@ class ScriptableSpectrum(epq.BaseSpectrum):
         return epq.SpectrumUtils.sumCounts(self.wrapped, ch0, ch1)
 
     def integrate(self, e0, e1):
-        """s.integrate(ch0, ch1)
+        """s.integrate(e0, e1)
     Sums the counts in the range of energies [e0, e1] in eV.  Partial bins contribute partial counts.  Use sumCounts(...) to ensure bin boundaries."""
         return epq.SpectrumUtils.integrate(self.wrapped, e0, e1)
 
