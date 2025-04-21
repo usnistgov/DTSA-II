@@ -24,13 +24,13 @@ ECHO ***** Performing DTSA-II and Relocate-only Build *****
 )
 
 REM Version information
-SET "D2V=2025-4-4"
-SET "NUM_VER=15.1.19"
+SET "D2V=2025-4-21"
+SET "NUM_VER=15.1.21"
 SET "NAME_VER=Oberon"
 
 REM Build paths
-SET "JDK_VER=21"
-SET "JDK_PATH=C:\Program Files\Eclipse Adoptium\jdk-21.0.5.11-hotspot"
+SET "JDK_VER=24"
+SET "JDK_PATH=C:\Users\nritchie\AppData\Local\Programs\Eclipse Adoptium\jdk-24.0.1.9-hotspot"
 SET "BPATH=C:\Users\nritchie\repositories"
 SET "IZPACK_HOME=C:\izpack\bin"
 SET "L4J_PATH=C:\Program Files (x86)\Launch4j"
