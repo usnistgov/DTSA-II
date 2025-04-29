@@ -35,12 +35,8 @@ from compiler.pycodegen import TRY_FINALLY
 # 1> xp = { "Transitions" : [transition("Fe K-L3"), transition("Fe K-M3"), transition("Fe L3-M5"), transition("O K-L3")], "Emission Images":5.0e-6, "Characteristic Accumulator":True, "Char Fluor Accumulator":True, "Brem Fluor Accumulator":True, "PhiRhoZ":5.0e-6, "Output" : "Z:/nritchie/Desktop/tmp" }
 # 2> display(simulate(material("Fe2O3",5.0), d2, 20.0, nTraj=100, sf=True, bf=True, xtraParams = xp))
 
-# Mac OS X seems to require the next line.
-
-__revision__ = "$Id: mcSimulate3.py Nicholas W. M. Ritchie. Mod JRM $"
-__version__ = "0.1.0 - 2023-07-05"
-
 import sys
+# Mac OS X seems to require the next line.
 sys.packageManager.makeJavaPackage("gov.nist.microanalysis.NISTMonte.Gen3", "CharacteristicXRayGeneration3, BremsstrahlungXRayGeneration3, FluorescenceXRayGeneration3, XRayTransport3", None)
 import gov.nist.microanalysis.NISTMonte as nm
 import gov.nist.microanalysis.NISTMonte.Gen3 as nm3
@@ -201,6 +197,12 @@ def suggestTransitions(mat, e0=20.0):
 
 def configureBSEDDepth(zMin, zMax):
     return { "BSEDDepth" : (zMin, zMax) }
+
+
+def configureRawSpectrum(enable = True):
+    """configureRawSpectrum()
+    Return the unconvolved raw emitted spectrum data."""
+    return { "Raw": enable }
 
 
 def estimateRange(mat, e0):
@@ -380,7 +382,10 @@ def base(det, e0, withPoisson, nTraj, dose, sf, bf, name, buildSample, buildPara
     det.reset()
     monte.runMultipleTrajectories(nTraj)
     # Get the spectrum and assign properties
-    spec = det.getSpectrum((dose * 1.0e-9) / (nTraj * epq.PhysicalConstants.ElectronCharge))
+    if not xtraParams.get("Raw", False):
+        spec = det.getSpectrum((dose * 1.0e-9) / (nTraj * epq.PhysicalConstants.ElectronCharge))
+    else:
+        spec = det.getRawXRayData((dose * 1.0e-9) / (nTraj * epq.PhysicalConstants.ElectronCharge))
     props = spec.getProperties()
     props.setNumericProperty(epq.SpectrumProperties.LiveTime, dose)
     props.setNumericProperty(epq.SpectrumProperties.ProbeCurrent, 1.0)
@@ -1358,6 +1363,3 @@ def simulateWedge(matA, matB, matC, tilt, thickness, det, e0=20.0, rotation = 0.
     tmp = u"MC simulation of %g um wedge at %g degrees of %s at %0.1f keV%s%s" % (thickness/1.0e-6, tilt, matB, e0, (" + CSF" if sf else ""), (" + BSF" if bf else ""))
     print tmp
     return base(det, e0, withPoisson, nTraj, dose, sf, bf, tmp, buildWedge, params, xtraParams)
-    
-
-    
