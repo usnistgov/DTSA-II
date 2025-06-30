@@ -73,7 +73,7 @@ public class PreferenceDialog
    }
 
    private void initialize() {
-      setLayout(new FormLayout("5dlu, 150dlu, 3dlu, 300dlu, 5dlu", "5dlu, pref, 5dlu, 200dlu, 5dlu, pref, 5dlu, pref, 5dlu"));
+      setLayout(new FormLayout("5dlu, 150dlu, 3dlu, 350dlu, 5dlu", "5dlu, pref, 5dlu, 200dlu, 5dlu, pref, 5dlu, pref, 5dlu"));
       final CellConstraints cc = new CellConstraints();
       final Border bdr = BorderFactory.createCompoundBorder(DTSA2.createDefaultBorder(), DTSA2.createEmptyBorder());
 

@@ -1942,6 +1942,10 @@ public class MainFrame extends JFrame {
       } catch (final Exception e1) {
          jCommandLine_Main.writeError(e1.getMessage());
       }
+      for (File path : AppPreferences.getInstance().getJythonLibraryPaths()) {
+         final String str = path.toString().replace('\\', '/');
+         jCommandLine_Main.execute("sys.path.append(\"" + str + "\")");
+      }
       try {
          final String startUp = AppPreferences.getInstance().getStartupScript();
          if (!startUp.equals("")) {
@@ -2248,10 +2252,10 @@ public class MainFrame extends JFrame {
             else {
                sb.append("<h3>Opening spectra from disk...</h3>\n<p>&nbsp;&nbsp;&nbsp;&nbsp;");
                int i = 0;
-               String last = list.get(list.size()-1);
+               String last = list.get(list.size() - 1);
                for (String item : list) {
                   sb.append(item);
-                  sb.append(i % 10 == 9 ? "<br/>&nbsp;&nbsp;&nbsp;&nbsp;" : (item==last ? "" : ", "));
+                  sb.append(i % 10 == 9 ? "<br/>&nbsp;&nbsp;&nbsp;&nbsp;" : (item == last ? "" : ", "));
                   ++i;
                }
             }
@@ -3197,7 +3201,7 @@ public class MainFrame extends JFrame {
                try {
                   addSpectrum(SpectrumUtils.linearizeSpectrum2(sd, rd.getPolynomial(), rd.getChannelWidth()), true, sd);
                } catch (EPQException e) {
-                  ErrorDialog.createErrorMessage(this, "Error while linearizing "+sd.toString(), e);
+                  ErrorDialog.createErrorMessage(this, "Error while linearizing " + sd.toString(), e);
                   e.printStackTrace();
                }
       }

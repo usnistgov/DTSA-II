@@ -783,9 +783,10 @@ public class JCommandLine extends JTextPane {
          mStdOut = new OutputWriter(Mode.StdOut);
          mConsole.setOut(mStdOut);
          mCommands.add("import sys");
-         final String path = System.getProperty("user.dir").replace('\\', '/');
-         mCommands.add("sys.path.append(\"" + path + "/Lib\")");
-         // mCommands.add("sys.add_extdir(\"" + path + "\")");
+         {
+            final String path = System.getProperty("user.dir").replace('\\', '/');
+            mCommands.add("sys.path.append(\"" + path + "/Lib\")");
+         }
       }
 
       /*

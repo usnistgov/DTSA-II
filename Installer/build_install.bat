@@ -6,7 +6,7 @@ REM     becomes too long and won't build.)
 REM   * Gnu SED [https://www.gnu.org/software/sed/]
 REM   * Launch4J [https://launch4j.sourceforge.net/]
 REM   * Maven [https://maven.apache.org/]
-REM  Update the paths below to reflect the location of these executables on your system.
+REM  Update the "Build paths" section below to reflect the location of these executables on your system.
 REM Output:
 REM   * An installation JAR containing all the applications (_full.jar)
 REM   * An installation JAR containing the core DTSA-II applications plus a Windows JRE (.jar)  
@@ -24,8 +24,8 @@ ECHO ***** Performing DTSA-II and Relocate-only Build *****
 )
 
 REM Version information
-SET "D2V=2025-4-21"
-SET "NUM_VER=15.1.21"
+SET "D2V=2025-05-30"
+SET "NUM_VER=15.1.30"
 SET "NAME_VER=Oberon"
 
 REM Build paths
