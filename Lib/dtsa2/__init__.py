@@ -1259,7 +1259,7 @@ Example:
 + oxidizer - (optional) An epq.Oxidizer object to use in place of the default epq.Oxidizer()
 + xtraKRatios - (optional) A list of elements each of which looks like (xrt , kratio, stdMat, props)
    where xrt is an XRayTransition(Set), kratio is a double/UncertainValue2, stdMat is a Composition and props is SpectrumProperties."""
-   qus = epq.QuantifyUsingStandards(det, epq.ToSI.keV(e0))
+   qus = epq.QuantifyUsingStandards(det, epq.ToSI.keV(e0), False, True)
    for elm, spec in stds.iteritems():
       elm = element(elm)
       if isinstance(spec, epq.StandardBundle):
