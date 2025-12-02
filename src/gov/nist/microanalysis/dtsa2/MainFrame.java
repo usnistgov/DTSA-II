@@ -743,7 +743,6 @@ public class MainFrame extends JFrame {
    }
 
    public void clearKLMs() {
-      jSpecDisplay_Main.clearKLMs();
       try {
          jKLMTreePanel.clearAll();
       } catch (EPQException e) {
@@ -764,6 +763,7 @@ public class MainFrame extends JFrame {
       jSpecDisplay_Main.zoomToAll();
       final Font f = jSpecDisplay_Main.getFont();
       jSpecDisplay_Main.setFont(new Font(f.getName(), f.getStyle(), (5 * f.getSize()) / 4));
+      jSpecDisplay_Main.setKLMTreePanel(jKLMTreePanel);
       jList_Spectrum.setForeground(FOREGROUND_COLOR);
       jList_Spectrum.setBackground(BACKGROUND_COLOR);
       jList_Spectrum.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
@@ -2645,7 +2645,7 @@ public class MainFrame extends JFrame {
    }
 
    public void updateDisplayedSpectra() {
-      jSpecDisplay_Main.clearAllSpectra();
+      jSpecDisplay_Main.clearAllSpectra(false);
       int i = 0;
       for (final ISpectrumData spec : getSelectedSpectra()) {
          jSpecDisplay_Main.addSpectrum(spec);

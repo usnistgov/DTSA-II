@@ -1,8 +1,8 @@
 REM This script rebuilds DTSA-II (including EPQ), SEMantics, Graf, FastQuant, and the NIST K-Glass Database
 REM It requires:  
-REM   * A Java Development Kit (version 21 or above)
+REM   * A Java Development Kit (version 24 or above)
 REM   * IZ-Pack (version 5 or above) [https://izpack.org/] (Don't install in "Program Files" as the path 
-REM     becomes too long and won't build.)
+REM     becomes too long and won't build.  Install directly into C:\)
 REM   * Gnu SED [https://www.gnu.org/software/sed/]
 REM   * Launch4J [https://launch4j.sourceforge.net/]
 REM   * Maven [https://maven.apache.org/]
@@ -24,17 +24,18 @@ ECHO ***** Performing DTSA-II and Relocate-only Build *****
 )
 
 REM Version information
-SET "D2V=2025-08-25"
-SET "NUM_VER=15.1.35"
+SET "D2V=2025-12-01"
+SET "NUM_VER=15.1.41"
 SET "NAME_VER=Oberon"
 
 REM Build paths
 SET "JDK_VER=24"
-SET "JDK_PATH=C:\Users\nritchie\AppData\Local\Programs\Eclipse Adoptium\jdk-24.0.1.9-hotspot"
+SET "JDK_PATH=C:\Program Files\Eclipse Adoptium\jdk-24.0.2.12-hotspot"
 SET "BPATH=C:\Users\nritchie\repositories"
 SET "IZPACK_HOME=C:\izpack\bin"
 SET "L4J_PATH=C:\Program Files (x86)\Launch4j"
 SET "SED_PATH=C:\Program Files (x86)\GnuWin32\bin"
+REM This path represents the archive containing a historical record of builds. 
 SET "DTSA_ARCHIVE_PATH=V:\internal\643_violet\DTSA-II Latest"
 
 
