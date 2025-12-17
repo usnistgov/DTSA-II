@@ -7,3 +7,5 @@ Installer/Launch4j_config.xml
 Installer/Launch4j_relocate.xml
 src/gov/nist/microanalysis/dtsa2/revision
 *.bak
+
+pom.xml
