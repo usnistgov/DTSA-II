@@ -145,6 +145,7 @@ import gov.nist.microanalysis.EPQTools.MaterialsCreator;
 import gov.nist.microanalysis.EPQTools.ParticleSignatureTableModel;
 import gov.nist.microanalysis.EPQTools.SimpleFileFilter;
 import gov.nist.microanalysis.EPQTools.SpecDisplay;
+import gov.nist.microanalysis.EPQTools.SpecDisplay.Region;
 import gov.nist.microanalysis.EPQTools.SpectrumFile;
 import gov.nist.microanalysis.EPQTools.SpectrumFileChooser;
 import gov.nist.microanalysis.EPQTools.SpectrumPropertyPanel;
@@ -1558,6 +1559,7 @@ public class MainFrame extends JFrame {
                   jSpecDisplay_Main.setTemporaryKLMs(lines);
                   break;
                case CLEAR_ALL :
+                  // Don't eliminate temporary lines
                   break;
             }
          }
@@ -3140,10 +3142,8 @@ public class MainFrame extends JFrame {
             }
             if (comp != null) {
                ba.initialize(comp, e0, toa);
-               final SpecDisplay.Regions r = jSpecDisplay_Main.getRegions();
                final ArrayList<int[]> rois = new ArrayList<>();
-               for (int i = r.size() - 1; i >= 0; --i) {
-                  final SpecDisplay.Region rr = r.get(i);
+               for (Region rr: jSpecDisplay_Main.getRegions()) {
                   rois.add(new int[]{SpectrumUtils.channelForEnergy(sd, rr.getLowEnergy()), SpectrumUtils.channelForEnergy(sd, rr.getHighEnergy())});
                }
                if (rois.size() > 0) {

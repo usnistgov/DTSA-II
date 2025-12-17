@@ -25,7 +25,7 @@ ECHO ***** Performing DTSA-II and Relocate-only Build *****
 
 REM Version information
 SET "D2V=2025-12-01"
-SET "NUM_VER=15.1.41"
+SET "NUM_VER=15.1.42"
 SET "NAME_VER=Oberon"
 
 REM Build paths
