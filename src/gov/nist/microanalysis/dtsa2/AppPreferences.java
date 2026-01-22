@@ -864,7 +864,7 @@ public class AppPreferences {
          jButton_Import.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent arg0) {
-               final ISpectrumData[] specs = DTSA2.getInstance().getFrame().selectSpectraFromFiles();
+               final ISpectrumData[] specs = DTSA2.getInstance(null).getFrame().selectSpectraFromFiles();
                if (specs != null) {
                   int chCount = 0;
                   SpectrumProperties props = null;
@@ -1343,7 +1343,7 @@ public class AppPreferences {
          jButton_Import.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent arg0) {
-               final ISpectrumData[] specs = DTSA2.getInstance().getFrame().selectSpectraFromFiles();
+               final ISpectrumData[] specs = DTSA2.getInstance(null).getFrame().selectSpectraFromFiles();
                if (specs != null) {
                   int chCount = 0;
                   SpectrumProperties props = null;
@@ -1937,7 +1937,7 @@ public class AppPreferences {
          try {
             openURL(EPQ_JAVA_DOC_DEFAULT);
          } catch (final Exception e2) {
-            ErrorDialog.createErrorMessage(DTSA2.getInstance().getFrame(), "Open EPQ library documentation", e2);
+            ErrorDialog.createErrorMessage(DTSA2.getInstance(null).getFrame(), "Open EPQ library documentation", e2);
          }
       }
 

@@ -925,7 +925,7 @@ public class MainFrame extends JFrame {
       mDataManager.addActionListener(ssl);
    }
 
-   private void updateDetector(DetectorProperties det) {
+   public void updateDetector(DetectorProperties det) {
       Object selInst, selDet;
       if (det != null) {
          selInst = det.getOwner();

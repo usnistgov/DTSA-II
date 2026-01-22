@@ -32,7 +32,7 @@ sys.packageManager.makeJavaPackage("javax.imageio", "ImageIO", None)
 import javax.imageio as ii
 import time
 
-App = dt2.DTSA2.getInstance()
+App = dt2.DTSA2.getInstance(None)
 MainFrame = App.getFrame()
 Database = dt2.DTSA2.getSession()
 DefaultOutput = (globals()["DefaultOutput"] if globals().has_key("DefaultOutput") else None)

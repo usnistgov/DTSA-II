@@ -120,7 +120,7 @@ public class HTMLReport {
                + c.getDisplayName(Calendar.MONTH, Calendar.SHORT, locale) + "-" + Integer.toString(c.get(Calendar.YEAR)));
          if (!(subDir.exists() || subDir.mkdirs())) {
             final Error err = new Error("Unable to create report directory.\n" + subDir.getAbsolutePath());
-            ErrorDialog.createErrorMessage(DTSA2.getInstance().getFrame(), "Fatal error", err);
+            ErrorDialog.createErrorMessage(DTSA2.getInstance(null).getFrame(), "Fatal error", err);
             throw err;
          }
          for (int i = 1; i < 1000; ++i) {
@@ -198,7 +198,7 @@ public class HTMLReport {
          }
       }
       if (set) {
-         JOptionPane.showMessageDialog(DTSA2.getInstance().getFrame(),
+         JOptionPane.showMessageDialog(DTSA2.getInstance(null).getFrame(),
                "The change in report directories will take place when " + DTSA2.APP_NAME + " is restarted.", DTSA2.APP_NAME,
                JOptionPane.INFORMATION_MESSAGE);
          Preferences.userNodeForPackage(HTMLReport.class).put(sfBASE_PATH, path);

@@ -90,7 +90,7 @@ public class DTSA2 {
    }
 
    // Construct the application
-   private DTSA2() {
+   private DTSA2(String scriptFile) {
       mFrame = new MainFrame();
       mFrame.pack();
       final URL url = DTSA2.class.getResource("icon.png");
@@ -102,13 +102,15 @@ public class DTSA2 {
             // Ignore it...
          }
       mFrame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+      if (scriptFile != null)
+         mFrame.runPythonScript(scriptFile);
       mFrame.setVisible(true);
       mFrame.flushHtml();
    }
 
-   static synchronized public DTSA2 getInstance() {
+   static synchronized public DTSA2 getInstance(String scriptFile) {
       if (mApplication == null)
-         mApplication = new DTSA2();
+         mApplication = new DTSA2(scriptFile);
       return mApplication;
    }
 
@@ -154,7 +156,7 @@ public class DTSA2 {
          try {
             res.write(path);
          } catch (final IOException ex) {
-            ErrorDialog.createErrorMessage(getInstance().getFrame(), "Error saving a standards database", ex);
+            ErrorDialog.createErrorMessage(getInstance(null).getFrame(), "Error saving a standards database", ex);
          }
          return res;
       }
@@ -167,7 +169,7 @@ public class DTSA2 {
       try {
          sdb.write(path);
       } catch (final IOException e) {
-         ErrorDialog.createErrorMessage(DTSA2.getInstance().getFrame(), "Saving standards database", e);
+         ErrorDialog.createErrorMessage(DTSA2.getInstance(null).getFrame(), "Saving standards database", e);
       }
    }
 
@@ -246,6 +248,16 @@ public class DTSA2 {
 
    // Main method
    public static void main(String[] args) {
+      String scriptFile = null;
+      if (args.length > 0) {
+         for (int i = 0; i < args.length; ++i) {
+            if (args[i].toLowerCase().equals("--script") && (i + 1 < args.length)) {
+               scriptFile = args[i + 1];
+               ++i;
+            }
+         }
+      }
+      // System.err.println("Script File: " + scriptFile);
       AppPreferences.getInstance();
       if (sOS == OS.OS_MAC) {
          System.setProperty("apple.laf.useScreenMenuBar", "true");
@@ -293,6 +305,6 @@ public class DTSA2 {
       /*
        * Start a background thread to initialize the database.
        */
-      DTSA2.getInstance();
+      DTSA2.getInstance(scriptFile);
    }
 }
