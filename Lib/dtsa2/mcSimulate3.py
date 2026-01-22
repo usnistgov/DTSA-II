@@ -7,33 +7,35 @@ Note that the Monte Carlo algorithm requires densities for all materials.  Usual
   3) using the material(str,density) version of the material utility function
 The methods basically implement the same geometries as the GUI but facilitate scripting multiple simulations.
 Methods:
-+ simulate(mat, [det], [e0], [dose], [withPoisson], [nTraj], [sf], [bf], [xtraParams])
-+ sphere(mat, [radius], [det], [e0], [withPoisson], [nTraj], [dose], [sf], [bf], [substrate], [xtraParams])
-+ multiFilm(layers, [det], [e0], [withPoisson], [nTraj], [dose], [sf], [bf], [xtraParams])
-+ embeddedSphere(mat, radius, substrate, depth, [det], [e0], [withPoisson], [nTraj], [dose], [sf], [bf], [xtraParams])
-+ embeddedRectangle(mat, dims, substrate, depth, [det], [e0], [withPoisson], [nTraj], [dose], [sf], [bf], [xtraParams]):
-+ interface(primary, offset, secondary, [det], [e0], [withPoisson], [nTraj], [dose], [sf], [bf], [xtraParams])
-Internal methods: (for special customization)
-+ base(det, e0, withPoisson, nTraj, dose, sf, bf, name, buildSample, buildParams, xtraParams)
+> import dtsa2.mcSimulate3 as mc3
+> mc3.simulate(mat, [det], [e0], [dose], [withPoisson], [nTraj], [sf], [bf], [xtraParams])
+> mc3.sphere(mat, [radius], [det], [e0], [withPoisson], [nTraj], [dose], [sf], [bf], [substrate], [xtraParams])
+> mc3.multiFilm(layers, [det], [e0], [withPoisson], [nTraj], [dose], [sf], [bf], [xtraParams])
+> mc3.embeddedSphere(mat, radius, substrate, depth, [det], [e0], [withPoisson], [nTraj], [dose], [sf], [bf], [xtraParams])
+> mc3.embeddedRectangle(mat, dims, substrate, depth, [det], [e0], [withPoisson], [nTraj], [dose], [sf], [bf], [xtraParams]):
+> mc3.interface(primary, offset, secondary, [det], [e0], [withPoisson], [nTraj], [dose], [sf], [bf], [xtraParams])
+> # Internal methods: (for special customization)
+> mc3.base(det, e0, withPoisson, nTraj, dose, sf, bf, name, buildSample, buildParams, xtraParams)
 xtraParams:
     xtraParams is a mechanism to allow for flexible yet efficient generation of alternative output mechanisms such as emission images, accumulators and phi(rho*z) curves. \
 Use the helper functions configureXXX to build xtraParams.
 Example:
-> xrts=suggestTransitions("SrF2")
+> import dtsa2.mcSimulate3 as mc3
+> xrts=mc3.suggestTransitions("SrF2")
 > xtraParams={}
-> xtraParams.update(configureXRayAccumulators(xrts,charAccum=True,charFluorAccum=True,bremFluorAccum=False))
-> xtraParams.update(configureEmissionImages(xrts,1.0e-5,512))
-> xtraParams.update(configureContinuumImages( ((2.3,2.5), (4.2,4.4 )), 1.0e-5, 512 ))
-> xtraParams.update(configurePhiRhoZ(1.0e-5))
-> xtraParams.update(configureTrajectoryImage(1.0e-5,512))
-> xtraParams.update(configureVariablePressure(pathLen, gas))
-> xtraParams.configureVRML(nElectrons = 40)
+> xtraParams.update(mc3.configureXRayAccumulators(xrts,charAccum=True,charFluorAccum=True,bremFluorAccum=False))
+> xtraParams.update(mc3.configureEmissionImages(xrts,1.0e-5,512))
+> xtraParams.update(mc3.configureContinuumImages( ((2.3,2.5), (4.2,4.4 )), 1.0e-5, 512 ))
+> xtraParams.update(mc3.configurePhiRhoZ(1.0e-5))
+> xtraParams.update(mc3.configureTrajectoryImage(1.0e-5,512))
+> xtraParams.update(mc3.configureVariablePressure(pathLen, gas))
+> xtraParams.update(mc3.configureVRML(nElectrons = 40))
 The default output path for all files created is the same as 'reportPath()'.  You can specify an alternative location using 'configureOutput(...)'. """
 from compiler.pycodegen import TRY_FINALLY
     
 # Example:
 # 1> xp = { "Transitions" : [transition("Fe K-L3"), transition("Fe K-M3"), transition("Fe L3-M5"), transition("O K-L3")], "Emission Images":5.0e-6, "Characteristic Accumulator":True, "Char Fluor Accumulator":True, "Brem Fluor Accumulator":True, "PhiRhoZ":5.0e-6, "Output" : "Z:/nritchie/Desktop/tmp" }
-# 2> display(simulate(material("Fe2O3",5.0), d2, 20.0, nTraj=100, sf=True, bf=True, xtraParams = xp))
+# 2> display(mc3.simulate(material("Fe2O3",5.0), d2, 20.0, nTraj=100, sf=True, bf=True, xtraParams = xp))
 
 import sys
 # Mac OS X seems to require the next line.
