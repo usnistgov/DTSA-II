@@ -13,7 +13,7 @@
   <stayAlive>false</stayAlive>
   <restartOnCrash>false</restartOnCrash>
   <manifest></manifest>
-  <icon>C:\Users\nritchie\repositories\DTSA-II\trixy.ico</icon>
+  <icon>..\trixy.ico</icon>
   <jre>
     <path>java-runtime</path>
     <requiresJdk>false</requiresJdk>
