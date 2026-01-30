@@ -18,18 +18,18 @@
     <path>java-runtime</path>
     <bundledJre64Bit>true</bundledJre64Bit>
     <bundledJreAsFallback>false</bundledJreAsFallback>
-    <minVersion>1.8.0_0</minVersion>
+    <minVersion>1.JDK_VERSION.0</minVersion>
     <maxVersion></maxVersion>
     <jdkPreference>preferJre</jdkPreference>
     <runtimeBits>64/32</runtimeBits>
   </jre>
   <versionInfo>
     <fileVersion>NUMBER_VERSION.0</fileVersion>
-    <txtFileVersion>Oberon DATE_VERSION</txtFileVersion>
+    <txtFileVersion>NAME_VERSION DATE_VERSION</txtFileVersion>
     <fileDescription>NIST MMSD Relocate</fileDescription>
     <copyright>Not subject to copyright</copyright>
     <productVersion>NUMBER_VERSION.0</productVersion>
-    <txtProductVersion>Oberon DATE_VERSION</txtProductVersion>
+    <txtProductVersion>NAME_VERSION DATE_VERSION</txtProductVersion>
     <productName>NIST Relocate</productName>
     <companyName>NIST</companyName>
     <internalName>NIST Relocate</internalName>

@@ -8,7 +8,7 @@
   <cmdLine></cmdLine>
   <chdir></chdir>
   <priority>normal</priority>
-  <downloadUrl>https://adoptium.net/temurin/releases/?version=21</downloadUrl>
+  <downloadUrl>https://adoptium.net/temurin/releases/?version=JDK_VERSION</downloadUrl>
   <supportUrl>http://www.cstl.nist.gov/div837/837.02/epq/dtsa2/index.html</supportUrl>
   <stayAlive>false</stayAlive>
   <restartOnCrash>false</restartOnCrash>
@@ -18,20 +18,19 @@
     <path>java-runtime</path>
     <requiresJdk>false</requiresJdk>
     <requires64Bit>true</requires64Bit>
-    <minVersion>1.20.0</minVersion>
+    <minVersion>1.JDK_VERSION.0</minVersion>
     <maxVersion></maxVersion>
     <initialHeapPercent>10</initialHeapPercent>
     <maxHeapPercent>70</maxHeapPercent>
-    <opt>-XX:+UseZGC -XX:+ZGenerational</opt>
   </jre>
   <versionInfo>
     <fileVersion>NUMBER_VERSION.0</fileVersion>
-    <txtFileVersion>Oberon DATE_VERSION</txtFileVersion>
-    <fileDescription>NIST DTSA-II Oberon DATE_VERSION</fileDescription>
+    <txtFileVersion>NAME_VERSION DATE_VERSION</txtFileVersion>
+    <fileDescription>NIST DTSA-II NAME_VERSION DATE_VERSION</fileDescription>
     <copyright>Not subject to copyright (US government work)</copyright>
     <productVersion>NUMBER_VERSION.0</productVersion>
-    <txtProductVersion>Oberon DATE_VERSION</txtProductVersion>
-    <productName>NIST DTSA-II Oberon</productName>
+    <txtProductVersion>NAME_VERSION DATE_VERSION</txtProductVersion>
+    <productName>NIST DTSA-II NAME_VERSION</productName>
     <companyName>National Institute of Standards and Technology</companyName>
     <internalName>JythonGUI</internalName>
     <originalFilename>JythonGUI.exe</originalFilename>

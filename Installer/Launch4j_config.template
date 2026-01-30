@@ -18,11 +18,10 @@
     <path>java-runtime</path>
     <requiresJdk>false</requiresJdk>
     <requires64Bit>true</requires64Bit>
-    <minVersion>1.21.0</minVersion>
+    <minVersion>1.JDK_VERSION.0</minVersion>
     <maxVersion></maxVersion>
     <initialHeapPercent>10</initialHeapPercent>
     <maxHeapPercent>70</maxHeapPercent>
-	<opt>-XX:+UseZGC -XX:+ZGenerational</opt>
   </jre>
   <versionInfo>
     <fileVersion>NUMBER_VERSION.0</fileVersion>
