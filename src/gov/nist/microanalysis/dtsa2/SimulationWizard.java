@@ -1161,7 +1161,7 @@ public class SimulationWizard extends JWizardDialog {
 								ti = new TrajectoryImage(1024, 1024, sc, false);
 								ti.setXRange(-sc + origin[0], sc + origin[0]);
 								ti.setYRange((-0.2 * sc) + origin[2], (1.8 * sc) + origin[2]);
-								ti.setMaxTrajectories(100);
+								ti.setMaxTrajectories(250);
 								mc.addActionListener(ti);
 							}
 							if ((ctr != null) && (mMode == SimulationMode.MCBulk)) {

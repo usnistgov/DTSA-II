@@ -562,6 +562,43 @@ def buildSlab(monte, chamber, origin, buildParams):
     if subMat:
         monte.addSubRegion(chamber, subMat, nm.MultiPlaneShape.createSubstrate([0.0, 0.0, -1.0], epu.Math2.plus(origin, [0.0, 0.0, thick])))
 
+def buildCylinder(monte, chamber, origin, buildParams):
+    height = buildParams["Height"]
+    diameter = buildParams["Diameter"]
+    mat = buildParams["Material"]
+    subMat = buildParams["Substrate"]
+    cylinder = nm.CylindricalShape(epu.Math2.plus(origin, [0.0,0.0,0.0]),epu.Math2.plus(origin,[0.0,0.0,height]), 0.5*diameter)
+    monte.addSubRegion(chamber, mat, cylinder)
+    if subMat:
+        monte.addSubRegion(chamber, subMat, nm.MultiPlaneShape.createSubstrate([0.0, 0.0, -1.0], epu.Math2.plus(origin, [0.0, 0.0, height])))
+
+def cylinder(mat, height, diameter, det, e0=20.0, withPoisson=True, nTraj=defaultNumTraj, dose=defaultDose, sf=defaultCharFluor, bf=defaultBremFluor, substrate=None, xtraParams=defaultXtraParams):    
+    """cyclinder(mat, height, diameter, det, e0=20.0, withPoisson=True, nTraj=defaultNumTraj, dose=defaultDose, sf=defaultCharFluor, bf=defaultBremFluor, substrate=None, xtraParams={})
+    Monte Carlo simulate a spectrum from a cylidrical particle of the specified material (mat) and height (z in m) and diameter (x and y in m). \
+    If substrate != None then substrate specifies the Material for an infinitely thick substrate immediately \
+    below the particle."""
+    tmp = u"MC simulation of a %0.2f micron high, %0.2f diameter micron cyclinder of %s%s at %0.1f keV%s%s" % (height * 1.0e6, diameter * 1.0e6, mat, (" on %s" % substrate if substrate else ""), e0, (" + CSF" if sf else ""), (" + BSF" if bf else ""))
+    return base(det, e0, withPoisson, nTraj, dose, sf, bf, tmp, buildCylinder, {"Substrate": substrate, "Diameter" : diameter, "Height" : height, "Material" : mat}, xtraParams)
+
+def buildNamid(monte, chamber, origin, buildParams):
+    height = buildParams["Height"]
+    base = buildParams["Base"]
+    namid_n = buildParams["Namid"]
+    mat = buildParams["Material"]
+    subMat = buildParams["Substrate"]
+    shape = nm.MultiPlaneShape.createNamid(epu.Math2.plus(origin, [0.0,0.0,-0.001*height]), namid_n, height, base)
+    monte.addSubRegion(chamber, mat, shape)
+    if subMat:
+        monte.addSubRegion(chamber, subMat, nm.MultiPlaneShape.createSubstrate([0.0, 0.0, -1.0], epu.Math2.plus(origin, [0.0, 0.0, height])))
+
+def namid(mat, height, base_d, namid_n, det, e0=20.0, withPoisson=True, nTraj=defaultNumTraj, dose=defaultDose, sf=defaultCharFluor, bf=defaultBremFluor, substrate=None, xtraParams=defaultXtraParams):
+    """namid(mat, height, base_d, namid_n, det, e0=20.0, withPoisson=True, nTraj=defaultNumTraj, dose=defaultDose, sf=defaultCharFluor, bf=defaultBremFluor, substrate=None, xtraParams={})
+    Monte Carlo simulate a spectrum from a namid shaped particle of the specified material (mat) and height (z in m) and base (x and y in m). \
+    Create a Tetrahedron (namid_n=3), Pyramid (namid_n=4), ..., etc with the specified center, number of sides, height and base dimension. \
+    If substrate != None then substrate specifies the Material for an infinitely thick substrate immediately \
+    below the particle."""
+    tmp = u"MC simulation of a %0.2f micron high, %0.2f base micron %d namid of %s%s at %0.1f keV%s%s" % (height * 1.0e6, base_d * 1.0e6, namid_n, mat, (" on %s" % substrate if substrate else ""), e0, (" + CSF" if sf else ""), (" + BSF" if bf else ""))
+    return base(det, e0, withPoisson, nTraj, dose, sf, bf, tmp, buildNamid, {"Substrate": substrate, "Base" : base_d, "Height" : height, "Material" : mat, "Namid": namid_n}, xtraParams)
 
 def slab(mat, thick, width, length, det, e0=20.0, withPoisson=True,
          nTraj=defaultNumTraj, dose=defaultDose, sf=defaultCharFluor,

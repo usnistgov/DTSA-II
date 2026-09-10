@@ -2655,8 +2655,10 @@ public class MainFrame extends JFrame {
          if (i >= MAX_DISPLAYED_SPECTRA)
             break;
       }
-      if((prev==0) && (i==1)) {
+      if(prev==0) {
          jSpecDisplay_Main.autoScaleV(SpecDisplay.DEFAULT_VZOOM);
+      } else {
+         jSpecDisplay_Main.rescaleV();
       }
       displaySpectrumProperties();
       jStatusBar_Main.setText(mDataManager.getSelectedCount() + " spectra selected");

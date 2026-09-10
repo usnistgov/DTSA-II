@@ -1,6 +1,6 @@
 REM This script rebuilds DTSA-II (including EPQ), SEMantics, Graf, FastQuant, and the NIST K-Glass Database
 REM It requires:  
-REM   * A Java Development Kit (version 24 or above)
+REM   * A Java Development Kit (version 26 or above)
 REM   * IZ-Pack (version 5 or above) [https://izpack.org/] (Don't install in "Program Files" as the path 
 REM     becomes too long and won't build.  Install directly into C:\)
 REM   * Gnu SED [https://www.gnu.org/software/sed/]
@@ -24,8 +24,8 @@ ECHO ***** Performing DTSA-II and Relocate-only Build *****
 )
 
 REM Version information
-SET "D2V=2026-07-14"
-SET "NUM_VER=15.1.54"
+SET "D2V=2026-09-10"
+SET "NUM_VER=15.1.57"
 SET "NAME_VER=Polaris"
 
 REM Build paths
@@ -178,6 +178,8 @@ COPY dtsa2_%NAME_VER%.jar "%DTSA_ARCHIVE_PATH%\dtsa2_%NAME_VER%.jar" || exit /b
 COPY dtsa2_%NAME_VER%_nojre.jar "%DTSA_ARCHIVE_PATH%\dtsa2_%NAME_VER%_nojre.jar" || exit /b
 COPY dtsa2_%NAME_VER%.jar "%DTSA_ARCHIVE_PATH%\dtsa2_prerelease.jar" || exit /b
 COPY dtsa2_%NAME_VER%_nojre.jar "%DTSA_ARCHIVE_PATH%\dtsa2_prerelease_nojre.jar" || exit /b
+COPY dtsa2_%NAME_VER%_nojre.jar  "C:\Users\nritchie\repositories\cstl-web\div837\837.02\epq\dtsa2" || exit /b
+COPY dtsa2_%NAME_VER%.jar  "C:\Users\nritchie\repositories\cstl-web\div837\837.02\epq\dtsa2" || exit /b
 if [%FULL_BUILD%] == [True] (
 COPY dtsa2_%NAME_VER%_full.jar "%DTSA_ARCHIVE_PATH%\dtsa2_%NAME_VER%_full.jar" || exit /b
 COPY dtsa2_%NAME_VER%_full.jar "%DTSA_ARCHIVE_PATH%\dtsa2_%NAME_VER%_full_%NUM_VER%.jar" || exit /b

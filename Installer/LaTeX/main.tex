@@ -60,7 +60,7 @@ More sensitive projects are maintained on NIST's GitLab.  NIST's GitLab is acces
 To facilitate the build process, there is a single file (`Installer/build\_install.bat`) located within the DTSA-II code-base that, when configured correctly, will build all the applications in the DTSA-II tool set.  `build\_install.bat` is executable from the Windows command line.  It will configure and rebuild all the Java source code, rebuild the Windows .exe files which make starting the applications easier on Window and build three different Java executable install programs.
 
 \begin{description}
-    \item[Base] Installs the DTSA-II (required), Relocation (optional) and Glass Database (optional) tools.  Compatible with Apple OS, Windows and Linux.  Requires a Java Runtime Environment 24 or above to execute the tools.
+    \item[Base] Installs the DTSA-II (required), Relocation (optional) and Glass Database (optional) tools.  Compatible with Apple OS, Windows and Linux.  Requires a Java Runtime Environment 26 or above to execute the tools.
     \item[Base With JRE] Same tools as Base but adds a Windows compatible Java Runtime Environment so the user does not need to install one separately.
     \item[Full] Adds Graf, SEMantics and FastQuant to the `Base with JRE` install.  This installer is designed only for distribution to NIST and our OA partners.
 \end{description}
@@ -78,7 +78,7 @@ Below the version information is a set of environmental variables that point to 
 
 \section{Software Development Tools}
 \subsection{Java Development Kit (JDK)}
-All the applications have been developed in Java and can be compiled with \href{https://adoptium.net/temurin/releases/?os=windows&arch=x64&package=jdk}{JDK 24}.  Java applications can be compiled on any Java supporting operating system.  The resulting '.jar' files can be deployed on any operating system supporting the Java Runtime Environment (JRE). NIST DTSA-II and its sibling applications have all been developed on a Microsoft Windows system.  However, they are known to work on Apple OS and Linux (Fedora).
+All the applications have been developed in Java and can be compiled with \href{https://adoptium.net/temurin/releases/?os=windows&arch=x64&package=jdk}{JDK 26}.  Java applications can be compiled on any Java supporting operating system.  The resulting '.jar' files can be deployed on any operating system supporting the Java Runtime Environment (JRE). NIST DTSA-II and its sibling applications have all been developed on a Microsoft Windows system.  However, they are known to work on Apple OS and Linux (Fedora).
 
 \subsection{Git}
 \href{https://git-scm.com/}{Git} is a distributed version control system used to administer the source code associated with each application.  While it is possible to download the source code directly from the remote repository (usually as a compressed archive), it is generally better to work with a Git tool to maintain synchronization between local and remote repositories.
@@ -106,13 +106,13 @@ The Java source code is built into an executable form using the Maven build tool
     \centering
     \begin{tabular}{ll}
          \emph{Tool} & \emph{Version} \\
-         Java JDK & jdk-24.0.1.9-hotspot \\
+         Java JDK & jdk-26.0.1.8-hotspot \\
          GitKraken & 10.6.0 \\
          Maven & 3.9.9 \\
          IzPack & 5.2.3 \\
          Gnu SED & 4.2.1 \\
          Launch4J & 3.5.0 \\         
-         Eclipse &  2025-9 \\
+         Eclipse &  2026-6 \\
     \end{tabular}
     \caption{The versions of each application used to rebuild the codebase.  These exact versions are not necessarily required.  However, it is recommended that 1) the version number exceed the version specified in this table; and 2) that only versions with the same major version number (left-most number) are used.}
     \label{tab:versions}
@@ -132,7 +132,7 @@ The Java source code is built into an executable form using the Maven build tool
     \item Install tools
     Use the \verb|.msi| installer when one is available.  Fall back to the \verb|*.exe| installer when it is available.
     \begin{enumerate}
-        \item Install JDK 24 [\url{https://adoptium.net/temurin/releases?version=24&os=windows&arch=x64&mode=filter}]
+        \item Install JDK 26 [\url{https://adoptium.net/temurin/releases?version=26&os=windows&arch=x64&mode=filter}]
         \begin{enumerate}
             \item Use the default installation settings \emph{except} for "Set or override \verb|JAVA_HOME| variable" which should be \emph{selected}.
         \end{enumerate}
@@ -222,10 +222,10 @@ The Java source code is built into an executable form using the Maven build tool
 
     \item Use \verb|Notepad++| to edit \verb|build_install.bat|.
     \begin{enumerate}
-        \item Edit these lines in the file \verb| "repositories\DTSA II\Installer\build_install.bat" | to reflect the locations of these items on your system.
+        \item Edit these lines in the file \verb| "repositories\DTSA II\Installer\build_install.bat" | to reflect the locations and versions of these items on your system. If the exact version listed here is not available, it is better to choose a later version rather than an earlier version as later versions of tools are more likely to produce a functional build.
         \begin{verbatim}
 REM Build paths
-SET "JDK_PATH=C:\Users\nritchie\AppData\Local\Programs\Eclipse Adoptium\jdk-24.0.1.9-hotspot"
+SET "JDK_PATH=C:\Users\nritchie\AppData\Local\Programs\Eclipse Adoptium\jdk-26.0.1.8-hotspot"
 SET "BPATH=C:\Users\nritchie\repositories"
 SET "IZPACK_HOME=C:\izpack\bin"
 SET "L4J_PATH=C:\Program Files (x86)\Launch4j"
@@ -269,4 +269,3 @@ SET "NAME_VER=Polaris"
 \end{enumerate}
 
 \end{document}
-
